@@ -1,7 +1,7 @@
 package com.onbright.oblink.local.bean;
 
 /**
- * 设置一次情景的action之后的结果
+ * 设置一次action之后的结果，下标以及是否结束
  */
 public class ActionReply {
     private int index;

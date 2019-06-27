@@ -31,7 +31,7 @@ public class Handset implements SceneCondition {
     public void setCondition(String key, byte[] condition) {
         if (conditionMap == null) {
             conditionMap = new HashMap<>();
-    }
+        }
         conditionMap.put(key, condition);
     }
 
@@ -40,6 +40,7 @@ public class Handset implements SceneCondition {
     }
 
     private List<String> bindOboxs = new ArrayList<>();
+
     public List<String> getBindObox() {
         return bindOboxs;
     }

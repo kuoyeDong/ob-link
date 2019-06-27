@@ -5,9 +5,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.cloud.ObInit;
 import com.onbright.oblink.local.bean.ObScene;
+import com.onbright.oblink.smartconfig.ConnectDeviceHandler;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -15,22 +16,41 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 
-class TcpReceive extends Thread {
-    private Socket mSocket;
-    private Handler mHandler;
-    private static final String TAG = "Recive";
-    private boolean canRec = true;
+/**
+ * 周五完成粘包处理
+ */
+public class TcpReceive extends Thread {
+    private int len = 500;
+    private byte[] sData = new byte[len];
+
+    private ConnectDeviceHandler connectDeviceHandler;
+    protected Socket mSocket;
+    protected Handler mHandler;
+    protected static final String TAG = "Recive";
+    protected boolean canRec = true;
     private static int[] index = new int[65];
-    private boolean mustRec = true;
-    private byte[] mPswbytes;
-    private ByteBuffer validBuffer = ByteBuffer.allocate(512);
-    private Sbox msBox;
+    protected boolean mustRec = true;
+    protected byte[] mPswbytes;
+    protected ByteBuffer validBuffer = ByteBuffer.allocate(512);
+    protected Sbox msBox;
+    protected ParseUpLoad mParseUpLoad;
+    protected TcpSend tcpSend;
 
     static {
         for (int i = 0; i < index.length; i++) {
             index[i] = i - 1;
         }
     }
+
+    public TcpReceive(Socket mSocket, Handler mHandler, Sbox msBox, TcpSend tcpSend, ConnectDeviceHandler connectDeviceHandler) {
+        this.mSocket = mSocket;
+        this.mHandler = mHandler;
+        this.msBox = msBox;
+        this.tcpSend = tcpSend;
+        mParseUpLoad = new ParseUpLoad(ObInit.CONTEXT, tcpSend);
+        this.connectDeviceHandler = connectDeviceHandler;
+    }
+
 
     void setMy(boolean my) {
         isMy = my;
@@ -43,50 +63,87 @@ class TcpReceive extends Thread {
     /**
      * 是否本机发送
      */
-    private boolean isMy = true;
+    protected boolean isMy = true;
 
     /**
      * 是否必须接收
      */
 
 
-    TcpReceive(Socket mSocket, Handler mHandler, Sbox sbox) {
+    public TcpReceive(Socket mSocket, Handler mHandler, Sbox sbox, TcpSend tcpSend) {
         this.mSocket = mSocket;
         this.mHandler = mHandler;
         msBox = sbox;
+        this.tcpSend = tcpSend;
+        mParseUpLoad = new ParseUpLoad(ObInit.CONTEXT, tcpSend);
     }
 
     @Override
     public void run() {
         try {
             while (canRec) {
-                int len = 68;
-                byte[] sData = new byte[len];
                 int rlRead = mSocket.getInputStream().read(sData);
                 if (rlRead == 68) {
                     byte[] receiveData = new byte[rlRead];
                     System.arraycopy(sData, 0, receiveData, 0, rlRead);
                     getValidData(receiveData, validBuffer);
                     Arrays.fill(sData, (byte) 0);
+                    Log.i(TAG, "log local receiveData = <<" + Transformation.byteArryToHexString(receiveData));
                     byte[] goal = msBox.unPack(receiveData, mPswbytes);
+                    Log.i(TAG, "log local goal = <<" + Transformation.byteArryToHexString(goal));
                     if (!NetLock.isCompile(goal)) {
+                        mParseUpLoad.onUpLoad(goal);
                         continue;
                     }
                     if (mustRec || isMy) {
                         isMy = false;
                         onRecieve(goal);
                     }
-                    validBuffer.clear();
+                    /*激活obox回复2b2b2b0d0a不加密*/
+                } else if (rlRead == 5) {
+                    byte[] receiveData = new byte[rlRead];
+                    System.arraycopy(sData, 0, receiveData, 0, rlRead);
+                    getValidData(receiveData, validBuffer);
+                    Arrays.fill(sData, (byte) 0);
+                    String replayStr = Transformation.byteArryToHexString(receiveData);
+                    Log.i(TAG, "log local receiveData = <<" + replayStr);
+                    if (mustRec || isMy) {
+                        if (replayStr != null) {
+                            if (replayStr.startsWith("2b2b2b")) {
+                                isMy = false;
+                                onRecieve(receiveData);
+                            }
+                        }
+                    } else {
+                        /*smartconfig连接后的上报，在之前不是由tcpSend发送的数据，所以isMy为false*/
+                        if (replayStr != null) {
+                            if (replayStr.startsWith("2b2b2b")) {
+                                if (connectDeviceHandler != null) {
+                                    connectDeviceHandler.onReceive(receiveData);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    /*smartConfig*/
+                    byte[] receiveData = new byte[rlRead];
+                    System.arraycopy(sData, 0, receiveData, 0, rlRead);
+                    getValidData(receiveData, validBuffer);
+                    Arrays.fill(sData, (byte) 0);
+                    if (connectDeviceHandler != null) {
+                        connectDeviceHandler.onReceive(receiveData);
+                    }
                 }
+                validBuffer.clear();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String getValidData(byte[] src, ByteBuffer buf) {
+    protected String getValidData(byte[] src, ByteBuffer buf) {
         boolean isValid = true;
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
         if (src == null || src.length <= 0) {
             return null;
         }
@@ -122,9 +179,14 @@ class TcpReceive extends Thread {
      *
      * @param bf 转换后的64字节数据
      */
-    private void onRecieve(byte[] bf) {
+    protected void onRecieve(byte[] bf) {
         mHandler.removeMessages(OBConstant.ReplyType.NOT_REPLY);
         Message msg = Message.obtain();
+        if (bf.length == 5) {
+            msg.what = OBConstant.ReplyType.ON_SET_MODE;
+            mHandler.sendMessage(msg);
+            return;
+        }
         Bundle bundle = new Bundle();
         bundle.putByteArray(OBConstant.StringKey.KEY, bf);
         msg.setData(bundle);
@@ -168,6 +230,9 @@ class TcpReceive extends Thread {
             case 0xa100:
                 onSetState(bf, msg);
                 break;
+            case 0xa103:
+                onSetRemoteLed(bf, msg);
+                break;
             /*设置节点组地址回复*/
             case 0xa006:
                 onOrganizGoup(bf, msg);
@@ -187,6 +252,9 @@ class TcpReceive extends Thread {
             case 0xa008:
                 onSetWifiConfig(bf, msg);
                 break;
+            case 0x200c:
+                onGetVersion(bf, msg);
+                break;
             /*出错*/
             case 0x200f:
                 onWrong(bf, msg);
@@ -196,7 +264,49 @@ class TcpReceive extends Thread {
         }
         mHandler.sendMessage(msg);
     }
-    /**设置wifi配置，设置ap模式，恢复默认密码*/
+
+    /**
+     * 设置遥控灯的回复
+     */
+    private void onSetRemoteLed(byte[] bf, Message msg) {
+        if (bf[7] == OBConstant.ReplyType.SUC) {
+            int pCmd = bf[15];
+            int cmd = bf[16] & 0xff;
+            if (pCmd == 1) {
+                if (cmd == 1) {
+                    msg.what = OBConstant.ReplyType.ADD_REMOTE_SUC;
+                } else if (cmd == 2) {
+                    msg.what = OBConstant.ReplyType.DELETE_REMOTE_SUC;
+                } else if (cmd == 0xd0) {
+                    msg.what = OBConstant.ReplyType.PAIR_REMOTE_SUC;
+                } else if (cmd == 0xd1) {
+                    msg.what = OBConstant.ReplyType.UNPAIR_REMOTE_SUC;
+                }
+            } else if (pCmd == 2) {
+                if (cmd == 3) {
+                    msg.what = OBConstant.ReplyType.TIMER_30S_TOOFF_SUC;
+                } else if (cmd == 8) {
+                    msg.what = OBConstant.ReplyType.NIGHTLIGHT_SUC;
+                }
+            } else if (pCmd == 3) {
+                if (cmd == 1) {
+                    msg.what = OBConstant.ReplyType.ON_REMOTE_SUC;
+                } else if (cmd == 2) {
+                    msg.what = OBConstant.ReplyType.OFF_REMOTE_SUC;
+                } else if (cmd == 0xfe) {
+                    msg.what = OBConstant.ReplyType.RGB_REMOTE_SUC;
+                } else if (cmd == 0xfd) {
+                    msg.what = OBConstant.ReplyType.DOUBLE_REMOTE_SUC;
+                }
+            }
+        } else if (bf[7] == OBConstant.ReplyType.FAL) {
+            msg.what = OBConstant.ReplyType.SET_REMOTE_FAL;
+        }
+    }
+
+    /**
+     * 设置wifi配置，设置ap模式，恢复默认密码
+     */
     private void onSetWifiConfig(byte[] bf, Message msg) {
         switch (bf[index[8]]) {
             case OBConstant.ReplyType.SUC:
@@ -276,6 +386,15 @@ class TcpReceive extends Thread {
         }
     }
 
+    private void onGetVersion(byte[] bf, Message msg) {
+        boolean isSuc = bf[index[9]] == OBConstant.ReplyType.SUC;
+        if (isSuc) {
+            msg.what = OBConstant.ReplyType.ON_GET_VERSION_SUCCESS;
+        } else {
+            msg.what = OBConstant.ReplyType.ON_GET_VERSION_FAIL;
+        }
+    }
+
     private void onEditNodeOrGroup(byte[] bf, Message msg) {
  /*byte7是否成功,8-14节点完整地址，接节点状态*/
         if (bf[7] == OBConstant.ReplyType.SUC) {
@@ -313,6 +432,9 @@ class TcpReceive extends Thread {
                     break;
                 case 2:
                     msg.what = isSuc ? OBConstant.ReplyType.FORCE_SEARCH_SUC : OBConstant.ReplyType.FORCE_SEARCH_FAL;
+                    break;
+                case 3:
+                    msg.what = isSuc ? OBConstant.ReplyType.ACTIVE_SEARCH_SUC : OBConstant.ReplyType.ACTIVE_SEARCH_FAL;
                     break;
             }
         }
@@ -375,7 +497,17 @@ class TcpReceive extends Thread {
                         msg.what = OBConstant.ReplyType.GET_OBOX_MSG_BACK;
                         break;
                     case 11:
-                        msg.what = OBConstant.ReplyType.ON_SET_MODE;
+                        switch (bf[10]) {
+                            case 1:
+                                msg.what = OBConstant.ReplyType.ON_SET_MODE;
+                                break;
+                            case 18:
+                                msg.what = OBConstant.ReplyType.ON_SET_ROUTE_SSID;
+                                break;
+                            case 19:
+                                msg.what = OBConstant.ReplyType.ON_SET_ROUTE_PWD;
+                                break;
+                        }
                         break;
                 }
         }
@@ -440,5 +572,12 @@ class TcpReceive extends Thread {
         mPswbytes = pswbytes;
     }
 
-
+    /**
+     * 设置obox对应的obox序列号
+     *
+     * @param oboxSer obox序列号
+     */
+    void setPaseUpLocad(String oboxSer) {
+        mParseUpLoad.setPaseUpLocad(oboxSer);
+    }
 }

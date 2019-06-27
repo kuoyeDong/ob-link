@@ -1,8 +1,7 @@
 package com.onbright.oblink.local.bean;
 
 
-
-import com.onbright.oblink.MathUtil;
+import com.ob.obsmarthouse.common.util.MathUtil;
 
 import java.util.Arrays;
 
@@ -53,6 +52,8 @@ public class Timing implements SceneCondition {
     /**
      * 返回星期的某一天是否激活
      *
+     * @param index
+     * @return
      */
     public int getcircleStateforIndex(int index) {
         return MathUtil.byteIndexValid(time[CIRCLE], index);

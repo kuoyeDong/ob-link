@@ -1,6 +1,5 @@
 package com.onbright.oblink.local.bean;
 
-
 import com.onbright.oblink.MathUtil;
 
 import java.io.Serializable;
@@ -8,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 本地情景,情景可以设定为在预设定条件下触发预设定行为
+ * 本地情景
  * creat by adolf_dong
  */
 public class ObScene implements Serializable {
@@ -18,12 +17,8 @@ public class ObScene implements Serializable {
     public static final int OBSCENE_ACTION = 3;
 
 
-
     /*使能状态  0 不使能  1 使能 2立即生效*/
     public static final int DISABLE = 0;
-    /**
-     * 不使能
-     */
     public static final int ENABLE = 1;
     public static final int EXUTE = 2;
 
@@ -169,6 +164,15 @@ public class ObScene implements Serializable {
                 sceneAction.putAction(newSerNum, action);
             }
         }
+        if (sceneCondition != null) {
+            for (List<SceneCondition> sceneConditions : sceneCondition) {
+                for (SceneCondition sc :
+                        sceneConditions) {
+                    byte[] cdt = sc.getCondition("" + serisNum);
+                    sc.setCondition(""+newSerNum,cdt);
+                }
+            }
+        }
         this.serisNum = newSerNum;
     }
 
@@ -215,8 +219,12 @@ public class ObScene implements Serializable {
                 }
             } else if (sceneAction instanceof ObGroup) {
                 ObGroup obGroup = (ObGroup) sceneAction;
-                if (obGroup.getGroupType() == modifyActionPtype && obGroup.getGroupType() == modifyActionType) {
+                if (obGroup.getGroupPType() == modifyActionPtype && obGroup.getGroupType() == modifyActionType) {
                     obGroup.putAction(serisNum, action);
+                    for (int j = 0; j < obGroup.getObNodes().size(); j++) {
+                        ObNode obNode = obGroup.getObNodes().get(j);
+                        obNode.putAction(serisNum, action);
+                    }
                 }
             }
         }

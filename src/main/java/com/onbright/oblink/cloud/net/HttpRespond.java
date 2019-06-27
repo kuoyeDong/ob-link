@@ -1,54 +1,42 @@
 package com.onbright.oblink.cloud.net;
 
+import okhttp3.FormBody;
+
 /**
- * 网络交互过程中的处理
- * Created by adolf_dongon 2016/1/6.
+ * 服务器请求接口
+ * Created by adolf_dongon 2019/6/24.
  */
 public interface HttpRespond {
 
     /**
-     * 请求时回调
-     *
-     * @param action 请求时行为，在完整交互中保持一致
+     * 请求出错码
      */
-    void onRequest(String action);
+    enum ErrorCode {
+        /**
+         * 发生异常
+         */
+        exceptionError,
+        /**
+         * 请求失败
+         */
+        responseNotOk,
+        /**
+         * 请求成功，但目标操作没成功
+         */
+        operationFailed
+    }
 
-    /**
-     * 请求返回的时候调用，在{@link #onFaild(String, Exception)},{@link #onFaild(String, int)},{@link #onSuccess(String, String)}
-     * {@link #operationFailed(String, String)} 之前被调用
-     *
-     * @param action 请求时行为，在完整交互中保持一致
-     */
-    void onRespond(String action);
-
-    /**
-     * 请求成功回调
-     *
-     * @param action 请求时行为，在完整交互中保持一致
-     * @param json   返回数据
-     */
     void onSuccess(String action, String json);
 
     /**
-     * 请求发生异常的回调
+     * 请求失败
      *
-     * @param action 请求时行为，在完整交互中保持一致
-     * @param e      异常
+     * @param errorCode             {@link ErrorCode}
+     * @param responseNotOkCode     {@link ErrorCode#responseNotOk}时的http出错码
+     * @param operationFailedReason {@link ErrorCode#operationFailed}时的出错原因
+     * @param action                请求失败时的命令
      */
-    void onFaild(String action, Exception e);
+    void onFaild(ErrorCode errorCode, int responseNotOkCode, String operationFailedReason, String action);
 
-    /**
-     * 请求发生错误的回调，非异常
-     *
-     * @param action 请求时行为，在完整交互中保持一致
-     * @param state  错误码，参见常规http状态码
-     */
-    void onFaild(String action, int state);
-
-
-    /**请求成功，但是服务器返回失败回调
-     * @param action 请求时行为，在完整交互中保持一致
-     * @param json 失败返回数据
-     */
-    void operationFailed(String action, String json);
+    FormBody.Builder getParamter(String action);
 }

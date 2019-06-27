@@ -3,6 +3,8 @@ package com.onbright.oblink.local.net;
 
 public interface OBConstant {
 
+    int MAX_SCENE_LIMIT = 24;
+
     /**
      * 键值
      */
@@ -21,15 +23,22 @@ public interface OBConstant {
         String GATEWAY = "gateway";
         String POSITION_ROOM = "position_room";
         String YS_BINDING = "ys_binding";
-        String YS_ACCESS_TOKEN= "ys_access_token";
+        String YS_ACCESS_TOKEN = "ys_access_token";
         String CLOUD_USER = "cloud_user";
+        String CLOUD_USER_WEIGHT = "cloud_user_weight";
         String CLOUD_PSW = "cloudpsw";
         String IS_LOCAL = "is_local";
+        /**
+         * 微信登录
+         */
+        String IS_WECHAT_LOGIN = "is_wechat_login";
         String IS_FIRST_RUN = "is_first_run";
         String DANGWEI = "dangwei";
         String WINDTYPE = "wind_type";
         String FRAGMENT_ELEMENT = "fragment_element";
         String SPKEY = "share";
+        String PHONE = "phone";
+        String PHONE_LIST = "phone_list";
 
         String PARENTTYPE = "parenttype";
         String TYPE = "type";
@@ -37,6 +46,83 @@ public interface OBConstant {
         String IS_SINGLE = "is_single";
         String IS_GROUP = "is_group";
         String IS_ACTION = "is_action";
+        /**
+         *
+         */
+        String UPDATE_OBOX_STATUS = "update_obox_status";
+        String UPDATE_NODES_CLOUD = "update_nodes_cloud";
+        String UPDATE_NODES_LOCAL = "update_nodes_local";
+        String UPDATE_SCENE_LOCAL = "update_scene_local";
+        String UPDATE_MODIFY_USER = "update_modify_user";
+        String UPDATE_FLIGHT_CLOUD = "update_flight_cloud";
+        String UPDATE_FLIGHT_LOCAL = "update_flight_local";
+        /**
+         * 门锁重置权限密码推送
+         */
+        String LOCK_ADMIN_PWD_RESET = "lock_admin_pwd_reset";
+        /**
+         * 房间内节点位置信息变更
+         */
+        String UPDATE_SET_DEVICE_LOCATION = "update_set_device_location";
+        String UPDATE_SCENE_CLOUD_SETTING = "update_scene_cloud_setting";
+        String UPDATE_SCENE_LOCAL_SETTING = "update_scene_local_setting";
+        String UPDATE_SCENE_CLOUD_EXUTE = "update_scene_cloud_exute";
+        String UPDATE_SCENE_LOCAL_EXUTE = "update_scene_local_exute";
+        String UPDATE_SCENE_LOCAL_PREVIEW = "update_scene_local_preview";
+        /**
+         * 房间绑定情景的更新
+         */
+        String UPDATE_SCENE_LOCATION = "update_scene_location";
+        /**
+         * 创建和删除房间的更新
+         */
+        String UPDATE_CREATE_LOCATION = "update_create_location";
+        String UPDATE_ADD_OBOX = "update_add_obox";
+        String UPDATE_GROUPS_INFO = "update_groups_info";
+        String UPDATE_SCAN_INFO = "update_scan_info";
+        String OBOX_HEART_INFO = "obox_heart_info";
+        /**
+         * 单品wifi上下线推送时广播key
+         */
+        String WIFI_HEART_INFO = "wifi_heart_info";
+        String UPDATE_NODES_CLOUD_2500 = "update_nodes_cloud_2500";
+        /**
+         * 刷新门锁是否有验证用户
+         */
+        String UPDATE_LOCK_ISAUTH = "update_lock_isauth";
+        /**
+         * wifi红外转发器学习按键广播的action
+         */
+        String LEARN_REMOTE = "learnRemote";
+        /**
+         * MQTT返回一键匹配测试码库结果广播的action
+         */
+        String PAIR_IR_REMOTE = "pairIrRemote";
+        /**
+         * MQTT返回下载码库到设备的广播action
+         */
+        String DOWN_IR_REMOTE = "down_ir_remote";
+        /**
+         * 广播action,添加wifi单品设备后刷新请求
+         */
+        String UPDATE_WIFI_DEVICE = "update_wifi_device";
+        /**
+         * 广播action,刷新码库方案
+         */
+        String FRES_PROGRAM = "fres_program";
+        /**
+         * 存储口令的键
+         */
+        String TOKEN = "token";
+        /**
+         * 微信openId键
+         */
+        String WX_OPEN_ID = "wx_open_id";
+
+        /**
+         * 存储服务器键start
+         */
+        String SERVER = "server";
     }
 
     /**
@@ -94,7 +180,7 @@ public interface OBConstant {
         int NOT_REPLY = 1000;
 
         /**
-         * 获取obox名称的返回
+         * 获取obox名称的返回,并且返回flash修改时间
          */
         int GET_OBOX_NAME_BACK = 1;
         /**
@@ -157,6 +243,25 @@ public interface OBConstant {
         int ON_INIT_RFPWD_SUC = 37;
         int ON_SETAP_FAL = 38;
         int ON_INIT_RFPWD_FAL = 39;
+        int ON_GET_VERSION_SUCCESS = 40;
+        int ON_GET_VERSION_FAIL = 41;
+        int ACTIVE_SEARCH_SUC = 42;
+        int ACTIVE_SEARCH_FAL = 43;
+        int ON_SET_ROUTE_SSID = 44;
+        int ON_SET_ROUTE_PWD = 45;
+        int ON_SET_HEART_SUCCESS = 46;
+        int ON_SET_HEART_FAIL = 47;
+        int ADD_REMOTE_SUC = 48;
+        int DELETE_REMOTE_SUC = 49;
+        int PAIR_REMOTE_SUC = 50;
+        int UNPAIR_REMOTE_SUC = 51;
+        int TIMER_30S_TOOFF_SUC = 52;
+        int NIGHTLIGHT_SUC = 53;
+        int ON_REMOTE_SUC = 54;
+        int OFF_REMOTE_SUC = 55;
+        int RGB_REMOTE_SUC = 56;
+        int DOUBLE_REMOTE_SUC = 57;
+        int SET_REMOTE_FAL = 58;
     }
 
     /**
@@ -185,10 +290,7 @@ public interface OBConstant {
          * obox广播包接收完毕
          */
         int ON_DSFINISH_OBOX = 100;
-        /**
-         * 服务器广播包接收完毕
-         */
-        int ON_DSFINISH_SERVER = 101;
+
     }
 
     /**
@@ -198,6 +300,7 @@ public interface OBConstant {
         int ORIGINAL_ENCRYPTED = 0;
         int ACTIVATED_UNENCRYPTED = 1;
     }
+
     /**
      * 出错类型
      */
@@ -232,6 +335,10 @@ public interface OBConstant {
          */
         int IS_COLOR_LAMP = 3;
         /**
+         * 三路滑条
+         */
+        int IS_THREE_WAY_LAMP = 13;
+        /**
          * 智能电饭煲
          */
         int IS_COOKER = 2;
@@ -248,9 +355,67 @@ public interface OBConstant {
          */
         int CHAZUO = 1;
         /**
-         * 智能开关
+         * 单线开关
          */
         int SWITCH = 2;
+        /**
+         * 1路开关
+         */
+        int SINGLE_TOUCH_SWITCH = 21;
+        /**
+         * 2路开关
+         */
+        int DOUBLE_TOUCH_SWITCH = 22;
+        /**
+         * 3路开关
+         */
+        int THREE_TOUCH_SWITCH = 23;
+        /**
+         * 1路开关 + 3路情景面板
+         */
+        int SINGLE_SWITCH_SCENE_PANEL = 41;
+        /**
+         * 2路开关 + 3路情景面板
+         */
+        int DOUBLE_SWITCH_SCENE_PANEL = 42;
+        /**
+         * 3路开关 + 3路情景面板
+         */
+        int THREE_SWITCH_SCENE_PANEL = 43;
+        /**
+         * 一键单线开关
+         */
+        int ONE_BUTTON_WIRE_SOCKET = 51;
+        /**
+         * 二键单线开关
+         */
+        int TWO_BUTTON_WIRE_SOCKET = 52;
+
+        /**
+         * 红外对管、3路开关 + 3路情景面板
+         */
+        int THREE_SWITCH_RED_SCENE_PANEL = 83;
+        /**
+         * 六键情景
+         */
+        int SIX_SCENE_PANEL = 36;
+        /**
+         * 六键情景+红外对管
+         */
+        int SIX_SCENE_RED_PANEL = 86;
+
+        /**
+         * 一路情景面板
+         */
+        int SINGLE_SCENE_PANEL = 31;
+        /**
+         * 两路情景面板
+         */
+        int DOUBLE_SCENE_PANEL = 32;
+        /**
+         * 3路情景面板
+         */
+        int THREE_SCENE_PANEL = 33;
         /**
          * 智能开合类设备
          */
@@ -339,42 +504,121 @@ public interface OBConstant {
         int SMOKE_SENSOR = 12;
 
         /**
-         * 传感器的预留
+         * 超声波传感器
          */
-        int RESERVE = 13;
+        int ULTRASOUND = 13;
         /**
-         * 是个雷达
+         * 是个雷达（酒店版本）
          */
-        int XIBING_RADAR = 14;
+        int HOTEL_RADAR = 14;
+        /**
+         * 环境传感器（7合一）
+         */
+        int ENVROMENT_SENSOR = 16;
+        /**
+         * 感应面板
+         */
+        int SENSING_PANEL = 17;
 
-        int SCENE_PANEL = 17;
+        /**
+         * dc红外
+         */
+        int DC_RED_SENSOR = 18;
+        /**
+         * 红外
+         */
+        int RED_SENSOR = 19;
+        /**
+         * PM2.5
+         */
+        int PM2_5_SENSOR = 20;
+        /**
+         * 门磁
+         */
+        int DOOR_WINDOW_MAGNET = 21;
+        /**
+         * 插卡取电感应器，00插卡，01拔出，02断电
+         */
+        int ELECTRIC_CARD = 15;
 
         /**
          * 智能抄电表
          */
         int AMMETER = 12;
         /**
-         * 智能空调
+         * 线控面板
          */
-        int AIR_CON = 13;
+        int CONTROL_PANEL = 13;
+        /**
+         * 空调线控面板
+         */
+        int AIR_CON_PANEL = 1;
+
         /**
          * 智能红外转发
          */
         int RED_OUT = 14;
+
+        /**
+         * 低功耗蓝牙红外转发器
+         */
+        int RED_OUT_BLE = 1;
+        /**
+         * wifi蓝牙转发器
+         */
+        int RED_OUT_WIFI = 2;
         /**
          * 智能遥控设备
          */
         int REMOTER = 15;
-        /**
-         * 飞行设备
-         */
-        int AEROCRAFT = 16;
 
-        int AEROCRAFT_4WING = 1;
+        /**
+         * 智能摄像类设备
+         */
+        int SMART_VIDEO = 17;
+        int FIXED_SMART_VIDEO = 1;//固定摄像设备（家用）
+        int MOVEING_SMART_VIDEO = 2;//防抖摄像设备（配合云台）
+
+        /**
+         * 智能门禁，中控指纹机
+         */
+        int SMART_FINGER = 20;
+        /**
+         * 智能门锁
+         */
+        int SMART_LOCK = 21;
+
+        /**
+         * 昂宝智能门锁（家居）
+         */
+        int SMART_LOCK_OB_HOUSE = 3;
+        /**
+         * 昂宝智能门锁（酒店公寓）
+         */
+        int SMART_LOCK_OB_HOTEL = 4;
+        /**
+         * 摄像头
+         */
+        int SMART_CAMERA = 32;
         /**
          * id长度
          */
         int ID_LEN = 16;
+        /**
+         * 遥控灯
+         */
+        int REMOTE_MULTI_LED = 22;
+
+        /**
+         * 单品wifi插座
+         */
+        int WIFI_SOCKET = 80;
+
+        /**
+         * 单品wifi红外转发器，不存储版本
+         */
+        int WIFI_IR = 81;
+
     }
 
 
@@ -390,4 +634,84 @@ public interface OBConstant {
         String ALPHA = "alpha";
     }
 
+    /**
+     * 红外设备类型
+     */
+    interface IrType {
+
+        /**
+         * 其他类型
+         */
+        int OTHER = 0;
+        /**
+         * 机顶盒
+         */
+        int TV_BOX = 1;
+        /**
+         * 电视
+         */
+        int TV = 2;
+        /**
+         * dvd
+         */
+        int DVD = 3;
+        /**
+         * 投影仪
+         */
+        int PROJECTOR = 5;
+        /**
+         * 风扇
+         */
+        int FAN = 6;
+        /**
+         * 空调
+         */
+        int AIR_CON = 7;
+        /**
+         * 智能灯
+         */
+        int LAMP = 8;
+        /**
+         * 互联网机顶盒
+         */
+        int NET_TV_BOX = 10;
+        /**
+         * 扫地机
+         */
+        int CLEAR_DOOR_MACHINE = 12;
+        /**
+         * 音响
+         */
+        int SPEAKER = 13;
+        /**
+         * 空气净化器
+         */
+        int AIR_CLEAR = 15;
+    }
+
+    /**
+     * 添加设备时wifi设备类型，根据此设备类型控制不同操作
+     */
+    interface OnAddWifiDeviceType {
+        /**
+         * obox智能网关
+         */
+        int OBOX = 10;
+        /**
+         * wifi红外转发器
+         */
+        int IR = 14;
+        /**
+         * wifi插座
+         */
+        int SOCKET = 4;
+    }
+
+    /**
+     * 包归属
+     */
+    interface PackInfoKey {
+        int SMART = 0;
+        int GTQ = 2;
+    }
 }

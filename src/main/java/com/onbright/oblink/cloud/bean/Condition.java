@@ -4,12 +4,16 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 情景的条件信息，即情景触发的条件
+ * 情景的条件信息
  * Created by shifan_xiao on 2016/9/2.
  * dky 2016年10月12日14:17:02修改
  */
 public class Condition implements Serializable {
 
+    public static final int TIMING = 0;
+    public static final int SENSOR = 1;
+    public static final int REMOTE = 2;
+    public static final int FINGERPRINT_MACHINE = 3;
     /**
      * 时间/设备/遥控器 00/01/02
      */
@@ -41,7 +45,7 @@ public class Condition implements Serializable {
     private String device_child_type;
 
     /**
-     * Obox序列号，只在条件为传感器的时候可用
+     * Obox序列号
      */
     private List<String> oboxs;
 
@@ -54,130 +58,74 @@ public class Condition implements Serializable {
     }
 
 
-    /**
-     * 获取设备序列号，当条件为时间时，没有该参数
-     */
     public String getSerialId() {
         return serialId;
     }
 
-    /**
-     * 设置设备序列号，当条件为时间时，没有该参数
-     */
     public void setSerialId(String serialId) {
         this.serialId = serialId;
     }
 
-    /**
-     * 获取设备地址，仅当条件类型是传感器的时候需要设置
-     */
     public String getAddr() {
         return addr;
     }
 
-    /**
-     * 设置设备地址，仅当条件类型是传感器的时候需要设置
-     */
     public void setAddr(String addr) {
         this.addr = addr;
     }
 
-    /**
-     * 获取所属obox序列号
-     */
     public String getObox_serial_id() {
         return obox_serial_id;
     }
 
-    /**
-     * 设置所属obox序列号
-     */
     public void setObox_serial_id(String obox_serial_id) {
         this.obox_serial_id = obox_serial_id;
     }
 
-    /**
-     * 获取作为条件的节点的设备类型
-     */
     public String getDevice_type() {
         return device_type;
     }
 
-    /**
-     * 设置作为条件的节点的设备类型
-     */
     public void setDevice_type(String device_type) {
         this.device_type = device_type;
     }
 
-    /**
-     * 获取作为条件的节点的设备子类型
-     */
     public String getDevice_child_type() {
         return device_child_type;
     }
 
-    /**
-     * 设置作为条件的节点的设备子类型
-     */
     public void setDevice_child_type(String device_child_type) {
         this.device_child_type = device_child_type;
     }
 
-    /**
-     * 获取作为条件的节点的设备名称
-     */
     public String getConditionID() {
         return conditionID;
     }
 
-    /**
-     * 设置作为条件的节点的设备名称
-     */
     public void setConditionID(String conditionID) {
         this.conditionID = conditionID;
     }
 
-    /**
-     * 获取具体的条件，即某时间或者某传感器符合某条件时
-     */
     public String getCondition() {
         return condition;
     }
 
-    /**
-     * 设置具体的条件，即某时间或者某传感器符合某条件时
-     */
     public void setCondition(String condition) {
         this.condition = condition;
     }
 
-    /**
-     * 获取Obox序列号，只在条件为传感器的时候可用
-     */
     public List<String> getOboxs() {
         return oboxs;
     }
 
-    /**
-     * 设置Obox序列号，只在条件为传感器的时候可用
-     */
     public void setOboxs(List<String> oboxs) {
         this.oboxs = oboxs;
     }
 
-    /**
-     * 获取条件类型
-     * 时间/设备/遥控器 00/01/02
-     */
     public String getCondition_type() {
         return condition_type;
     }
 
-    /**
-     * 设置条件类型
-     * 时间/设备/遥控器 00/01/02
-     */
     public void setCondition_type(String condition_type) {
         this.condition_type = condition_type;
     }

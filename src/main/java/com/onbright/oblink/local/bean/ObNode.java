@@ -1,22 +1,22 @@
 package com.onbright.oblink.local.bean;
 
+import android.support.annotation.NonNull;
 
 import com.onbright.oblink.MathUtil;
 import com.onbright.oblink.StringUtil;
 import com.onbright.oblink.local.net.Transformation;
 
 /**
- * 本地登录模式单节点设备，
- *
+ * 本地登录模式Device，不包含版本信息和设备序列号信息，版本信息存与灯中，
+ * 所以在此不包含版本信息
  * Created by Adolf_Dong on 2016/5/24.
  */
-public class ObNode extends SceneAction  {
-
+public class ObNode extends SceneAction implements Comparable<ObNode>{
+    public transient boolean isOnline = true;
     /**
      * 所属obox
      */
     private String oboxName;
-
 
     /**
      * 获取单节点流程中标识的编号
@@ -67,7 +67,7 @@ public class ObNode extends SceneAction  {
     /**
      * 状态、根据派生类实际情况而定
      */
-    private byte[] state;
+    protected byte[] state;
 
     /**
      * 7字节完整地址
@@ -201,10 +201,10 @@ public class ObNode extends SceneAction  {
     }
 
     public byte[] getState() {
-        if (state != null) {
-            return state;
+        if (state == null) {
+            state = new byte[7];
         }
-        return new byte[7];
+        return state;
     }
 
     public void setState(byte[] state) {
@@ -240,31 +240,14 @@ public class ObNode extends SceneAction  {
         return StringUtil.getUtf8(id);
     }
 
-    /**
-     * 获得对应tag的参数
-     *
-     * @param index 对应的tag
-     * @return 对应tag的参数值
-     */
-    public int getIndexState(int index) {
-        return MathUtil.validByte(getState()[index]);
-    }
-
-    /**
-     * 设置状态
-     *
-     * @param index 对应的参数在字节数组中的位置
-     * @param stall 状态参数
-     */
-    public void setIndexState(int index, int stall) {
-        getState()[index] = (byte) stall;
-    }
-
-
     @Override
     public byte[] getAddrs() {
-        return cplAddr;
+        return getCplAddr();
     }
 
+    @Override
+    public int compareTo(@NonNull ObNode o) {
+        return this.getSerNumString().compareTo(o.getSerNumString());
+    }
 }
 

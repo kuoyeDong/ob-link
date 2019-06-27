@@ -5,683 +5,194 @@ import com.google.gson.Gson;
 import com.onbright.oblink.cloud.bean.Action;
 import com.onbright.oblink.cloud.bean.CloudScene;
 import com.onbright.oblink.cloud.bean.DeviceConfig;
+import com.onbright.oblink.cloud.bean.LockPush;
 import com.onbright.oblink.cloud.bean.User;
 import com.onbright.oblink.local.Obox;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
-import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.FormBody;
+
 public class GetParameter {
-    /**
-     * 执行动作
-     */
-    public static String ACTION;
-
-    /**
-     * 口令
-     */
-    public static String ACCESSTOKEN;
-    public static int ACTION_TIME = 1;
-
-    /**
-     * 注册
-     *
-     * @param name 用户名
-     * @param psw  密码
-     */
-    public static List<NameValuePair> onRegister(String name, String psw, String license) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.REGISTER));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.USERNAME, name));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PASS_WORD, psw));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.LICENSE, license));
-        return nvps;
-
-    }
-
-    /**
-     * 登录
-     *
-     * @param name 用户名
-     * @param psw  密码
-     */
-    public static List<NameValuePair> onLogin(String name, String psw) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.LOGIN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.USERNAME, name));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PASS_WORD, psw));
-        return nvps;
-    }
-
-    /**
-     * 修改密码
-     *
-     * @param type 用户类型
-     * @param pwd  密码
-     */
-    public static List<NameValuePair> setPassword(String type, String serialId, String pwd) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SET_PASSWORD));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, type));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PASS_WORD, pwd));
-        if (type.equals("01")) {
-            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, serialId));
-        }
-        return nvps;
-    }
-
-    /**
-     * 上传之前的检测，如果返回true则存在以及绑定成功，如果返回false则不存在，可执行后续addobox（）
-     *
-     * @param obox 选中的obox
-     */
-    public static List<NameValuePair> onQueryOboxBind(Obox obox) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_OBOX_BIND));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        return nvps;
-    }
 
     /**
      * 添加obox
      *
      * @return 控制数据集
      */
-    public static List<NameValuePair> onAddObox(Obox obox) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_OBOX));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
+    public static FormBody.Builder onAddObox(Obox obox, String deviceName, String productKey, boolean isSmarConfig) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_OBOX);
         Gson gson = new Gson();
         String json = gson.toJson(obox);
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX, json));
-        return nvps;
-
+        builder.add(CloudConstant.ParameterKey.OBOX, json);
+        if (isSmarConfig) {
+            builder.add(CloudConstant.ParameterKey.PRODUCT_KEY, productKey);
+            builder.add(CloudConstant.ParameterKey.DEVICE_NAME, deviceName);
+        }
+        return builder;
     }
 
     /**
-     * 查询摄像头
-     */
-    public static List<NameValuePair> queryCamera() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_CAMERA));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        return nvps;
-
-    }
-
-    /**
-     * 查询摄像头直播地址
-     */
-    public static List<NameValuePair> queryCameraLiveAddress(String deviceSerial) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_CAMERA_LIVE_ADDR));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL, deviceSerial));
-        return nvps;
-
-    }
-
-    /**
-     * 摄像头抓拍
-     */
-    public static List<NameValuePair> setCameraCapture(String deviceSerial) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SET_CAMERA_CAPTURE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL, deviceSerial));
-        return nvps;
-
-    }
-
-    /**
-     * 设置摄像头云台
-     */
-    public static List<NameValuePair> setCameraPtz(String deviceSerial, int direction, int speed, int action) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SET_CAMERA_PTZ));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL, deviceSerial));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DIRECTION, String.valueOf(direction)));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SPEED, String.valueOf(speed)));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, String.valueOf(action)));
-        return nvps;
-
-    }
-
-
-    /**
-     * 设置单节点或者组节点的状态
+     * 设置单节点或者组节点的状态,会修改状态最后一个字节
      *
      * @param deviceConfig 节点
      * @param isBili       是否闪烁
-     * @return
      */
-    public static List<NameValuePair> onSetNodeState(DeviceConfig deviceConfig, boolean isBili) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-//        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, deviceConfig.getObox_serial_id()));
-//        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUPADDR, "00"));
-//        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADDR, deviceConfig.getAddr()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceConfig.getSerialId()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.STATE, !isBili ?
-                deviceConfig.getState().substring(0, 12) + "02" : deviceConfig.getState().substring(0, 12) + "ff"));
-        return nvps;
+    public static FormBody.Builder onSetNodeState(DeviceConfig deviceConfig, boolean isBili) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceConfig.getSerialId());
+        builder.add(CloudConstant.ParameterKey.STATE, !isBili ?
+                deviceConfig.getState().substring(0, 12) + "02" : deviceConfig.getState().substring(0, 12) + "ff");
+        return builder;
     }
 
-    private static final String TAG = "GetParameter";
-
-
     /**
-     * 删除obox
+     * 设置节点状态不会修改状态的最后一个字节
      *
-     * @param obox 要删除的obox  在每次点击操作之前替换引用指向的实例
+     * @param deviceConfig 节点
      */
-    public static List<NameValuePair> onDelObox(Obox obox) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_OBOX));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.FORCE, CloudConstant.ParameterValue.FORCE_TRUE));
-        return nvps;
+    public static FormBody.Builder onSetNodeState(DeviceConfig deviceConfig) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceConfig.getSerialId());
+        builder.add(CloudConstant.ParameterKey.STATE, deviceConfig.getState());
+        return builder;
     }
 
     /**
-     * 组结构操作
+     * 设置节点状态
      *
-     * @param obox         当前操作的obox
-     * @param isAdd        是添加还是删除
-     * @param superId      组id
-     * @param deviceConfig 当前操作的节点
+     * @param deviceConfig 节点
+     * @param status       要设置的状态
      */
-    public static List<NameValuePair> onOpreGoupMeb(Obox obox, boolean isAdd, String superId, DeviceConfig deviceConfig) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.OPERATE_GROUP_MEMBERS));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATE_TYPE, isAdd ? CloudConstant.ParameterValue.IS_ADD_MEMBER : CloudConstant.ParameterValue.IS_DEL_MEMBER));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SUPERID, superId));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_ID, deviceConfig.getName()));
-        return nvps;
-    }
-
-    /**
-     * @param obox         当前obox
-     * @param deviceConfig 要删除的组中的节点，以此传入组id
-     */
-    public static List<NameValuePair> onDelGoup(Obox obox, DeviceConfig deviceConfig) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.OPERATE_GROUP_MEMBERS));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATE_TYPE, CloudConstant.ParameterValue.IS_DEL_MEMBER));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_ID, null));
-        return nvps;
-    }
-
-
-    /**
-     * 删除单节点
-     *
-     * @param obox         选中obox
-     * @param deviceConfig 选中节点
-     */
-    public static List<NameValuePair> onDelNode(Obox obox, DeviceConfig deviceConfig) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_SINGLE_DEVICE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_ID, deviceConfig.getName()));
-        return nvps;
-    }
-
-    /**
-     * 给节点进行重命名
-     *
-     * @param obox         当前操作的obox
-     * @param deviceConfig 当前操作设备
-     * @param newID        新ID
-     * @param isGroup      是否为组操作
-     */
-    public static List<NameValuePair> onRenameNode(Obox obox, DeviceConfig deviceConfig, String newID, boolean isGroup) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.UPDATE_NODE_NAME));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.NODE_TYPE, isGroup ? CloudConstant.NodeType.IS_GROUP : CloudConstant.NodeType.IS_SINGLE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.NEW_ID, newID));
-        return nvps;
-    }
-
-    /**
-     * 第一步
-     * id与条件级别的情景操作
-     *
-     * @param obox       操作obox
-     * @param action     动作， 包括 CREAT_SCENE DELETE_SCENE EXECUTE_SCENE RENAME_SCENE MODIFY_SCENE
-     * @param cloudScene 新建或已经存在的scene
-     */
-    public static List<NameValuePair> onOpreaScene(Obox obox, String action, CloudScene cloudScene) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_SC_ID));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATE_TYPE, action));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_NUMBER, cloudScene.getScene_number()));
-        /*modify没用，修改情景的是否执行状态也是用rename*/
-        if (action.equals(CloudConstant.ParameterValue.CREAT_SCENE) || action.equals(CloudConstant.ParameterValue.RENAME_SCENE)) {
-            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION_TYPE, cloudScene.getScene_status()));
-            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_ID, cloudScene.getScene_name()));
-        }
-
-        return nvps;
-    }
-
-
-    /**
-     * 第二步
-     * 设置场景序号的条件信息
-     *
-     * @param obox       选中的obox
-     * @param action     执行动作，添加  删除   修改
-     * @param cloudScene 当前情景
-     */
-    public static List<NameValuePair> settingScCondition(Obox obox, String action, CloudScene cloudScene) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_SC_CONDITION));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATE_TYPE, action));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_NUMBER, cloudScene.getScene_number()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_TYPE, cloudScene.getScene_type()));
-        //删除和改变为非传感器场景则不需要传condition相关参数,即只要是删除，或者情景模式不是传感器，都不传此参数
-//        if (!(action.equals(CloudConstant.DEL_CONDITION)||!cloudScene.getScene_type().equals(CloudConstant.SENSOR_SCENE))) {
-//            nvps.add(new BasicNameValuePair(CloudConstant.CONDITION_ID,cloudScene.getCondition_id()));
-//            nvps.add(new BasicNameValuePair(CloudConstant.CONDITION,cloudScene.getConditions()));
-//        }
-        if (action.equals(CloudConstant.ParameterValue.CREAT_CONDITION) || action.equals(CloudConstant.ParameterValue.UPDATE_CONDITION)) {
-            // FIXME: 2016/10/12 待修复，暂时设置为取第一个condition的条件和id
-            if (cloudScene.getScene_type().equals(CloudConstant.ParameterValue.TIM_SCENE)) {
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CONDITION, cloudScene.getConditions().get(0).get(0).getCondition()));
-            } else if (cloudScene.getScene_type().equals(CloudConstant.ParameterValue.SENSOR_SCENE)) {
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CONDITION, cloudScene.getConditions().get(0).get(0).getCondition()));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CONDITION_ID, cloudScene.getConditions().get(0).get(0).getConditionID()));
-            }
-        }
-        return nvps;
-    }
-
-    /**
-     * 第三步
-     * 设置场景序号的行为节点
-     *
-     * @param obox       当前选中的obox
-     * @param action     操作类型 添加 删除
-     * @param cloudScene 情景
-     * @param actions    情景行为节点
-     */
-    public static List<NameValuePair> onOpretaScAction(Obox obox, String action, CloudScene cloudScene, Action actions) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_SC_ACTION));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_NUMBER, cloudScene.getScene_number()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATE_TYPE, action));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION_ID, actions.getSerialId()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, actions.getAction() + "0000"));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.NODE_TYPE, actions.getNode_type()));
-        return nvps;
+    public static FormBody.Builder onSetNodeState(DeviceConfig deviceConfig, String status) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceConfig.getSerialId());
+        builder.add(CloudConstant.ParameterKey.STATE, status);
+        return builder;
     }
 
     /**
      * 查询obox中的所有情景   此方法查询后 ， 返回obox中情景的映射Map，要正常显示，则要进行转换到List处理
-     */
-    public static List<NameValuePair> onQueryScenes() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_SCENES));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        return nvps;
-    }
-
-    /**
-     * 改变obox的id
+     * 分页查询
      *
-     * @param obox     当前obox
-     * @param oboxName obox新id
+     * @param isMulti 是否分页
+     * @param start   起始数
+     * @param count   长度
+     * @return un
      */
-    public static List<NameValuePair> onChangeOboxId(Obox obox, String oboxName) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.UPDATE_OBOX_NAME));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_NEW_NAME, oboxName));
-        return nvps;
-    }
-
-    /**
-     * 改变obox的控制密码
-     *
-     * @param obox    当前obox
-     * @param oboxPsw obox新密码
-     */
-    public static List<NameValuePair> onChangeOboxPsw(Obox obox, String oboxPsw) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.UPDATE_OBOX_PASSWORD));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_OLD_PWD, obox.getObox_pwd()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_NEW_PWD, oboxPsw));
-        return nvps;
-    }
-
-    /**
-     * 重置obox的控制密码
-     *
-     * @param obox 当前obox
-     */
-    public static List<NameValuePair> onResetOboxPsw(Obox obox) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.RESET_OBOXPWD));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox.getObox_serial_id()));
-        return nvps;
-    }
-
-    /**
-     * 查询所有升级信息
-     */
-    public static List<NameValuePair> onQueryUpgrades() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_UPGRADES));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.QUERY_TYPE, "01"));
-        return nvps;
-    }
-
-    /**
-     * 设置升级
-     */
-    public static List<NameValuePair> onSetUpgrades(String type, String serialId, String request) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_UPGRADES));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.QUERY_TYPE, type));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SERIALID, serialId));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.REQUEST, serialId));
-        return nvps;
+    public static FormBody.Builder onQueryScenes(boolean isMulti, int start, int count) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_SCENES);
+        if (isMulti) {
+            builder.add("start", String.valueOf(start));
+            builder.add("count", String.valueOf(count));
+        }
+        return builder;
     }
 
     /**
      * 查询OBOX信息
      */
-    public static List<NameValuePair> onQueryObox() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_OBOX));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        //  nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADMIN_NAME, "OB"));
-        return nvps;
+    public static FormBody.Builder onQueryObox() {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_OBOX);
+        return builder;
     }
 
     /**
      * 扫描新节点设备
      */
-    public static List<NameValuePair> onSearchNewDevices(String obox_serial_id, String state, String timeout) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SEARCH_NEW_DEVICES));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox_serial_id));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.STATES, state));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TIME_OUT, timeout));
-        return nvps;
-    }
-
-    /**
-     * 获取新节点设备
-     */
-    public static List<NameValuePair> onGetNewDevices(String obox_serial_id) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.GET_NEW_DEVICES));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox_serial_id));
-        return nvps;
-    }
-
-    /**
-     * 查询OBOX配置信息
-     */
-    public static List<NameValuePair> onQueryOboxConfig(String obox_serial_id) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_OBOX_CONFIG));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox_serial_id));
-        return nvps;
-    }
-
-    /**
-     * 获取节点状态信息
-     */
-    public static List<NameValuePair> getNodeStatus(String jsonArray) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.GET_STATUS));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.NODES, jsonArray));
-        return nvps;
-    }
-
-    /**
-     * 批量命名
-     */
-    public static List<NameValuePair> OnMultiRename(String name, String jsonArray) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.MULTI_RENAME));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.NAME, name));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICES, jsonArray));
-        return nvps;
-    }
-
-    /**
-     * 释放单个obox中的设备
-     */
-    public static List<NameValuePair> onReleaseDevice(String obx_serial_id) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.RELEASE_ALL_DEVICES));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obx_serial_id));
-        return nvps;
+    public static FormBody.Builder onSearchNewDevicesOB(String oboxSerialId, String state, String timeout, String serialId, String pType, String type) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SEARCH_NEW_DEVICES);
+        builder.add(CloudConstant.ParameterKey.OBOX_SERIAL_ID, oboxSerialId);
+        builder.add(CloudConstant.ParameterKey.STATES, state);
+        builder.add(CloudConstant.ParameterKey.TIME_OUT, timeout);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.DEVICE_TYPE, pType);
+        builder.add(CloudConstant.ParameterKey.DEVICE_CHILD_TYPE, type);
+        return builder;
     }
 
     /**
      * 查询设备
      *
-     * @param user  暂时是查询自身所有设备
      * @param index 其实index
      * @param count 长度，为0则全部查询
      */
-    public static List<NameValuePair> onQueryDevice(User user, int index, int count) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_DEVICE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        // FIXME: 2016/8/12 访客模式不传这些参数
-//        if (user.getAdminName()!=null) {
-//            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADMIN_NAME, user.getAdminName()));
-//        }
-//
-//        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GUEST_NAME, user.getGuestName()));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.START_INDEX, String.valueOf(index)));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.COUNT, String.valueOf(count)));
-        return nvps;
+    public static FormBody.Builder onQueryDevice(int index, int count) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_DEVICE);
+        builder.add(CloudConstant.ParameterKey.START_INDEX, String.valueOf(index));
+        builder.add(CloudConstant.ParameterKey.COUNT, String.valueOf(count));
+        return builder;
     }
 
-    /**
-     * 此方法用于删除房间用
-     *
-     * @param building 建筑名称
-     * @param room     房间名称
-     * @param location 位置序号
-     */
-    public static List<NameValuePair> onDelPosition(String building, String room, String location) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.CREATE_LOCATION));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.BUILDING, building));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ROOM, room));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.LOCATION, location));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, "00"));
-        return nvps;
-    }
-
-    /**
-     * 查询位置信息
-     *
-     * @param guestName 如果是admin或者root就可以传入访客名字查询其位置信息
-     * @param adminName 如果是root就可以传入管理者名字查询其位置信息
-     */
-    public static List<NameValuePair> onQueryLocation(String guestName, String adminName, String type) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_LOCATION));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        switch (type) {
-            case CloudConstant.CloudDitalMode.GUEST:
-                if (User.getUser().getWeight().equals(CloudConstant.CloudDitalMode.ROOT)
-                        || User.getUser().getWeight().equals(CloudConstant.CloudDitalMode.ADMIN)) {
-                    nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GUEST_NAME, guestName));
-                }
-                break;
-            case CloudConstant.CloudDitalMode.ADMIN:
-                if (User.getUser().getWeight().equals(CloudConstant.CloudDitalMode.ROOT)) {
-                    nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADMIN_NAME, adminName));
-                }
-                break;
-
+    public static FormBody.Builder onQueryDeviceStatusHistory(String device_serial_id, String type, String from_date, String to_date,
+                                                              String start_index, String count) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_DEVICE_STATUS_HISTORY);
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device_serial_id);
+        builder.add(CloudConstant.ParameterKey.TYPE, type);
+        if (type.equals("00")) {//个数为单位
+            builder.add(CloudConstant.ParameterKey.START, start_index);
+            builder.add(CloudConstant.ParameterKey.COUNT, count);
+        } else if (type.equals("01")) {//小时为单位
+            builder.add(CloudConstant.ParameterKey.FROM_DATA, from_date);
+            builder.add(CloudConstant.ParameterKey.TO_DATA, to_date);
+        } else if (type.equals("02")) {//天为单位
+            builder.add(CloudConstant.ParameterKey.FROM_DATA, from_date);
+            builder.add(CloudConstant.ParameterKey.TO_DATA, to_date);
         }
-        return nvps;
+        return builder;
     }
 
-
-    /**
-     * 查询节点的历史记录
-     *
-     * @param device_serial_id 目标节点的序列号
-     * @param type             {@link CloudConstant.ParameterValue#ONE_DAY,CloudConstant.ParameterValue#SOME_DAY}
-     * @param from_date        查询当天则为确切的时间 ，如果是查询时间段则是起始日期
-     * @param to_date          someday的时候要传，结束时间
-     * @param start_index      查询oneday的时候要传
-     * @param count            查询oneday的时候要传
-     */
-    public static List<NameValuePair> onQueryNodeHistory(String device_serial_id, String type, String from_date, String to_date,
-                                                         String start_index, String count) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_NODE_HISTORY));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device_serial_id));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, type));
-        switch (type) {
-            case CloudConstant.ParameterValue.ONE_DAY:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.FROM_DATE, from_date));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TO_DATE, to_date));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.START_INDEX, start_index));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.COUNT, count));
-                break;
-            case CloudConstant.ParameterValue.SOME_DAY:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.FROM_DATE, from_date));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TO_DATE, to_date));
-                // nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TO_DATE, to_date));
-                break;
-            case CloudConstant.ParameterValue.WEEKLY_DAY:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.FROM_DATE, from_date));
-                // nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TO_DATE, to_date));
-                break;
-        }
-        return nvps;
-    }
-
-    public static List<NameValuePair> onQueryDeviceStatusHistory(String device_serial_id, String type, String from_date, String to_date,
-                                                         String start_index, String count) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_DEVICE_STATUS_HISTORY));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device_serial_id));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, type));
-       if(type.equals("00")) {//个数为单位
-           nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.START, start_index));
-           nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.COUNT, count));
-       } else if (type.equals("01")) {//小时为单位
-           nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.FROM_DATA, from_date));
-           nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TO_DATA, to_date));
-       } else if (type.equals("02")) {//天为单位
-           nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.FROM_DATA, from_date));
-           nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TO_DATA, to_date));
-       }
-        return nvps;
-    }
-
-    /**
-     * 设置组
-     */
-
-    public static List<NameValuePair> onSetGroup(String group_id, String group_name, String group_state,
-                                                 String operate_type, String group_member, String group_style, String obox_serialid,String groupAddr) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SET_GROUP));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATE_TYPE, operate_type));
+    public static FormBody.Builder onSetGroup(String group_id, String group_name, String group_state,
+                                              String operate_type, String group_member, String group_style, String obox_serialid, String groupAddr) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SET_GROUP);
+        builder.add(CloudConstant.ParameterKey.OPERATE_TYPE, operate_type);
         switch (operate_type) {
             case CloudConstant.ParameterValue.DELETE_GROUP:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_ID, group_id));
+                builder.add(CloudConstant.ParameterKey.GROUP_ID, group_id);
                 break;
             case CloudConstant.ParameterValue.SETTING_GROUP:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_STYLE, group_style));
+                builder.add(CloudConstant.ParameterKey.GROUP_STYLE, group_style);
                 if (group_style.equals("00")) {
-                    nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox_serialid));
+                    builder.add(CloudConstant.ParameterKey.OBOX_SERIAL_ID, obox_serialid);
                 }
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_NAME, group_name));
+                builder.add(CloudConstant.ParameterKey.GROUP_NAME, group_name);
                 break;
             case CloudConstant.ParameterValue.COVER_MEMBER:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_MEMBER, group_member));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_ID, group_id));
+                builder.add(CloudConstant.ParameterKey.GROUP_MEMBER, group_member);
+                builder.add(CloudConstant.ParameterKey.GROUP_ID, group_id);
                 break;
             case CloudConstant.ParameterValue.ADD_MEMBER:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_MEMBER, group_member));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_ID, group_id));
+                builder.add(CloudConstant.ParameterKey.GROUP_MEMBER, group_member);
+                builder.add(CloudConstant.ParameterKey.GROUP_ID, group_id);
                 break;
             case CloudConstant.ParameterValue.DELETE_MEMBER:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_MEMBER, group_member));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_ID, group_id));
+                builder.add(CloudConstant.ParameterKey.GROUP_MEMBER, group_member);
+                builder.add(CloudConstant.ParameterKey.GROUP_ID, group_id);
                 break;
             case CloudConstant.ParameterValue.RE_NAME:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_NAME, group_name));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_ID, group_id));
+                builder.add(CloudConstant.ParameterKey.GROUP_NAME, group_name);
+                builder.add(CloudConstant.ParameterKey.GROUP_ID, group_id);
                 break;
             case CloudConstant.ParameterValue.EXUTE_GROUP:
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_ID, group_id));
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUP_STATE,
-                        group_state.substring(0, 12) + "02"));
+                builder.add(CloudConstant.ParameterKey.GROUP_ID, group_id);
+                builder.add(CloudConstant.ParameterKey.GROUP_STATE,
+                        group_state.substring(0, 12) + "02");
                 if (group_style.equals("00")) {
-                    nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.GROUPADDR, groupAddr));
+                    builder.add(CloudConstant.ParameterKey.GROUPADDR, groupAddr);
                 }
                 break;
         }
-        return nvps;
-    }
-
-    /**
-     * 请求位置的节点
-     *
-     * @param location 位置序号
-     */
-    public static List<NameValuePair> onQueryDeviceLocation(String location, String room) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_DEVICE_LOCATION));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.LOCATION, location));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ROOM, room));
-        return nvps;
+        return builder;
     }
 
     /**
@@ -689,163 +200,35 @@ public class GetParameter {
      *
      * @param serialId 序号
      */
-    public static List<NameValuePair> onModifyDevice(String serialId, String name, boolean isDelete) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.MODIFY_DEVICE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SERIALID, serialId));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATE_TYPE, isDelete ? "00" : "01"));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.NAME, name));
-        return nvps;
-    }
-
-
-
-    /**
-     * 查询位置内绑定的情景
-     *
-     * @param location 位置序号
-     */
-    public static List<NameValuePair> onQueryLocationScene(String location) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_SCENE_LOCATION));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.LOCATION, location));
-        return nvps;
+    public static FormBody.Builder onModifyDevice(String serialId, String name, boolean isDelete) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.MODIFY_DEVICE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.OPERATE_TYPE, isDelete ? "00" : "01");
+        builder.add(CloudConstant.ParameterKey.NAME, name);
+        return builder;
     }
 
     /**
      * 查询组信息
      */
-    public static List<NameValuePair> onQueryGroups() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_GROUP));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        return nvps;
+    public static FormBody.Builder onQueryGroups() {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_GROUP);
+        return builder;
     }
 
-    /**
-     * 绑定情景到位置
-     *
-     * @param location 位置序号
-     * @param sceneNum 情景序号
-     * @param action   01 绑定 00 解绑
-     */
-    public static List<NameValuePair> onSetLocationScene(String location, String sceneNum, String action) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SET_SCENE_LOCATION));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.LOCATION, location));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_NUMBER, sceneNum));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, action));
-        return nvps;
-    }
-
-    /**
-     * @param sceneNum 情景序号 ,暂时写定为执行
-     * @param type 00| 01|02|03   Disable|Enable|Action|Delete,如果是条件场景，则传这个参数
-     */
-    public static List<NameValuePair> onExecuteLocationScene(String sceneNum, String type) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.EXECUTE_SC));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_NUMBER, sceneNum));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE_STATUS, type));
-        return nvps;
-    }
-
-    /**
-     * 绑定或者解除绑定电话号码
-     *
-     * @param phoneNum 电话号码
-     * @param isBind   是否绑定，绑定传true，解除绑定传false
-     */
-    public static List<NameValuePair> onBindPhone(String phoneNum, boolean isBind) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.BIND_PHONE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PHONE, phoneNum));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, isBind ? "01" : "00"));
-        return nvps;
-    }
 
     /**
      * 设置场景信息
      */
-    public static List<NameValuePair> onSetScInfo(CloudScene curentScene) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_SC_INFO));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        Gson gs = new Gson();
-        String gson = gs.toJson(curentScene);
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SCENE, gson));
-        return nvps;
-    }
-
-    /**
-     * 查询遥控器
-     */
-    public static List<NameValuePair> onQueryRemote() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_REMOTE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        return nvps;
-    }
-
-    /**
-     * 查询遥控器可用通道
-     */
-    public static List<NameValuePair> onQrRmtChanl(String remoteSer) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_REMOTER_CHANNEL));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.REMOTER, remoteSer));
-        return nvps;
-    }
-
-    public static List<NameValuePair> onDetectRemote() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DETECT_REMOTE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        return nvps;
-    }
-
-    public static List<NameValuePair> onQueryAccessToken() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_YS_ACCESS_TOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        return nvps;
-    }
-
-    public static List<NameValuePair> onCreateCamera(String action, String deviceSerial, String validateCode) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.CREATE_YS_CAMERA));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, action));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL, deviceSerial));
-        if (action.equals("01")) {
-            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.VALIDATE_CODE, validateCode));
-        }
-        return nvps;
-    }
-
-    public static List<NameValuePair> onBindUser(String action, String phone) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.BIND_YS_USER));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, action));
-        if (action.equals("01")) {
-            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PHONE, phone));
-        }
-        return nvps;
-    }
-
-    public static List<NameValuePair> onQueryCapture(String deviceSerial) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_CAMERA_CAPTURE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICE_SERIAL, deviceSerial));
-        return nvps;
+    public static FormBody.Builder onSetScInfo(CloudScene curentScene) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_SC_INFO);
+        Gson gson = new Gson();
+        String gsonStr = gson.toJson(curentScene);
+        builder.add(CloudConstant.ParameterKey.SCENE, gsonStr);
+        return builder;
     }
 
     /**
@@ -854,200 +237,625 @@ public class GetParameter {
      * @param force   是否强制删除，不建议使用强制删除
      * @param oboxSer 要删除的obox的序列号
      */
-    public static List<NameValuePair> onDeleteObox(boolean force, String oboxSer) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_OBOX));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OBOX_SERIAL_ID, oboxSer));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.FORCE_DELETE, force ? "01" : "00"));
-        return nvps;
+    public static FormBody.Builder onDeleteObox(boolean force, String oboxSer) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_OBOX);
+        builder.add(CloudConstant.ParameterKey.OBOX_SERIAL_ID, oboxSer);
+        builder.add(CloudConstant.ParameterKey.FORCE_DELETE, force ? "01" : "00");
+        return builder;
     }
 
     /**
-     * 找回密码
+     * 获取设备真实状态
      *
-     * @param phone        手机号码
-     * @param code         验证码
-     * @param countryPhone 国家电话号码
+     * @param deviceConfig 目标设备
      */
-    public static List<NameValuePair> onFindPwd(String phone, String code, String countryPhone, boolean isOther) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.FINDPWD));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PHONE, phone));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.APP_KEY, isOther ? "1c7cd49c673f6" : "16eff033f92d9"));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ZONE, countryPhone));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CODE, code));
-        return nvps;
+    public static FormBody.Builder getNodeStatus(DeviceConfig deviceConfig) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_NODE_REAL_STATUS);
+        builder.add(CloudConstant.ParameterKey.SERIALID, deviceConfig.getSerialId());
+        return builder;
     }
 
     /**
-     * 添加指纹机
+     * 注册阿里设备
      *
-     * @param action        解绑／绑定
-     * @param serialId      设备序列号
+     * @param zone 时区
+     * @param type 设备类型
+     * @return 请求参数列表
      */
-    public static List<NameValuePair> addFingerPrint(String action, String serialId) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_FINGERPRINT));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, action));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SERIALID, serialId));
-        return nvps;
+    public static FormBody.Builder registAliDev(String zone, String type) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.REGIST_ALIDEV);
+        builder.add(CloudConstant.ParameterKey.ZONE, zone);
+        builder.add(CloudConstant.ParameterKey.TYPE, type);
+        return builder;
     }
 
     /**
-     * 查询指纹机
+     * 上传单品设备到云端
      *
+     * @param deviceName 产品名字
+     * @param productKey 产品key
+     * @param configStr  标准化设备定义json字符串
+     * @return 请求参数列表
      */
-    public static List<NameValuePair> queryFingerPrint() {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_FINGERPRINT));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        return nvps;
+    public static FormBody.Builder uploadConfig(String deviceName, String productKey, String configStr) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.UPLOAD_CONFIG);
+        builder.add(CloudConstant.ParameterKey.DEVICE_NAME, deviceName);
+        builder.add(CloudConstant.ParameterKey.PRODUCT_KEY, productKey);
+        builder.add(CloudConstant.ParameterKey.CONFIG, configStr);
+        return builder;
     }
 
     /**
-     * 查询智能门锁首页
+     * 查询OB智能门锁主页信息,返回电量，上下线，状态
      *
+     * @param serialId 门锁序列号
      */
-    public static List<NameValuePair> querySmartLockHome(String serialId) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_FINGER_HOME));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SERIALID, serialId));
-        return nvps;
+    public static FormBody.Builder queryIntelligentFingerhome(String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_INTELLIGENT_FINGERHOME);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
     }
 
     /**
-     * 查询指纹机下用户
+     * 查询门锁开门记录
      *
-     * @param start        起始
-     * @param serialId     设备序列号
-     * @param count        数量
-     * @param type        00/01	  指纹门禁机／门锁
+     * @param serialId 门锁序列号
      */
-    public static List<NameValuePair> queryFingerPrintUser(String serialId,String start,String count,String type) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_FINGERPRINT_USER));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SERIALID, serialId));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.START, start));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.COUNT, count));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, type));
-        return nvps;
+    public static FormBody.Builder queryIntelligentOpenrecord(String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_INTELLIGENT_OPENRECORD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
     }
 
     /**
-     * 查询指纹机下用户
+     * 查询门锁警告记录
      *
-     * @param start        起始
-     * @param serialId     设备序列号
-     * @param count        数量
-     * @param type        00 中控  01 门禁
-     * @param operation   00/01/02/03/04	开门/删除用户/添加用户/修改密码/修改指纹
+     * @param serialId 门锁序列号
      */
-    public static List<NameValuePair> queryFingerLog(String serialId,String start,String count,String type,String operation) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_FINGERPRINT_LOG));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SERIALID, serialId));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.START, start));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.COUNT, count));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, type));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.OPERATION, operation));
-        return nvps;
+    public static FormBody.Builder queryIntelligentWarningrecord(String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_INTELLIGENT_WARNINGRECORD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
     }
 
     /**
-     * 绑定用户指纹
+     * 查询OB智能门锁用户列表
      *
-     * @param user_name        需要分配的属下用户
-     * @param serialId         设备序列号
-     * @param action           解绑／绑定
-     * @param pin              指纹机上的编号
-     * @param type             00 指纹机 01 门锁
-     * @param cover       0/1	不覆盖/覆盖
+     * @param serialId 门锁序列号
      */
-    public static List<NameValuePair> addUserFinger(String user_name,String action,String type,String serialId,String pin,String cover) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_USER_FINGERPRINT));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.USERNAME, user_name));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, action));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, type));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.SERIALID, serialId));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PIN, pin));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.COVER, cover));
-        return nvps;
+    public static FormBody.Builder queryIntelligentUseringrecord(String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_INTELLIGENT_USERINGRECORD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
     }
 
     /**
-     * 修改子用户
+     * 发送验证码到胁迫时目标手机
      *
-     * @param root_name        超级管理员名字  创建时不用传，weight 是2/3时才需要传
-     * @param admin_name       管理员名字  创建时不用传，weight是3时才需要传
-     * @param weight           01/02/03 root/admin/guest
-     * @param user_name        用户名
-     * @param pwd              密码  删除不用传
-     * @param modify_type      00/01 删除/创建
+     * @param serialId 门锁序列号
+     * @param pin      门锁用户pin
+     * @param phone    目标手机号码
      */
-    public static List<NameValuePair> modifyUser(String root_name,String admin_name,String weight,String user_name,String pwd,String modify_type) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.MODIFY_USER));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
+    public static FormBody.Builder sendIntelligentValidatecode(String serialId, String pin, String phone) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SEND_INTELLIGENT_VALIDATECODE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.PIN, pin);
+        builder.add(CloudConstant.ParameterKey.MOBILE, phone);
+        return builder;
+    }
 
-        if (modify_type.equals("01")) {
-            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.PASS_WORD, pwd));
-            if (weight.equals("03")) {
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADMIN_NAME, admin_name));
-            }
-        } else if (modify_type.equals("00")) {
-           if( weight.equals("02"))  {
-               nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ROOTNAME, root_name));
-               nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADMIN_NAME, admin_name));
-           } else if (weight.equals("03")) {
-                nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADMIN_NAME, admin_name));
-            }
+    /**
+     * 编辑门锁用户
+     *
+     * @param serialId     门锁序列号
+     * @param pin          门锁用户pin
+     * @param nickName     门锁用户昵称
+     * @param phone        门锁用户被胁迫推送的电话号码
+     * @param validateCode 验证码
+     * @param hasStressPwd 是否有胁迫指纹或密码
+     */
+    public static FormBody.Builder editIntelligentUser(String serialId, String pin, String nickName, String phone, String validateCode, boolean hasStressPwd) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.EDIT_INTELLIGENT_USER);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.PIN, pin);
+        builder.add(CloudConstant.ParameterKey.NICKNAME, nickName);
+        if (hasStressPwd) {
+            builder.add(CloudConstant.ParameterKey.MOBILE, phone);
+            builder.add(CloudConstant.ParameterKey.VALIDATE_CODE, validateCode);
         }
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.USERNAME, user_name));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.WEIGHT, weight));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.MODIFY_TYPE, modify_type));
-        return nvps;
+        return builder;
     }
 
     /**
-     * 设备权限分配
+     * 智能门锁验证权限密码
      *
-     * @param action          00/01	add/delete
-     * @param jsonArray       序列号数组	obox/节点/遥控器
-     * @param user_name       需要分配的用户
-     * @param admin_name      如果需要分配的用户是guest且分配人是root，需要传该参数
-     * @param weight          02/03	   Admin/guset,需要分配的用户的权限
+     * @param serialId       门锁序列号
+     * @param verficationPwd 门锁密码
      */
-    public static List<NameValuePair> bindDevice(String action,String jsonArray,String user_name,String admin_name,String weight) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.BIND_DEVICE));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACTION, action));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.DEVICES, jsonArray));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.USERNAME, user_name));
-        if (weight.equals("01")) {
-            nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ADMIN_NAME, admin_name));
+    public static FormBody.Builder queryIntelligentAuthpwd(String serialId, String verficationPwd) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_INTELLIGENT_AUTHPWD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.PASS_WORD, verficationPwd);
+        return builder;
+    }
+
+    /**
+     * 查询门锁临时用户
+     *
+     * @param serialId  门锁序列号
+     * @param authToken 门锁token
+     */
+    public static FormBody.Builder queryIntelligentRemoteUnlocking(String serialId, String authToken) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_INTELLIGENT_REMOTE_UNLOCKING);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
+        return builder;
+    }
+
+    /**
+     * 删除临时门锁用户
+     *
+     * @param id        临时用户id
+     * @param serialId  门锁序列号
+     * @param authToken 门锁口令
+     * @param pin       临时用户pin
+     */
+    public static FormBody.Builder delIntelligentRemote_user(int id, String serialId, String authToken, String pin) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DEL_INTELLIGENT_REMOTE_USER);
+        builder.add(CloudConstant.ParameterKey.ID, id + "");
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
+        builder.add(CloudConstant.ParameterKey.PIN, pin);
+        return builder;
+    }
+
+    /**
+     * @param serialId  门锁序列号
+     * @param authToken 门锁口令
+     * @param nickName  昵称
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @param times     使用次数
+     * @param mobile    电话号码
+     * @param pushPhone 是否需要推送手机
+     */
+    public static FormBody.Builder addIntelligentRemoteUser(String serialId, String authToken, String nickName,
+                                                            String startTime, String endTime, String times, String mobile, boolean pushPhone, boolean isMax) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
+        builder.add(CloudConstant.ParameterKey.NICKNAME, nickName);
+        builder.add(CloudConstant.ParameterKey.START_TIME, startTime);
+        builder.add(CloudConstant.ParameterKey.END_TIME, endTime);
+        builder.add(CloudConstant.ParameterKey.TIMES, times);
+        if (pushPhone) {
+            builder.add(CloudConstant.ParameterKey.MOBILE, mobile);
         }
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.WEIGHT, weight));
-        return nvps;
+        builder.add(CloudConstant.ParameterKey.ISMAX, isMax ? "1" : "0");
+        return builder;
     }
 
     /**
-     * 查询用户下的子用户
+     * 发送密码给临时用户
      *
-     * @param type        01/02/03/04	root/admin/guest/both,
+     * @param serialId  门锁序列号
+     * @param pin       临时用户pin
+     * @param authToken 门锁口令
+     * @param mobile    临时用户手机号
      */
-    public static List<NameValuePair> queryUser(String type) {
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_USER));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.ACCESS_TOKEN, ACCESSTOKEN));
-        nvps.add(new BasicNameValuePair(CloudConstant.ParameterKey.TYPE, type));
-        return nvps;
+    public static FormBody.Builder sendRemotePwd(String serialId, String pin, String authToken, String mobile) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SEND_REMOTE_PWD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.PIN, pin);
+        builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
+        builder.add(CloudConstant.ParameterKey.MOBILE, mobile);
+        return builder;
+    }
+
+    /**
+     * 智能门锁忘记权限密码
+     *
+     * @param serialId 门锁序列号
+     */
+    public static FormBody.Builder forgetIntelligentPwd(String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.FORGET_INTELLIGENT_PWD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
+    }
+
+    /**
+     * 智能门锁根据推送重置权限密码
+     *
+     * @param serialId 门锁序列号
+     * @param pwd      密码
+     */
+    public static FormBody.Builder resetIntelligentPwdByCode(String serialId, String pwd) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.RESET_INTELLIGENT_PWD_BY_CODE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.PASS_WORD, pwd);
+        return builder;
+    }
+
+    /**
+     * 智能门锁修改权限密码
+     *
+     * @param serialId 门锁序列号
+     * @param oldPwd   旧密码
+     * @param newPwd   新密码
+     */
+    public static FormBody.Builder resetIntelligentPwd(String serialId, String oldPwd, String newPwd) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.RESET_INTELLIGENT_PWD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.OLD_PWD, oldPwd);
+        builder.add(CloudConstant.ParameterKey.NEW_PWD, newPwd);
+        return builder;
+    }
+
+    /**
+     * 智能门锁修改远程用户
+     *
+     * @param id        用户序列号
+     * @param serialId  门锁序列号
+     * @param pin       远程用户pin
+     * @param authToken 门锁口令
+     * @param mobile    远程用户绑定手机
+     * @param nickName  远程用户昵称
+     * @param startTime 有效开始时间
+     * @param endTime   有效结束时间
+     * @param times     有效次数
+     */
+    public static FormBody.Builder modifyIntelligentRemoteUser(int id, String serialId, String pin, String authToken,
+                                                               String mobile, String nickName, String startTime, String endTime, String times, boolean isMax) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.MODIFY_INTELLIGENT_REMOTE_USER);
+        builder.add(CloudConstant.ParameterKey.ID, id + "");
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.PIN, pin);
+        builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
+        if (mobile != null && mobile.length() != 0) {
+            builder.add(CloudConstant.ParameterKey.MOBILE, mobile);
+        }
+        builder.add(CloudConstant.ParameterKey.NICKNAME, nickName);
+        builder.add(CloudConstant.ParameterKey.START_TIME, startTime);
+        builder.add(CloudConstant.ParameterKey.END_TIME, endTime);
+        builder.add(CloudConstant.ParameterKey.TIMES, times);
+        builder.add(CloudConstant.ParameterKey.ISMAX, isMax ? "1" : "0");
+        return builder;
+    }
+
+    /**
+     * 智能门锁修改远程用户
+     *
+     * @param serialId 门锁序列号
+     */
+    public static FormBody.Builder queryIntelligentPushList(String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_INTELLIGENT_PUSH_LIST);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
+    }
+
+    /**
+     * 修改推送设置
+     *
+     * @param serialId   门锁序列号
+     * @param mobile     电话
+     * @param lockPushes 推送数据集合
+     */
+    public static FormBody.Builder modifyIntelligentPush(String serialId, String mobile, List<LockPush> lockPushes) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.MODIFY_INTELLIGENT_PUSH);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.MOBILE, mobile);
+        Gson gson = new Gson();
+        String pushInfo = gson.toJson(lockPushes);
+        builder.add(CloudConstant.ParameterKey.PUSH_INFO, pushInfo);
+        return builder;
+    }
+
+    /**
+     * 门锁创建权限密码
+     *
+     * @param serialId 门锁序列号
+     * @param pwd      权限密码
+     */
+    public static FormBody.Builder addIntelligentAuthpwd(String serialId, String pwd) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_INTELLIGENT_AUTHPWD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.PASS_WORD, pwd);
+        return builder;
+    }
+
+    /*以下为更新后的红外转发器对应的接口*/
+
+    /**
+     * 查询设备
+     */
+    public static FormBody.Builder queryAliDevice() {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_ALI_DEV);
+        return builder;
+    }
+
+    /**
+     * 删除设备
+     *
+     * @param deviceId 设备序列号
+     */
+    public static FormBody.Builder delAliDev(String deviceId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_ALI_DEV);
+        builder.add(CloudConstant.ParameterKey.DEVICEID, deviceId);
+        return builder;
+    }
+
+    /**
+     * wifi查询遥控器支持的设备类型
+     *
+     * @return un
+     */
+    public static FormBody.Builder onQueryWifiIrDeviceType() {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_IR_DEVICE_TYPE);
+        return builder;
+    }
+
+    /**
+     * 获取遥控云品牌类型
+     *
+     * @param type 遥控云定义的设备类型
+     * @return un
+     */
+    public static FormBody.Builder onQueryWifiIrBrand(String type) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_IR_BRAND);
+        builder.add(CloudConstant.ParameterKey.DEVICETYPE, type);
+        return builder;
+    }
+
+    /**
+     * 获取红外遥控方案
+     *
+     * @param serialId 红外转发器序列号
+     * @return un
+     */
+    public static FormBody.Builder onQueryWifiIrDevice(String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_IR_DEVICE);
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, serialId);
+        return builder;
+    }
+
+    /**
+     * 删除红外遥控方案,同时解绑匹配的遥控云码库
+     *
+     * @param index    遥控索引ID
+     * @param serialId 红外转发器序列号
+     * @return un
+     */
+    public static FormBody.Builder onDeleteIrDevice(String index, String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_IR_DEVICE);
+        builder.add(CloudConstant.ParameterKey.INDEX, index);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
+    }
+
+    /**
+     * 重命名红外遥控方案
+     *
+     * @param serialId 红外转发器序列号
+     * @param index    遥控索引ID
+     * @param name     要设置的新名称
+     * @return un
+     */
+    public static FormBody.Builder renameIrDevice(String serialId, String index, String name) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.RENAME_IR_DEVICE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.INDEX, index);
+        builder.add(CloudConstant.ParameterKey.NAME, name);
+        return builder;
+    }
+
+    /**
+     * 控制转发命令
+     *
+     * @param serialId 红外转发器序列号
+     * @param index    遥控索引ID
+     * @param key      标准按键或拓展按键的按键名称key
+     * @param keyType  0:标准按键
+     *                 1:拓展按键
+     *                 2:手动匹配测试按键
+     * @return un
+     */
+    public static FormBody.Builder controlWifiIrDevice(String serialId, int index, String key, int keyType) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.CONTROL_IR_DEVICE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.INDEX, index + "");
+        builder.add(CloudConstant.ParameterKey.KEYTYPE, keyType + "");
+        builder.add(CloudConstant.ParameterKey.KEY, key);
+        return builder;
+    }
+
+    /**
+     * 删除方案中特定按键
+     *
+     * @param serialId 红外转发器序列号
+     * @param index    遥控索引ID
+     * @param keyType  0:标准按键
+     *                 1:拓展按键
+     *                 2:手动匹配测试按键
+     * @param key      标准按键或拓展按键的按键名称key
+     * @return un
+     */
+    public static FormBody.Builder deleteIrDeviceKey(String serialId, int index, int keyType, String key) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_IR_DEVICE_KEY);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.INDEX, index + "");
+        builder.add(CloudConstant.ParameterKey.KEYTYPE, keyType + "");
+        builder.add(CloudConstant.ParameterKey.KEY, key);
+        return builder;
+    }
+
+    /**
+     * 学习遥控方案——进入按键学习模式
+     *
+     * @param serialId 红外转发器序列号
+     * @param index    遥控索引ID
+     * @param keyType  0:标准按键
+     *                 1:拓展按键
+     *                 2:手动匹配测试按键
+     * @param key      标准按键或拓展按键的按键名称key
+     * @param timeOut  超时时间/秒置0为提前取消,红外转发器只在此时间内处于接收原始码状态
+     * @return un
+     */
+    public static FormBody.Builder learnIrDeviceKey(String serialId, int index, int keyType, String key, int timeOut) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.LEARN_IR_DEVICE_KEY);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.INDEX, index + "");
+        builder.add(CloudConstant.ParameterKey.KEYTYPE, keyType + "");
+        builder.add(CloudConstant.ParameterKey.KEY, key);
+        builder.add(CloudConstant.ParameterKey.TIME_OUT, timeOut + "");
+        return builder;
+    }
+
+    /**
+     * 学习遥控方案——新建自定义遥控器
+     *
+     * @param serialId   红外转发器序列号
+     * @param deviceType 学习的设备类型
+     * @param brandId    学习的品牌，如无置0
+     * @param name       用户自定义输入，默认为自定义遥控器+类型名
+     * @return un
+     */
+    public static FormBody.Builder createIrDevice(String serialId, int deviceType, int brandId, String name) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.CREATE_IR_DEVICE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.DEVICETYPE, deviceType + "");
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId + "");
+        builder.add(CloudConstant.ParameterKey.NAME, name);
+        return builder;
+    }
+
+    /**
+     * 一键匹配遥控方案——进入空调对码模式
+     *
+     * @param serialId 红外转发器序列号
+     * @param timeOut  超时时间/秒置0为提前取消,红外转发器只在此时间内处于接收原始码状态
+     * @param brandId  匹配空调品牌
+     * @return un
+     */
+    public static FormBody.Builder pairIrRemoteCode(String serialId, int timeOut, String brandId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.PAIR_IR_REMOTECODE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.TIME_OUT, "" + timeOut);
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId);
+        return builder;
+    }
+
+    /**
+     * 根据品牌id，设备类型主动数据匹配,手动匹配遥控方案——测试码获取
+     *
+     * @param deviceType 匹配类型
+     * @param brandId    匹配品牌
+     * @param serialId   红外转发器序列号
+     * @return un
+     */
+    public static FormBody.Builder queryIrTestCode(String deviceType, String brandId, String serialId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_IR_TESTCODE);
+        builder.add(CloudConstant.ParameterKey.DEVICETYPE, deviceType);
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        return builder;
+    }
+
+    /**
+     * 手动匹配/一键匹配遥控方案——绑定码库方案,完成手动匹配测试码库，绑定生成新的遥控方案对象
+     *
+     * @param serialId   红外转发器序列号
+     * @param deviceType 匹配类型
+     * @param brandId    匹配品牌
+     * @param remoteId   遥控云码库id
+     * @param name       可选，默认为类型加品牌名
+     * @return un
+     */
+    public static FormBody.Builder bindIrRemotecode(String serialId, String deviceType, String brandId, String remoteId, String name) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.BIND_IR_REMOTECODE);
+        builder.add(CloudConstant.ParameterKey.DEVICETYPE, deviceType);
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.REMOTEID, remoteId);
+        builder.add(CloudConstant.ParameterKey.NAME, name);
+        return builder;
+
+    }
+
+    /**
+     * 下载码库方案至红外转发器
+     *
+     * @param serialId 红外转发器序列号
+     * @param index    遥控索引ID
+     * @param timeOut  超时时间/秒
+     * @return un
+     */
+    public static FormBody.Builder localIrDeviceDownload(String serialId, String index, String timeOut) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.LOCAL_IR_DEVICE_DOWNLOAD);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.INDEX, index);
+        builder.add(CloudConstant.ParameterKey.TIME_OUT, timeOut);
+        return builder;
+    }
+
+    /**
+     * 本地遥控方案——删除方案
+     *
+     * @param serialId 红外转发器序列号
+     * @param index    遥控索引ID
+     * @return un
+     */
+    public static FormBody.Builder localIrDeviceDelete(String serialId, String index) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.LOCAL_IR_DEVICE_DELETE);
+        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add(CloudConstant.ParameterKey.INDEX, index);
+        return builder;
+    }
+
+    /**
+     * 初始化sdk，与昂宝云校验
+     *
+     * @param appKey    昂宝分配的key
+     * @param appSecret key对应的secret
+     */
+    public static FormBody.Builder onInit(String appKey, String appSecret) {
+        return null;
     }
 }

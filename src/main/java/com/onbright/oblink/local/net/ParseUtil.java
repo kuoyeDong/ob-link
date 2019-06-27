@@ -1,17 +1,11 @@
 package com.onbright.oblink.local.net;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Message;
-import android.text.InputFilter;
-import android.text.InputType;
-import android.text.method.NumberKeyListener;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.local.LocalDataPool;
 import com.onbright.oblink.local.Obox;
 import com.onbright.oblink.local.bean.ActionReply;
 import com.onbright.oblink.local.bean.AirClean;
@@ -21,25 +15,38 @@ import com.onbright.oblink.local.bean.Ammeter;
 import com.onbright.oblink.local.bean.Body;
 import com.onbright.oblink.local.bean.Co;
 import com.onbright.oblink.local.bean.Cooker;
+import com.onbright.oblink.local.bean.DoorWindowSensor;
+import com.onbright.oblink.local.bean.ElectricCard;
+import com.onbright.oblink.local.bean.EnvironmentSensor;
 import com.onbright.oblink.local.bean.Environmental;
 import com.onbright.oblink.local.bean.Fan;
 import com.onbright.oblink.local.bean.Flood;
 import com.onbright.oblink.local.bean.Handset;
 import com.onbright.oblink.local.bean.Humidifier;
 import com.onbright.oblink.local.bean.Lamp;
+import com.onbright.oblink.local.bean.Light;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
 import com.onbright.oblink.local.bean.ObScene;
 import com.onbright.oblink.local.bean.ObSensor;
 import com.onbright.oblink.local.bean.Obsocket;
 import com.onbright.oblink.local.bean.Pm;
+import com.onbright.oblink.local.bean.Pm25Sensor;
 import com.onbright.oblink.local.bean.PowerCheck;
 import com.onbright.oblink.local.bean.Radar;
+import com.onbright.oblink.local.bean.RedOut;
+import com.onbright.oblink.local.bean.RedSensor;
+import com.onbright.oblink.local.bean.Remoter;
 import com.onbright.oblink.local.bean.SceneAction;
 import com.onbright.oblink.local.bean.SceneCondition;
+import com.onbright.oblink.local.bean.SensingPanelSensor;
+import com.onbright.oblink.local.bean.SmartLock;
+import com.onbright.oblink.local.bean.Smoke;
+import com.onbright.oblink.local.bean.TempHumid;
 import com.onbright.oblink.local.bean.TheCurtain;
 import com.onbright.oblink.local.bean.Timing;
 import com.onbright.oblink.local.bean.Tv;
+import com.onbright.oblink.local.bean.UltraSound;
 import com.onbright.oblink.local.bean.WinCurtain;
 
 import java.io.UnsupportedEncodingException;
@@ -71,71 +78,31 @@ public class ParseUtil {
     /**
      * 获取oboxID
      *
-     * @param msg      msg
-     * @param obox     要解析的obox
-     * @param tcpSend  网络发送端
-     * @param oboxSSID 保存当前连接名字的列表
+     * @param msg                 msg
+     * @param obox
+     * @param mySharedPreferences sharep数据
+     * @param tcpSend             网络发送端
+     * @param oboxSSID            保存当前连接名字的列表
+     * @param context             环境
+     * @param wrongPwd            是否在网络错误时刻      @return oboxID
      */
-    public static String getOboxId(Message msg, Obox obox,
-                                   TcpSend tcpSend, List<String> oboxSSID) {
+    public static String getOboxId(Message msg, Obox obox, SharedPreferences mySharedPreferences,
+                                   TcpSend tcpSend, List<String> oboxSSID,
+                                   Context context, boolean wrongPwd) {
         byte[] bytes = getBytes(msg);
-        return getWifiName(obox,
-                bytes, tcpSend, oboxSSID);
+        return getWifiName(mySharedPreferences, obox,
+                bytes, tcpSend, oboxSSID,
+                context, wrongPwd);
     }
 
-    private static boolean isActivator(Message msg) {
+    public static boolean isActivator(Message msg) {
         byte[] bytes = getBytes(msg);
         return MathUtil.byteIndexValid(bytes[index[9]], 0) == 1;
     }
 
-    private static boolean isOnServer(Message msg) {
+    public static boolean isOnServer(Message msg) {
         byte[] bytes = getBytes(msg);
         return MathUtil.byteIndexValid(bytes[index[9]], 1) == 1;
-    }
-
-    private static String getWifiName(Obox obox, byte[] data, TcpSend tcpSend, List<String> oboxSSID) {
-
-        int encryptionType = MathUtil.byteIndexValid(data[index[9]], 0);
-        boolean isConnetCloud = MathUtil.byteIndexValid(data[index[9]], 1) == 1;
-        byte[] temp = new byte[16];
-        System.arraycopy(data, index[10], temp, 0, 16);
-        int i = 0;
-        for (int j = 0; j < temp.length; j++) {
-            if ((temp[j] & 0xff) == 0xff) {
-                i = j;
-                break;
-            }
-        }
-//        temp[8] = '\0';
-        String ID;
-        String id = null;
-        try {
-            ID = new String(temp, "utf-8");
-            id = ID.substring(0, i);
-            boolean oboxNameExist = false;
-            tcpSend.setOboxName(id);
-            obox.setObox_name(id);
-            tcpSend.setEncryptionType(encryptionType);
-            for (String oboxName : oboxSSID) {
-                if (oboxName.equalsIgnoreCase(id)) {
-                    oboxNameExist = true;
-                    break;
-                }
-            }
-            if (!oboxNameExist) {
-                oboxSSID.add(id);
-//                tcpSend.setOboxName(id);
-//                obox.setObox_name(id);
-//                tcpSend.setEncryptionType(encryptionType);
-            }
-            /*ap模式并且没有被激活 */
-//            if ((encryptionType == 0) && NetUtil.getWorkMode() == OBConstant.NetState.ON_AP) {
-//                activateObox(tcpSend, context, mySharedPreferences, wrongPwd);
-//            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return id;
     }
 
     /**
@@ -173,6 +140,7 @@ public class ParseUtil {
         }
         return true;
     }
+
 
     /**
      * 根据不同类型做不同添加
@@ -240,11 +208,8 @@ public class ParseUtil {
                 obNodes.add(tv);
                 break;
 
-            case OBConstant.NodeType.AIR_CON:
-                Aircon aircon = new Aircon(num, rfAddr, addr, id,
-                        serNum, parentType, type,
-                        version, surplusSence, gourpAddr, state);
-                obNodes.add(aircon);
+            case OBConstant.NodeType.CONTROL_PANEL:
+                onParseControlPanel(obNodes, obNode, num, rfAddr, addr, id, serNum, parentType, type, version, surplusSence, gourpAddr, state);
                 break;
             case OBConstant.NodeType.IS_SENSOR:
                 onParseSensor(obNodes, obNode, num, rfAddr, addr, id,
@@ -257,7 +222,49 @@ public class ParseUtil {
                         version, surplusSence, gourpAddr, state);
                 obNodes.add(am);
                 break;
+            case OBConstant.NodeType.SMART_LOCK:
+                SmartLock smartLock = new SmartLock(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(smartLock);
+                break;
+            case OBConstant.NodeType.RED_OUT:
+                RedOut redOut = new RedOut(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(redOut);
+                break;
+            case OBConstant.NodeType.REMOTER:
+                Remoter remoter = new Remoter(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(remoter);
+                break;
+            case OBConstant.NodeType.REMOTE_MULTI_LED:
+                ObNode remoteLed = new ObNode();
+                remoteLed.setAddr((byte) 0xfe);
+                remoteLed.setRfAddr(rfAddr);
+                remoteLed.setSerNum(serNum);
+                remoteLed.setId("RemoteLed".getBytes());
+                remoteLed.setParentType((byte) 22);
+                obNodes.add(remoteLed);
+                break;
         }
+    }
+
+    /**
+     * 解析控制面板
+     */
+    private static void onParseControlPanel(List<ObNode> obNodes, ObNode obNode, byte num, byte[] rfAddr, byte addr, byte[] id, byte[] serNum, byte parentType, byte type, byte[] version, byte surplusSence, byte gourpAddr, byte[] state) {
+        switch (obNode.getType()) {
+            case OBConstant.NodeType.AIR_CON_PANEL:
+                Aircon aircon = new Aircon(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(aircon);
+                break;
+        }
+
     }
 
     /**
@@ -280,14 +287,14 @@ public class ParseUtil {
         }
     }
 
-
     /**
      * 此方法只处理收到新节点的情况，其他2003返回在msg.what处理
      * 设备类型，设备子类型，设备id，序列号， 完整地址
      *
-     * @param ObNodes 节点列表
+     * @param msg 数据
+     * @return 本机已经有缓存数据，返回false,否则返回true
      */
-    public static void parseNewNode(Message msg, List<ObNode> ObNodes) {
+    public static ObNode parseNewNode(Message msg, Map<String, List<ObNode>> obNodeListMap) {
         byte[] bytes = getBytes(msg);
         byte parentType = (byte) MathUtil.byteIndexValid(bytes[index[9]], 0, 7);
         byte type = bytes[index[10]];
@@ -301,14 +308,84 @@ public class ParseUtil {
         if (parentType == 1) {
             newObNode.setState(new byte[]{20, 0, 0, 0, 0, 0, 1});
         }
-        addNodeWithType(ObNodes, newObNode);
+        // FIXME: 2017/10/25 新入网的节点可能已经存在
+        // rf地址没变化，覆盖参数；rf地址有变化，从原先的obox节点列表删除，添加到新入网时所在obox节点列表
+        for (List<ObNode> obNodes : obNodeListMap.values()) {
+            for (ObNode obNode : obNodes) {
+                if (Arrays.equals(obNode.getSerNum(), newObNode.getSerNum())) {
+                    if (Arrays.equals(obNode.getRfAddr(), newObNode.getRfAddr())) {
+                        obNode.setState(newObNode.getState());
+                        obNode.setGroupAddr(newObNode.getGroupAddr());
+                        obNode.setAddr(newObNode.getAddr());
+                        obNode.setCplAddr(newObNode.getCplAddr());
+                        obNode.setId(newObNode.getId());
+                    } else {
+                        obNodes.remove(obNode);
+                        addNodeWithType(obNodeListMap.get(Transformation.byteArryToHexString(newObNode.getRfAddr())), newObNode);
+                    }
+                    return newObNode;
+                }
+            }
+        }
+        addNodeWithType(obNodeListMap.get(Transformation.byteArryToHexString(newObNode.getRfAddr())), newObNode);
+        return newObNode;
+    }
+
+
+    private static String getWifiName(SharedPreferences mySharedPreferences,
+                                      Obox obox, byte[] data, TcpSend tcpSend, List<String> oboxSSID,
+                                      Context context, boolean wrongPwd) {
+
+        int encryptionType = MathUtil.byteIndexValid(data[index[9]], 0);
+        boolean isConnetCloud = MathUtil.byteIndexValid(data[index[9]], 1) == 1;
+        byte[] temp = new byte[16];
+        System.arraycopy(data, index[10], temp, 0, 16);
+        int i = 0;
+        for (int j = 0; j < temp.length; j++) {
+            if ((temp[j] & 0xff) == 0xff) {
+                i = j;
+                break;
+            }
+        }
+//        temp[8] = '\0';
+        String ID;
+        String id = null;
+        try {
+            ID = new String(temp, "utf-8");
+            id = ID.substring(0, i);
+            boolean oboxNameExist = false;
+            tcpSend.setOboxName(id);
+            obox.setObox_name(id);
+            tcpSend.setEncryptionType(encryptionType);
+            for (String oboxName : oboxSSID) {
+                if (oboxName.equalsIgnoreCase(id)) {
+                    oboxNameExist = true;
+                    break;
+                }
+            }
+            if (!oboxNameExist) {
+                oboxSSID.add(id);
+//                tcpSend.setOboxName(id);
+//                obox.setObox_name(id);
+//                tcpSend.setEncryptionType(encryptionType);
+            }
+            /*ap模式并且没有被激活 */
+//            if ((encryptionType == 0) && NetUtil.getWorkMode() == OBConstant.NetState.ON_AP) {
+//                activateObox(tcpSend, context, mySharedPreferences, wrongPwd);
+//            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
 
     /**
      * 当解析的参数是传感器
      */
-    private static void onParseSensor(List<ObNode> obNodes, ObNode obNode, byte num, byte[] rfAddr, byte addr, byte[] id, byte[] serNum, byte parentType, byte type, byte[] version, byte surplusSence, byte gourpAddr, byte[] state) {
+    private static void onParseSensor(List<ObNode> obNodes, ObNode obNode, byte num, byte[] rfAddr,
+                                      byte addr, byte[] id, byte[] serNum, byte parentType, byte type,
+                                      byte[] version, byte surplusSence, byte gourpAddr, byte[] state) {
         switch (obNode.getType()) {
             case OBConstant.NodeType.ALS:
                 Als als = new Als(num, rfAddr, addr, id,
@@ -366,23 +443,72 @@ public class ParseUtil {
                 obNodes.add(radar1);
                 break;
             case OBConstant.NodeType.LIGHT_SENSOR:
-
+                Light light = new Light(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(light);
                 break;
             case OBConstant.NodeType.TEMP_HUMID_SENSOR:
-
+                TempHumid tempHumid = new TempHumid(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(tempHumid);
                 break;
             case OBConstant.NodeType.SMOKE_SENSOR:
-
+                Smoke smoke = new Smoke(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(smoke);
                 break;
 
-            case OBConstant.NodeType.RESERVE:
-
+            case OBConstant.NodeType.ULTRASOUND:
+                UltraSound ultraSound = new UltraSound(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(ultraSound);
                 break;
-            case OBConstant.NodeType.XIBING_RADAR:
+            case OBConstant.NodeType.PM2_5_SENSOR:
+                Pm25Sensor pm25Sensor = new Pm25Sensor(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(pm25Sensor);
+                break;
+            case OBConstant.NodeType.HOTEL_RADAR:
                 Radar radar2 = new Radar(num, rfAddr, addr, id,
                         serNum, parentType, type,
                         version, surplusSence, gourpAddr, state);
                 obNodes.add(radar2);
+                break;
+            case OBConstant.NodeType.RED_SENSOR:
+            case OBConstant.NodeType.DC_RED_SENSOR:
+                RedSensor redSensor = new RedSensor(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(redSensor);
+                break;
+            case OBConstant.NodeType.ENVROMENT_SENSOR:
+                EnvironmentSensor environmentSensor = new EnvironmentSensor(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(environmentSensor);
+                break;
+            case OBConstant.NodeType.SENSING_PANEL:
+                SensingPanelSensor sensingPanelSensor = new SensingPanelSensor(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(sensingPanelSensor);
+                break;
+            case OBConstant.NodeType.DOOR_WINDOW_MAGNET:
+                DoorWindowSensor doorWindowSensor = new DoorWindowSensor(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(doorWindowSensor);
+                break;
+            case OBConstant.NodeType.ELECTRIC_CARD:
+                ElectricCard electricCard = new ElectricCard(num, rfAddr, addr, id,
+                        serNum, parentType, type,
+                        version, surplusSence, gourpAddr, state);
+                obNodes.add(electricCard);
                 break;
         }
     }
@@ -426,48 +552,79 @@ public class ParseUtil {
     public static boolean parseDeviceState(Message msg, List<ObNode> obNodes, TcpSend tcpSend) {
         int stateStart = 15;
         byte[] bytes = getBytes(msg);
-        byte[] cplAddr = Arrays.copyOfRange(bytes, 7, 14);
+        byte[] rfAddr = Arrays.copyOfRange(bytes, 7, 12);
+        int addr = bytes[13] & 0xff;
         int len = obNodes.size();
+        boolean isTwo = false;
         for (int i = 0; i < len; i++) {
             ObNode ld = obNodes.get(i);
-            if (Arrays.equals(ld.getCplAddr(), cplAddr)) {
-                byte[] state = null;
+            /*比较rf和节点地址即可，组地址不考虑*/
+            if (Arrays.equals(ld.getRfAddr(), rfAddr) && (ld.getAddr() & 0xff) == addr) {
+                byte[] state;
                 switch (ld.getParentType()) {
                     case OBConstant.NodeType.IS_LAMP:
                         state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 7]);
                         break;
                     case OBConstant.NodeType.IS_COOKER:
-                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 3]);
+                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 7]);
                         break;
                     case OBConstant.NodeType.IS_HUMIDIFIER:
-                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 5]);
+                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 7]);
                         break;
                     case OBConstant.NodeType.IS_OBSOCKET:
                         state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 7]);
                         break;
                     case OBConstant.NodeType.IS_CURTAIN:
-                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 2]);
+                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 7]);
                         break;
                     case OBConstant.NodeType.IS_FAN:
-                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 6]);
+                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 7]);
                         break;
-                    case OBConstant.NodeType.IS_AIR_CLEAN:
-                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 5]);
-                        break;
-                    case OBConstant.NodeType.AIR_CON:
-                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 5]);
+                    case OBConstant.NodeType.CONTROL_PANEL:
+                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 7]);
                         break;
                     case OBConstant.NodeType.IS_SENSOR:
-                        state = parseSensorState(stateStart, bytes, ld);
+                        switch (ld.getType()) {
+                            case OBConstant.NodeType.ENVROMENT_SENSOR:
+                                isTwo = true;
+                                backIndex++;
+                                if (backIndex < 2) {
+                                    tcpSend.setMustRec(true);
+                                }
+                                state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 6]);
+                                if (MathUtil.byteIndexValid(state[0], 4, 4) == 0) {
+                                    System.arraycopy(state, 0, ld.getState(), 0, 6);
+                                } else {
+                                    System.arraycopy(state, 0, ld.getState(), 6, 6);
+                                }
+                                if (backIndex < 2) {
+                                    return false;
+                                } else {
+                                    tcpSend.setMustRec(false);
+                                }
+                                break;
+                            default:
+                                state = parseSensorState(stateStart, bytes, ld);
+                                break;
+                        }
                         break;
                     case OBConstant.NodeType.AMMETER:
                         state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 8]);
                         break;
+                    case OBConstant.NodeType.IS_AIR_CLEAN:
+                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 5]);
+                        break;
+                    default:
+                        state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 8]);
+                        break;
                 }
-                ld.setState(state);
+                backIndex = 0;
+                if (!isTwo) {
+                    ld.setState(state);
+                }
                 int index = i + 1;
                 if (index < obNodes.size()) {
-                    tcpSend.getDeviceState(obNodes.get(index).getCplAddr(), new byte[2]);
+                    tcpSend.getDeviceState(obNodes.get(index).getCplAddr(), null);
                     return false;
                 }
             }
@@ -475,6 +632,8 @@ public class ParseUtil {
         }
         return true;
     }
+
+    private static int backIndex;
 
     /**
      * 返回当前传感器的状态
@@ -485,7 +644,7 @@ public class ParseUtil {
      * @return 对应的状态数组
      */
     private static byte[] parseSensorState(int stateStart, byte[] bytes, ObNode ld) {
-        byte[] state = null;
+        byte[] state;
         switch (ld.getType()) {
             case OBConstant.NodeType.ALS:
                 state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 4]);
@@ -512,8 +671,23 @@ public class ParseUtil {
             case OBConstant.NodeType.POWER_CHECK:
                 state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 5]);
                 break;
+            case OBConstant.NodeType.HOTEL_RADAR:
+                state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 8]);
+                break;
+            case OBConstant.NodeType.LIGHT_SENSOR:
+                state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 8]);
+                break;
+            default:
+                state = Arrays.copyOfRange(bytes, index[stateStart], index[stateStart + 8]);
+                break;
         }
         return state;
+    }
+
+    public static byte[] parseNodeVersion(Message msg) {
+        byte[] datas = ParseUtil.getBytes(msg);
+        byte[] version = Arrays.copyOfRange(datas, index[17], index[17] + 16);
+        return version;
     }
 
 
@@ -523,14 +697,13 @@ public class ParseUtil {
      * @param msg     msg
      * @param obox    obox
      * @param tcpSend 当前选择的连接
-     * @param rfPsw   rf通信密码 传null则使用默认密码
      */
-    public static void parseObox(Message msg, Obox obox, TcpSend tcpSend, String rfPsw) {
+    public static void parseObox(Message msg, Obox obox, TcpSend tcpSend, SharedPreferences mySharedPreferences) {
         byte[] bytes = getBytes(msg);
         byte[] serNum = Arrays.copyOfRange(bytes, index[11], index[11] + 5);
         byte[] version = Arrays.copyOfRange(bytes, index[11] + 5, index[11] + 5 + 8);
         String serNumStr = Transformation.byteArryToHexString(serNum);
-        tcpSend.setPSW(rfPsw == null ? OBConstant.StringKey.PSW : rfPsw);
+        tcpSend.setPSW(mySharedPreferences.getString(serNumStr, OBConstant.StringKey.PSW));
         obox.setObox_pwd(tcpSend.getPSW());
         tcpSend.setRfAddr(serNum);
         obox.setObox_serial_id(serNum);
@@ -584,7 +757,7 @@ public class ParseUtil {
                 /*此处num只是帧数标志，每个帧，只要此位置不为0xff则其内必然包含三个行为节点，
                 否则，若此位置为0xff则表示情景内部节点读取结束，需判断帧内具体的行为节点数量*/
         ObScene obScene = getObSceneforSer(obScenes, sceneSernum);
-                    /*通过完整地址查找对应节点添加到数据*/
+        /*通过完整地址查找对应节点添加到数据*/
         boolean isFault = false;
         for (int i = 0; i < 3; i++) {
             byte[] cplAddr = Arrays.copyOfRange(data, index[12 + 15 * i], index[19 + 15 * i]);
@@ -601,8 +774,9 @@ public class ParseUtil {
             tcpSend.reqScene(ObScene.OBSCENE_ACTION, sceneSernum, ++num);
         } else {
             int scenenum = obScene.getNum();
+            int scenegroup = obScene.getSceneGroup();
             /*是最后一个情景？*/
-            if (scenenum == 0xff) {
+            if (scenenum == 0xff || scenegroup == 0xffff) {
                 return true;
             } else {
                 tcpSend.reqScene(ObScene.OBSCENE_ID, 0, ++scenenum);
@@ -666,6 +840,7 @@ public class ParseUtil {
                         continue;
                     case SceneCondition.TIMING:
                         sceneCondition = new Timing(condition);
+                        sceneConditions.add(sceneCondition);
                         break;
                     case SceneCondition.SENSOR:
                         for (int index = 0; index < nodes.size(); index++) {
@@ -673,7 +848,18 @@ public class ParseUtil {
                             if (Arrays.equals(conditionaddr, obNode.getCplAddr())) {
                                 if (obNode instanceof ObSensor) {
                                     sceneCondition = (ObSensor) obNode;
+                                    sceneCondition.setCondition("" + obScene.getSerisNum(), condition);
+                                    sceneConditions.add(sceneCondition);
+                                } else if (obNode instanceof Obsocket) {
+                                    sceneCondition = (Obsocket) obNode;
+                                    sceneCondition.setCondition("" + obScene.getSerisNum(), condition);
+                                    sceneConditions.add(sceneCondition);
+                                } else if (obNode instanceof SmartLock) {
+                                    sceneCondition = (SmartLock) obNode;
+                                    sceneCondition.setCondition("" + obScene.getSerisNum(), condition);
+                                    sceneConditions.add(sceneCondition);
                                 }
+
                                 break;
                             }
                         }
@@ -683,14 +869,16 @@ public class ParseUtil {
                         Handset hs = new Handset();
                         hs.setBindOboxs(null);
                         sceneCondition = hs;
+                        sceneConditions.add(sceneCondition);
                         break;
                     default:
                         break;
                 }
                 // FIXME: 2016/7/6 此处暂时先把所有的情景内条件统一管理
-                sceneConditions.add(sceneCondition);
             }
-            obScene.getSceneCondition().add(sceneConditions);
+            if (sceneConditions.size() > 0) {
+                obScene.getSceneCondition().add(sceneConditions);
+            }
         }
         /*ff没意义*/
         int num = MathUtil.validByte(data[index[11]]);
@@ -728,6 +916,11 @@ public class ParseUtil {
      * 解析情景id
      */
     private static boolean parseSceneId(List<ObScene> obScenes, TcpSend tcpSend, byte[] data) {
+        int option = MathUtil.validByte(data[index[9]]);
+        // FIXME: 2017/10/16 选项为f0同样也是结束标志
+        if (option == 0xf0) {
+            return true;
+        }
         int serNum = MathUtil.validByte(data[index[10]]);
         int number = MathUtil.validByte(data[index[11]]);
         if (serNum != 0) {
@@ -740,11 +933,13 @@ public class ParseUtil {
             obScene.setSceneGroup(sceneGroup);
             obScenes.add(obScene);
         } else {
-             /*是最后一个情景并且编号为0*/
+            /*情景序号为0且最后一个情景*/
             if (number == 0xff) {
                 return true;
             } else {
+                /*情景序号为0且不是最后一个情景*/
                 tcpSend.reqScene(ObScene.OBSCENE_ID, 0, ++number);
+                return false;
             }
         }
         tcpSend.reqScene(ObScene.OBSCENE_CONDITION, serNum, 1);
@@ -754,25 +949,60 @@ public class ParseUtil {
     /**
      * 设置节点状态返回
      *
-     * @param message  传入message
-     * @param isSingle 是否单节点
+     * @param message      传入message
+     * @param isSingle     是否单节点
+     * @param isGroup
      * @param obNode
+     * @param obGroup
      */
-    public static void onSetStatusRecSuc(Message message, boolean isSingle, ObNode obNode, ObGroup obGroup) {
+    public static void onSetStatusRec(Message message, boolean isSingle, boolean isGroup, ObNode obNode, ObGroup obGroup) {
         byte[] bytes = getBytes(message);
         if (bytes == null) {
             return;
         }
+        if (obNode == null) {
+            return;
+        }
+        byte[] status = Arrays.copyOfRange(bytes, 15, 15 + 7);
+        if (isSingle) {
+            switch (message.what) {
+                case OBConstant.ReplyType.SET_STATUS_SUC:
+                    obNode.setState(status);
+                    break;
+                case OBConstant.ReplyType.SET_STATUS_FAL:
+
+                    break;
+            }
+        } else if (isGroup) {
+            if (obGroup == null) {
+                return;
+            }
+            switch (message.what) {
+                case OBConstant.ReplyType.SET_STATUS_SUC:
+                    obGroup.setStatus(status);
+                    break;
+                case OBConstant.ReplyType.SET_STATUS_FAL:
+
+                    break;
+            }
+        }
+    }
+
+    /**
+     * 读取红外配置时候的解析
+     *
+     * @return 9字节的数据
+     */
+    public static byte[] onReadIrcfgRec(Message message) {
+        byte[] bytes = getBytes(message);
         switch (message.what) {
             case OBConstant.ReplyType.SET_STATUS_SUC:
-                byte[] status = Arrays.copyOfRange(bytes, 15, 15 + 7);
-                if (isSingle) {
-                    obNode.setState(status);
-                } else {
-                    obGroup.setStatus(status);
-                }
+                return Arrays.copyOfRange(bytes, 15, 15 + 9);
+            case OBConstant.ReplyType.SET_STATUS_FAL:
+
                 break;
         }
+        return null;
     }
 
     /**
@@ -782,12 +1012,10 @@ public class ParseUtil {
      * @param isSingle
      * @param obNode
      * @param obGroup
-     * @param obNodeMap
-     * @param obGroupMap
      */
-    public static void onEditNodeOrGroupSuc(Message message, boolean isSingle,
-                                            ObNode obNode, ObGroup obGroup,
-                                            Map<String, List<ObNode>> obNodeMap, Map<String, List<ObGroup>> obGroupMap) {
+    public static void onEditNodeOrGroup(Message message, boolean isSingle,
+                                         ObNode obNode, ObGroup obGroup
+                                         ) {
         switch (message.what) {
             case OBConstant.ReplyType.EDIT_NODE_OR_GROUP_SUC:
                 byte[] datas = ParseUtil.getBytes(message);
@@ -795,18 +1023,14 @@ public class ParseUtil {
                     /*删除*/
                     case 0:
                         if (isSingle) {
-                            if (obNodeMap != null) {
-                                obNodeMap.get(Transformation.byteArryToHexString(obNode.getRfAddr())).remove(obNode);
-                            }
+                            LocalDataPool.newInstance().editNode(Transformation.byteArryToHexString(obNode.getRfAddr()), obNode, false);
                         } else {
                             if (obGroup.getObNodes() != null) {
                                 for (int i = 0; i < obGroup.getObNodes().size(); i++) {
                                     obGroup.getObNodes().get(i).setGroupAddr((byte) 0);
                                 }
                             }
-                            if (obGroupMap != null) {
-                                obGroupMap.get(Transformation.byteArryToHexString(obGroup.getRfAddr())).remove(obGroup);
-                            }
+                            LocalDataPool.newInstance().editGroup(Transformation.byteArryToHexString(obGroup.getRfAddr()), obGroup, false);
                         }
                         break;
                     /*新增*/
@@ -814,9 +1038,7 @@ public class ParseUtil {
                         if (!isSingle) {
                             obGroup.setRfAddrs(Arrays.copyOfRange(datas, index[10], index[10] + 5));
                             obGroup.setAddr(datas[index[15]]);
-                            if (obGroupMap != null) {
-                                obGroupMap.get(Transformation.byteArryToHexString(obGroup.getRfAddr())).add(obGroup);
-                            }
+                            LocalDataPool.newInstance().editGroup(Transformation.byteArryToHexString(obGroup.getRfAddr()), obGroup, true);
                         }
                         break;
                     /*重命名*/
@@ -833,6 +1055,9 @@ public class ParseUtil {
                         }
                         break;
                 }
+                break;
+            case OBConstant.ReplyType.EDIT_NODE_OR_GROUP_FAL:
+
                 break;
         }
     }
@@ -864,8 +1089,13 @@ public class ParseUtil {
      * @param obScenes 被操作的场景对象所在容器，删除或者增加传，用于在源数据内删除
      * @param message  返回message
      */
-    public static void onEditScene(boolean isLink, ObScene obScene, List<ObScene> obScenes, Message message, List<ObNode> obNodes) {
-        byte[] bytes = getBytes(message);
+    public static void onEditScene(boolean isLink, ObScene obScene, List<ObScene> obScenes, Message message, byte[] msgbytes, List<ObNode> obNodes) {
+        byte[] bytes;
+        if (message != null) {
+            bytes = getBytes(message);
+        } else {
+            bytes = msgbytes;
+        }
         int operaType = bytes[index[9]];
         switch (operaType) {
             case ObScene.OBSCENE_ID:
@@ -925,8 +1155,10 @@ public class ParseUtil {
                             for (int index = 0; index < obNodes.size(); index++) {
                                 ObNode obNode = obNodes.get(index);
                                 if (Arrays.equals(conditionaddr, obNode.getCplAddr())) {
-                                    obNode.putAction(obScene.getSerisNum(), condition);
-                                    sceneCondition = (ObSensor) obNode;
+                                    if (obNode instanceof SceneCondition) {
+                                        sceneCondition = (SceneCondition) obNode;
+                                        sceneCondition.setCondition("" + obScene.getSerisNum(), condition);
+                                    }
                                     break;
                                 }
                             }
@@ -964,7 +1196,6 @@ public class ParseUtil {
     /**
      * 批量处理action
      *
-     * @param obScene      目标本地情景
      * @param srcActions   待处理数据源
      * @param index        start下标值
      * @param isDel        是否删除
@@ -972,8 +1203,7 @@ public class ParseUtil {
      * @param isAlldellete 是否全部清空
      * @return 操作之后的下标  当actionreply 返回 0和true的时候，并没有发送数据，请自行处理
      */
-    public static ActionReply batAction(ObScene obScene, List<SceneAction> srcActions, int index,
-                                        boolean isDel, TcpSend tcpSend, boolean isAlldellete) {
+    public static ActionReply batAction(List<SceneAction> srcActions, int index, boolean isDel, TcpSend tcpSend, boolean isAlldellete) {
         List<SceneAction> sceneActions = new ArrayList<>();
         if (srcActions.size() == 0) {
             return new ActionReply(0, true);
@@ -990,7 +1220,7 @@ public class ParseUtil {
                 afterIndex++;
             }
         }
-        tcpSend.editSceneAction(obScene.getSerisNum(), sceneActions, isDel, isAlldellete);
+        tcpSend.editSceneAction(LocalDataPool.getCurentScene().getSerisNum(), sceneActions, isDel, isAlldellete);
         return new ActionReply(afterIndex, afterIndex >= srcActions.size());
     }
 
@@ -1009,4 +1239,20 @@ public class ParseUtil {
         }
     }
 
+    /**
+     * 获取obox的flash修改时间，此时间为obox内单节点、组结构、情景结构变化的时间
+     *
+     * @param message un
+     * @return obox的flash修改时间
+     */
+    public static byte[] getOboxFlashTime(Message message) {
+        byte[] bytes = getBytes(message);
+        int index = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            if ((bytes[i] & 0xff) == 0xff) {
+                index = i;
+            }
+        }
+        return Arrays.copyOfRange(bytes, index + 1, index + 1 + 8);
+    }
 }

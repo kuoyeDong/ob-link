@@ -1,13 +1,9 @@
 package com.onbright.oblink;
 
 
-import com.onbright.oblink.local.bean.ObNode;
-import com.onbright.oblink.local.bean.ObScene;
 import com.onbright.oblink.local.net.OBConstant;
-import com.onbright.oblink.local.net.Transformation;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,8 +20,6 @@ public class StringUtil {
      * @return 合法
      */
     public static boolean isLegit(String str, int type, int len) {
-//        String limitEx="^[a-zA-Z0-9\u4E00-\u9FA5]{0,5}|[a-zA-Z0-9]{0,16}$";
-        // FIXME: 2016/6/12
         String limitEx;
         final int phone = 1;
         final int psw = 2;

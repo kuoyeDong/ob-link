@@ -6,7 +6,6 @@ import java.io.Serializable;
  * 情景条件，除了可以为正常节点外还可以是定时和遥控器，所以之前各类均继承于此类
  * Created by adolf_dong on 2016/6/30.
  */
-
 public interface SceneCondition extends Serializable {
 
 

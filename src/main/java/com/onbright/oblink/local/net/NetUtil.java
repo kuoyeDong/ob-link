@@ -17,10 +17,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * 检查当前网络判断工作模式，并查找连接的路由器中的obox
+ * 检查当前网络判断工作模式，执行服务器连接请求
  * Created by adolf_dong on 2016/5/19.
  */
-public abstract class NetUtil {
+public abstract class  NetUtil {
     private static final String TAG = "NetUtil";
 
     private static int workMode;
@@ -28,7 +28,7 @@ public abstract class NetUtil {
     private DhcpInfo dhcpinfo;
     private DatagramPacket mDatagramPacket;
     private MulticastSocket ms;
-    private int search_count;
+    private int searchCount;
     private boolean isSearchTimeout;
     private DatagramPacket pack;
     private List<String> oboxStringList;
@@ -37,7 +37,6 @@ public abstract class NetUtil {
 
     /**
      * 检测当前网络环境
-     *
      */
     public void ckNet() {
         if (mWifiManager.isWifiEnabled()) {
@@ -68,20 +67,24 @@ public abstract class NetUtil {
 
     public abstract void onWifiDisAble();
     public NetUtil(Context context) {
-        mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (mWifiManager.isWifiEnabled()) {
-            dhcpinfo = mWifiManager.getDhcpInfo();
-        } else {
-            onWifiDisAble();
+        mWifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (mWifiManager != null) {
+            if (mWifiManager.isWifiEnabled()) {
+                dhcpinfo = mWifiManager.getDhcpInfo();
+            } else {
+                onWifiDisAble();
+            }
         }
     }
 
     /**
      * 发送udp广播包
      */
-    public void udpBc(Context context,final Handler handler, final boolean findServer,final int timeOut) {
-        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        lock = manager.createMulticastLock("broad");
+    public void udpBc(Context context, final Handler handler, final int timeOut) {
+        WifiManager manager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (manager != null) {
+            lock = manager.createMulticastLock("broad");
+        }
         lock.acquire();
         try {
             if (ms == null) {
@@ -96,29 +99,29 @@ public abstract class NetUtil {
                 String broadCastIp = null;
                 int ip = dhcpinfo.serverAddress;
                 int mask = dhcpinfo.netmask;
-                int broadIp = (ip & mask)|~mask;
+                int broadIp = (ip & mask) | ~mask;
                 if (broadIp != 0) {
                     broadCastIp = ((broadIp & 0xff) + "." + (broadIp >> 8 & 0xff) + "." + (broadIp >> 16 & 0xff) + "." + (broadIp >> 24 & 0xff));
                 }
                 byte[] buffer = new byte[10];
                 mDatagramPacket = new DatagramPacket(buffer, 10);
-                String str = findServer ? "on-bright" : "HLK";
+                String str = "HLK";
                 byte out[] = str.getBytes();
                 mDatagramPacket.setData(out);
                 mDatagramPacket.setLength(out.length);
-                mDatagramPacket.setPort(findServer ? 9090 : 988);
-                search_count = 0;
-                while (search_count < 10) {
+                mDatagramPacket.setPort(988);
+                searchCount = 0;
+                while (searchCount < 3) {
                     try {
                         InetAddress address = InetAddress.getByName(broadCastIp);
                         mDatagramPacket.setAddress(address);
                         ms.send(mDatagramPacket);
                         Log.d(TAG, "run: mDatagramPacket.send = " + str);
-                        Thread.sleep(200);
+                        Thread.sleep(1000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    search_count++;
+                    searchCount++;
                 }
                 Timer mTimer = new Timer();
                 mTimer.schedule(new TimerTask() {
@@ -127,7 +130,7 @@ public abstract class NetUtil {
                         isSearchTimeout = true;
                         Message mes = new Message();
                         lock.release();
-                        mes.what = findServer ? OBConstant.NetState.ON_DSFINISH_SERVER : OBConstant.NetState.ON_DSFINISH_OBOX;
+                        mes.what = OBConstant.NetState.ON_DSFINISH_OBOX;
                         handler.sendMessage(mes);
                     }
                 }, timeOut);
@@ -152,16 +155,20 @@ public abstract class NetUtil {
                         pack = new DatagramPacket(DataReceive, DataReceive.length);
                         ms.receive(pack);
                         String addr = ("" + pack.getAddress()).substring(1);
-                        boolean isFound = false;
-                        for (String tmp : oboxStringList) {
-                            if (tmp.equalsIgnoreCase(addr)) {
-                                isFound = true;
-                                break;
+                        String date = new String(pack.getData());
+                        Log.d(TAG, "recAddr = " + addr + "data = " + date);
+                        if (date.contains("QCA4004")) {
+                            boolean isFound = false;
+                            for (String tmp : oboxStringList) {
+                                if (tmp.equalsIgnoreCase(addr)) {
+                                    isFound = true;
+                                    break;
+                                }
                             }
-                        }
-                        if (!isFound) {
-                            oboxStringList.add(addr);
-                            Log.d(TAG, "add(addr) = " + addr);
+                            if (!isFound) {
+                                Log.d(TAG, "addAddr = " + addr + "data = " + date);
+                                oboxStringList.add(addr);
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -170,9 +177,6 @@ public abstract class NetUtil {
             }
         }).start();
     }
-
-
-
 
     /**
      * 设置当前工作模式
@@ -190,7 +194,8 @@ public abstract class NetUtil {
         return oriWorkMode;
     }
 
-    /**设置原始工作状态
+    /**
+     * 设置原始工作状态
      */
     public static void setOriWorkMode(int workMode) {
         oriWorkMode = workMode;
@@ -200,8 +205,9 @@ public abstract class NetUtil {
         return workMode;
     }
 
-
-    /**释放本地网络资源，即断开本地的连接和监听
+    /**
+     * 释放本地网络资源，即断开本地的连接和监听
+     *
      * @param tcpSend 网络连接
      * @param tcpMaps 网络连接映射
      */

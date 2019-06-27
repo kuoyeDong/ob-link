@@ -1,8 +1,11 @@
 package com.onbright.oblink.local.bean;
 
+import android.support.annotation.NonNull;
+
 
 import com.onbright.oblink.MathUtil;
 import com.onbright.oblink.local.net.OBConstant;
+import com.onbright.oblink.local.net.Transformation;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -10,23 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 本地组,可通过组关系统一设置若干的单节点设备
+ * 本地组元素
  * Created by Adolf_Dong on 2016/5/24.
  */
-public class ObGroup extends SceneAction implements Serializable {
+public class ObGroup extends SceneAction implements Serializable,Comparable<ObGroup> {
+    public transient boolean isOnline = true;
     private byte num;
     /**
      * 组地址
      */
     private byte addr;
-    /**
-     * 返回组id，用以表示组的名称
-     */
     private byte[] id;
-    private byte[] indexs;
     private List<Integer> indexList;
     /**
-     * 组内节点列表
+     * 组内节点
      */
     private List<ObNode> obNodes;
 
@@ -35,7 +35,7 @@ public class ObGroup extends SceneAction implements Serializable {
     }
 
     /**
-     * rf地址，即所属obox的地址
+     * rf地址
      */
     private byte[] rfAddr;
 
@@ -47,9 +47,6 @@ public class ObGroup extends SceneAction implements Serializable {
         return indexList;
     }
 
-    public void setIndexList(List<Integer> indexList) {
-        this.indexList = indexList;
-    }
 
     public void setNum(byte num) {
         this.num = num;
@@ -82,16 +79,6 @@ public class ObGroup extends SceneAction implements Serializable {
         this.id = id;
     }
 
-    /**
-     * 获得组索引数组
-     */
-    public byte[] getIndexs() {
-        return indexs;
-    }
-
-    public void setIndexs(byte[] indexs) {
-        this.indexs = indexs;
-    }
 
     public ObGroup() {
 
@@ -101,9 +88,18 @@ public class ObGroup extends SceneAction implements Serializable {
         this.num = num;
         this.addr = addr;
         this.id = MathUtil.validArray(id);
-        this.indexs = indexs;
         indexList = new ArrayList<>();
-        MathUtil.index2List(indexs, indexList);
+        for (int index = 0; index < 32; index++) {
+            if (indexs[index] == 0) {
+                continue;
+            }
+            for (int i = 0; i < 8; i++) {
+                if (((indexs[index] >> i) & 0x01) != 0) {
+                    int indexVal = index * 8 + i + 1;
+                    indexList.add(indexVal);
+                }
+            }
+        }
     }
 
     public List<ObNode> getObNodes() {
@@ -111,6 +107,15 @@ public class ObGroup extends SceneAction implements Serializable {
             obNodes = new ArrayList<>();
         }
         return obNodes;
+    }
+
+    @Override
+    public void putAction(int SceneSerNum, byte[] action) {
+        super.putAction(SceneSerNum, action);
+        for (ObNode obNode :
+                getObNodes()) {
+            obNode.putAction(SceneSerNum,action);
+        }
     }
 
     public void setObNodes(List<ObNode> obNodes) {
@@ -157,9 +162,6 @@ public class ObGroup extends SceneAction implements Serializable {
         return new byte[7];
     }
 
-    /**设置组内单节点的状态
-     * @param status 要设置的状态 7字节
-     */
     public void setStatus(byte[] status) {
         for (ObNode obNode :
                 obNodes) {
@@ -167,5 +169,9 @@ public class ObGroup extends SceneAction implements Serializable {
         }
     }
 
-
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public int compareTo(@NonNull ObGroup o) {
+        return Transformation.byteArryToHexString(this.getAddrs()).compareTo(Transformation.byteArryToHexString(o.getAddrs()));
+    }
 }

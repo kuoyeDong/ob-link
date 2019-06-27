@@ -18,6 +18,7 @@ public class Obox implements Serializable {
      * obox的id，也是obox的唯一标识
      */
     private String obox_serial_id;
+    private String serialId;
     /**
      * obox的版本号
      */
@@ -35,26 +36,14 @@ public class Obox implements Serializable {
      */
     private List<DeviceConfig> device_config;
 
-    /**
-     * 在执行绑定obox成功后此方法获取的返回才有效主要用于绑定obox成功后刷新数据使用
-     *
-     * @return 服务器模式下的组
-     */
     public List<Groups> getGroup_config() {
         return group_config;
     }
 
-
-    /**设置服务器模式的组数据
-     * @param group_config 目标组数据
-     */
     public void setGroup_config(List<Groups> group_config) {
         this.group_config = group_config;
     }
 
-    /**在执行绑定obox成功后此方法获取的返回才有效，获取服务器模式的情景数据
-     * @return 服务器模式的情景数据
-     */
     public List<CloudScene> getScene_config() {
         return scene_config;
     }
@@ -74,6 +63,9 @@ public class Obox implements Serializable {
 
     private String obox_activate;
     private String obox_person;
+    /**
+     * "0" offLine
+     */
     private String obox_status;
     private String obox_control;
 
@@ -90,6 +82,7 @@ public class Obox implements Serializable {
     public boolean canSearch(long currentTime, int second) {
         return currentTime - releaseTime > second * 1000;
     }
+
 
     public Obox(String obox_serial_id, String obox_version, String obox_name, String obox_pwd, List<DeviceConfig> device_config) {
         this.obox_serial_id = obox_serial_id;
@@ -116,6 +109,18 @@ public class Obox implements Serializable {
 
     public void setObox_serial_id(String obox_serial_id) {
         this.obox_serial_id = obox_serial_id;
+    }
+
+    public String getSerialId() {
+        return serialId;
+    }
+
+    public String getDevice_type() {
+        return "0a";
+    }
+
+    public void setSerialId(String serialId) {
+        this.serialId = serialId;
     }
 
     public String getObox_version() {
