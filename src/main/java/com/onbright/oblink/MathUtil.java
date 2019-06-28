@@ -1,17 +1,25 @@
 package com.onbright.oblink;
 
 
+import android.annotation.SuppressLint;
+import android.util.Base64;
+
+import com.onbright.oblink.cloud.bean.DeviceConfig;
+import com.onbright.oblink.cloud.bean.Groups;
+import com.onbright.oblink.local.bean.EnvironmentSensor;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
 import com.onbright.oblink.local.net.OBConstant;
 
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 算法工具
- * Created by adolf_dong on 2016/5/23.
+ * Created by adolf_dong on 2019/6/28.
  */
 public class MathUtil {
     /**
@@ -76,31 +84,24 @@ public class MathUtil {
     }
 
     /**
-     * 通过组索引获得组成员
-     *
-     * @param bytes    组索引
-     * @param integers 组成员装载容器
-     */
-    public static void index2List(byte[] bytes, List<Integer> integers) {
-        for (int index = 0; index < 32; index++) {
-            if (bytes[index] == 0) {
-                continue;
-            }
-            for (int i = 0; i < 8; i++) {
-                if (((bytes[index] >> i) & 0x01) != 0) {
-                    int indexVal = index * 8 + i + 1;
-                    integers.add(indexVal);
-                }
-            }
-        }
-    }
-
-    /**
      * 判断字节数组值是否为0
      */
     public static boolean byteArrayIsZero(byte[] src) {
         for (byte aSrc : src) {
             if (aSrc != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 判断字节数组值是否全为ff
+     */
+    public static boolean byteArrayIsff(byte[] src, int start, int len) {
+        for (int i = 0; i < len; i++) {
+            byte aSrc = src[i + start];
+            if ((aSrc & 0xff) != 0xff) {
                 return false;
             }
         }
@@ -139,20 +140,147 @@ public class MathUtil {
      *
      * @param src    目标字节
      * @param dst    要改变的位 0-7
-     * @param isTrue 1为true
+     * @param isTure 1为true
      * @return 目标位置
      */
-    public static byte changeByteIndexvalue(byte src, int dst, boolean isTrue) {
-        byte goal;
-        if (dst == 0) {
-            goal = (byte) ((MathUtil.byteIndexValid(src, 1, 7) << 1) + (isTrue ? 1 : 0));
-        } else if (dst == 7) {
-            goal = (byte) (MathUtil.byteIndexValid(src, 0, 7) + (isTrue ? 0x80 : 0));
+    public static byte setBitIndex(byte src, int dst, boolean isTure) {
+        if (isTure) {
+            src |= (1 << dst);
         } else {
-            goal = (byte) ((MathUtil.byteIndexValid(src, dst + 1, 7 - dst) << (dst + 1))
-                    + (isTrue ? 1 << dst : 0) + MathUtil.byteIndexValid(src, 0, dst));
+            src &= ~(1 << dst);
         }
-        return goal;
+        return src;
     }
+
+    /**
+     * 反转字节的某个bit
+     *
+     * @param src 字节
+     * @param dst 目标位置
+     */
+    public static byte toggleBitIndex(byte src, int dst) {
+        src ^= (1 << dst);
+        return src;
+    }
+
+    /**
+     * 设定连续bit的数值
+     *
+     * @param src   原字节
+     * @param start 起始位置
+     * @param len   从起始位置开始的长度
+     * @param value 具体数值,value过大则从低位开始取
+     */
+    public static byte setMultiBitIndex(byte src, int start, int len, int value) {
+        for (int i = 0; i < len; i++) {
+            if (((value >> i) & 1) == 1) {
+                src |= (1 << start + i);
+            } else {
+                src &= ~(1 << start + i);
+            }
+        }
+        return src;
+    }
+
+    /**
+     * 计算环境传感器的某个位置的值
+     *
+     * @param index 目标位置
+     * @param src   环境传感器的12字节状态
+     * @return 计算后用于显示的数值
+     */
+    @SuppressLint("DefaultLocale")
+    public static String getEvIndexStr(int index, byte[] src) {
+        String showStr = null;
+        int code = MathUtil.byteIndexValid(src[index], 0, 4) << 8 + MathUtil.validByte(src[index + 1]);
+        switch (index) {
+            case EnvironmentSensor.FORMALDEHYDE:
+                showStr = String.format("%.3f", code * 0.001233 * 0.4);
+                break;
+            case EnvironmentSensor.PM:
+                return String.valueOf(code * 2);
+            case EnvironmentSensor.CO:
+                return String.valueOf(code * 658);
+            case EnvironmentSensor.TEMP:
+                showStr = String.format("%.1f", 0.0429 * code - 46.85);
+                break;
+            case EnvironmentSensor.HUMI:
+                return String.valueOf((int) (0.0305 * code - 6));
+            case EnvironmentSensor.CO2:
+                return String.valueOf(code * 4);
+        }
+        return showStr;
+    }
+
+    public static double getEvIndexValue(int index, byte[] src) {
+        int code = MathUtil.byteIndexValid(src[index], 0, 4) + MathUtil.validByte(src[index + 1]);
+        switch (index) {
+            case EnvironmentSensor.FORMALDEHYDE:
+                return code * 0.001233 * 0.4;
+            case EnvironmentSensor.PM:
+                return code * 2;
+            case EnvironmentSensor.CO:
+                return code * 658;
+            case EnvironmentSensor.TEMP:
+                return 0.0429 * code - 46.85;
+            case EnvironmentSensor.HUMI:
+                return 0.0305 * code - 6;
+            case EnvironmentSensor.CO2:
+                return code * 4;
+        }
+        return 0;
+    }
+
+    /**
+     * 判断设备是否可以加入到组
+     *
+     * @param dev            要判断设备
+     * @param groupMember    当前组内节点成员
+     * @param group_style    组类型，服务器组或者通过服务器下发到本地组
+     * @param obox_serial_id obox序列号
+     * @param groupses       待判断组数据总集
+     * @return 可以添加则返回true
+     */
+    public static boolean isCan(DeviceConfig dev, List<DeviceConfig> groupMember, String group_style,
+                                String obox_serial_id, List<Groups> groupses) {
+        boolean can = true;
+        for (int j = 0; j < groupMember.size(); j++) {
+            DeviceConfig decCache = groupMember.get(j);
+            if (decCache.getSerialId().equals(dev.getSerialId())) {
+                can = false;
+                break;
+            }
+        }
+        /*如果是服务器下发到本地组则还则需要判断
+        1.此节点是否属于该obox
+        2.此节点是否在任何当前obox的本地组内*/
+        if (can && group_style.equals("00")) {
+            if (!dev.getObox_serial_id().equals(obox_serial_id)) {
+                can = false;
+            }
+            if (can) {
+                for (int i = 0; i < groupses.size(); i++) {
+                    Groups groups = groupses.get(i);
+                    if (groups.getGroup_style() != null
+                            && groups.getGroup_style().equals("00")
+                            ) {
+                        List<DeviceConfig> deviceConfigs = groups.getGroup_member();
+                        if (deviceConfigs != null) {
+                            for (int j = 0; j < deviceConfigs.size(); j++) {
+                                DeviceConfig deviceConfig = deviceConfigs.get(j);
+                                if (deviceConfig.getSerialId().equals(dev.getSerialId())) {
+                                    can = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        return can;
+    }
+
 
 }

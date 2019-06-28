@@ -53,7 +53,6 @@ public class HttpRequst {
         builder.add(CloudConstant.ParameterKey.APP_ID, ObInit.APPLICATION_NAME);
         builder.add(CloudConstant.ParameterKey.APPKEY, ObInit.DEVICE_ID);
         builder.add(CloudConstant.ParameterKey.ACCESS_TOKEN, ObInit.ACCESSTOKEN);
-
         Request request = new Request.Builder().url(CloudConstant.Source.HTTPS + CloudConstant.Source.SERVER + "/consumer/common?")
                 .post(builder.build()).build();
         okHttpClient.newCall(request).enqueue(new Callback() {

@@ -311,7 +311,7 @@ public class CloudDataPool {
         List<Groups> groupses = new ArrayList<>();
         for (int i = 0; i < getGroupList().size(); i++) {
             Groups groups = getGroupList().get(i);
-            if (obox_serial_id.equals("") || (groups.getObox_serial_num() != null && groups.getObox_serial_num().equals(obox_serial_id))) {
+            if (obox_serial_id.equals("") || (groups.getObox_serial_id() != null && groups.getObox_serial_id().equals(obox_serial_id))) {
                 String groupType = groups.getGroup_type();
                 if (deviceType == 0 || (groupType != null && Integer.parseInt(groupType, 16) == deviceType)) {
                     String childType = groups.getGroup_child_type();

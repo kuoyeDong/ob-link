@@ -629,7 +629,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
     /**
      * 整个过程成功完成
      */
-    public abstract void onAllSuc();
+    public abstract void onAllSuc(Obox obox);
 
     /**
      * 解析上下线消息
@@ -651,7 +651,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                                 sendBroadUpdateWifiDevice();
                             }
                             handler.removeMessages(CON_CLOUD_TIMEOUT);
-                            onAllSuc();
+                            onAllSuc(obox);
                         }
                         break;
                 }

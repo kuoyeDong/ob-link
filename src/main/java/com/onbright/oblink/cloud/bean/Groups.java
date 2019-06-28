@@ -1,26 +1,24 @@
 package com.onbright.oblink.cloud.bean;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**服务器组节点元素
- * Created by shifan_xiao on 2016/10/20.
- * 为什么要继承DeviceConfig
+ * Created by adolf on 2019/6/28.
+ *
  */
-public class Groups extends DeviceConfig {
+public class Groups  {
     private String group_id;
     private String group_name;
     private String group_type;
     private String group_state;
     private String group_child_type;
-    private String obox_serial_num;
-    private String group_addr;
+    private String obox_serial_id;
+    private String groupAddr;
     private List<DeviceConfig> group_member;
-    private ArrayList<DeviceConfig> children;
     private String group_style;
 
     public Groups(List<DeviceConfig> group_member, String group_id, String group_name,
-                  String group_type, String group_state, String group_child_type, String group_style, String obox_serial_num, String group_addr) {
+                  String group_type, String group_state, String group_child_type, String group_style, String obox_serial_id, String groupAddr) {
         this.group_member = group_member;
         this.group_id = group_id;
         this.group_name = group_name;
@@ -28,24 +26,11 @@ public class Groups extends DeviceConfig {
         this.group_state = group_state;
         this.group_child_type = group_child_type;
         this.group_style = group_style;
-        this.obox_serial_num = obox_serial_num;
-        this.group_addr = group_addr;
-        children = new ArrayList<>();
+        this.obox_serial_id = obox_serial_id;
+        this.groupAddr = groupAddr;
     }
     public Groups() {
 
-    }
-
-    public void addChildrenItem(DeviceConfig child) {
-        children.add(child);
-    }
-
-    public int getChildrenCount() {
-        return children.size();
-    }
-
-    public DeviceConfig getChildItem(int index) {
-        return children.get(index);
     }
 
     public String getGroup_id() {
@@ -69,7 +54,7 @@ public class Groups extends DeviceConfig {
     }
 
     public void setGroup_type(String group_type) {
-        this.group_type = group_type;
+        this.   group_type = group_type;
     }
 
     public String getGroup_state() {
@@ -104,19 +89,19 @@ public class Groups extends DeviceConfig {
         this.group_style = group_style;
     }
 
-    public String getObox_serial_num() {
-        return obox_serial_num;
+    public String getObox_serial_id() {
+        return obox_serial_id;
     }
 
-    public void setObox_serial_num(String obox_serial_num) {
-        this.obox_serial_num = obox_serial_num;
+    public void setObox_serial_id(String obox_serial_id) {
+        this.obox_serial_id = obox_serial_id;
     }
 
-    public String getGroup_addr() {
-        return group_addr;
+    public String getGroupAddr() {
+        return groupAddr;
     }
 
-    public void setGroup_addr(String group_addr) {
-        this.group_addr = group_addr;
+    public void setGroupAddr(String groupAddr) {
+        this.groupAddr = groupAddr;
     }
 }

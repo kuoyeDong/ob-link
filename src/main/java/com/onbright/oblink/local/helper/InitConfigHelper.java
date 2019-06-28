@@ -8,6 +8,7 @@ import android.os.Message;
 import android.text.format.Time;
 
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.Share;
 import com.onbright.oblink.local.Obox;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
@@ -143,7 +144,7 @@ public abstract class InitConfigHelper {
                 break;
 
             case OBConstant.NetState.ON_STATION:
-                netUtil.udpBc(mContext, handler, false, 3000);
+                netUtil.udpBc(mContext, handler, 3000);
                 netUtil.dscvObox(oboxIps);
                 break;
 
@@ -181,7 +182,7 @@ public abstract class InitConfigHelper {
         }
         switch (message.what) {
             case OBConstant.ReplyType.GET_OBOX_NAME_BACK:
-                ParseUtil.getOboxId(message, obox, mTcpSend, oboxSSIDs);
+                ParseUtil.getOboxId(message, obox,Share.getSp(mContext), mTcpSend, oboxSSIDs,mContext,false);
                 //noinspection deprecation
                 mTcpSend.setOboxTime(new Time());
                 break;
@@ -192,7 +193,7 @@ public abstract class InitConfigHelper {
             case OBConstant.ReplyType.GET_OBOX_MSG_BACK:
                 isReqOboxMsg = false;
                 obox = new Obox();
-                ParseUtil.parseObox(message, obox, mTcpSend, OBConstant.StringKey.PSW);
+                ParseUtil.parseObox(message, obox, mTcpSend, Share.getSp(mContext));
                 mTcpSendMap.put(obox.getObox_serial_id(), mTcpSend);
                 oboxs.add(obox);
                 obNodes = new ArrayList<>();
