@@ -21,8 +21,8 @@ import com.onbright.oblink.cloud.bean.AliDevState;
 import com.onbright.oblink.cloud.bean.AliSpec;
 import com.onbright.oblink.cloud.bean.CloudScene;
 import com.onbright.oblink.cloud.bean.Condition;
-import com.onbright.oblink.cloud.bean.DeviceConfig;
-import com.onbright.oblink.cloud.bean.Groups;
+import com.onbright.oblink.cloud.bean.Device;
+import com.onbright.oblink.cloud.bean.Group;
 import com.onbright.oblink.cloud.bean.UpLoadWifiIr;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
@@ -160,11 +160,11 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
             case CloudConstant.CmdValue.QUERY_GROUP:
                 Gson gson = new Gson();
                 try {
-                    CloudDataPool.getGroupList().clear();
+                    CloudDataPool.getGroups().clear();
                     JSONObject jsonObject = new JSONObject(json);
                     JSONArray jsonArray = jsonObject.getJSONArray("groups");
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        Groups groups = gson.fromJson(jsonArray.getString(i), Groups.class);
+                        Group groups = gson.fromJson(jsonArray.getString(i), Group.class);
                         CloudDataPool.addGroups(groups);
                     }
                 } catch (JSONException e) {
@@ -192,12 +192,12 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                             j--;
                         }
                     }
-                    for (int j = 0; j < CloudDataPool.getGroupList().size(); j++) {
+                    for (int j = 0; j < CloudDataPool.getGroups().size(); j++) {
                         /*删除本地组*/
-                        if (CloudDataPool.getGroupList().get(j).getGroup_style().equals("00")) {
-                            if (CloudDataPool.getGroupList().get(j).getObox_serial_id() != null) {
-                                if (CloudDataPool.getGroupList().get(j).getObox_serial_id().equals(oboxSer)) {
-                                    CloudDataPool.getGroupList().remove(j);
+                        if (CloudDataPool.getGroups().get(j).getGroup_style().equals("00")) {
+                            if (CloudDataPool.getGroups().get(j).getObox_serial_id() != null) {
+                                if (CloudDataPool.getGroups().get(j).getObox_serial_id().equals(oboxSer)) {
+                                    CloudDataPool.getGroups().remove(j);
                                     j--;
                                 }
                             }
@@ -256,23 +256,23 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
      */
     @SuppressLint("DefaultLocale")
     private void initDeviceConfig() {
-        List<DeviceConfig> deviceConfigList = new ArrayList<>();
+        List<Device> devices = new ArrayList<>();
         for (int i = 0; i < obNodes.size(); i++) {
             ObNode obNode = obNodes.get(i);
             if (obox.getObox_serial_id().equals(Transformation.byteArryToHexString(obNode.getRfAddr()))) {
-                DeviceConfig deviceConfig = new DeviceConfig();
-                deviceConfig.setName(obNode.getNodeId() == null ? "unKnow" : obNode.getNodeId());
-                deviceConfig.setSerialId(obNode.getSerNumString());
-                deviceConfig.setObox_serial_id(Transformation.byteArryToHexString(obNode.getRfAddr()));
-                deviceConfig.setAddr(Transformation.byte2HexString(obNode.getAddr()));
-                deviceConfig.setState(Transformation.byteArryToHexString(obNode.getState()));
-                deviceConfig.setDevice_type(Transformation.byte2HexString((byte) obNode.getParentType()));
-                deviceConfig.setDevice_child_type(Transformation.byte2HexString((byte) obNode.getType()));
-                deviceConfig.setVersion(Transformation.byteArryToHexString(obNode.getVersion()));
-                deviceConfigList.add(deviceConfig);
+                Device device = new Device();
+                device.setName(obNode.getNodeId() == null ? "unKnow" : obNode.getNodeId());
+                device.setSerialId(obNode.getSerNumString());
+                device.setObox_serial_id(Transformation.byteArryToHexString(obNode.getRfAddr()));
+                device.setAddr(Transformation.byte2HexString(obNode.getAddr()));
+                device.setState(Transformation.byteArryToHexString(obNode.getState()));
+                device.setDevice_type(Transformation.byte2HexString((byte) obNode.getParentType()));
+                device.setDevice_child_type(Transformation.byte2HexString((byte) obNode.getType()));
+                device.setVersion(Transformation.byteArryToHexString(obNode.getVersion()));
+                devices.add(device);
             }
         }
-        obox.setDevice_config(deviceConfigList);
+        obox.setDevice_config(devices);
         obox.setObox_status("1");
     }
 
@@ -281,22 +281,22 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
      */
     @SuppressLint("DefaultLocale")
     private void initGroup() {
-        List<Groups> groupses = new ArrayList<>();
+        List<Group> groupses = new ArrayList<>();
         for (ObGroup obGroup : obGroups) {
-            Groups groups = new Groups();
-            List<DeviceConfig> dvs = new ArrayList<>();
+            Group groups = new Group();
+            List<Device> dvs = new ArrayList<>();
             List<ObNode> obNodes = obGroup.getObNodes();
             for (ObNode obNode : obNodes) {
-                DeviceConfig deviceConfig = new DeviceConfig();
-                deviceConfig.setName(obNode.getNodeId());
-                deviceConfig.setSerialId(obNode.getSerNumString());
-                deviceConfig.setObox_serial_id(Transformation.byteArryToHexString(obNode.getRfAddr()));
-                deviceConfig.setAddr(Transformation.byte2HexString(obNode.getAddr()));
-                deviceConfig.setState(Transformation.byteArryToHexString(obNode.getState()));
-                deviceConfig.setDevice_type(Transformation.byte2HexString((byte) obNode.getParentType()));
-                deviceConfig.setDevice_child_type(Transformation.byte2HexString((byte) obNode.getType()));
-                deviceConfig.setVersion(Transformation.byteArryToHexString(obNode.getVersion()));
-                dvs.add(deviceConfig);
+                Device device = new Device();
+                device.setName(obNode.getNodeId());
+                device.setSerialId(obNode.getSerNumString());
+                device.setObox_serial_id(Transformation.byteArryToHexString(obNode.getRfAddr()));
+                device.setAddr(Transformation.byte2HexString(obNode.getAddr()));
+                device.setState(Transformation.byteArryToHexString(obNode.getState()));
+                device.setDevice_type(Transformation.byte2HexString((byte) obNode.getParentType()));
+                device.setDevice_child_type(Transformation.byte2HexString((byte) obNode.getType()));
+                device.setVersion(Transformation.byteArryToHexString(obNode.getVersion()));
+                dvs.add(device);
             }
             groups.setGroup_member(dvs);
             groups.setGroup_name(obGroup.getNodeId());

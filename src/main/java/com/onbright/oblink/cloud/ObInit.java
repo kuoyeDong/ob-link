@@ -13,7 +13,7 @@ import okhttp3.FormBody;
 
 
 /**
- * use by:sdk初始化
+ * use by:sdk初始化,获取昂宝云交互令牌
  * create by dky at 2019/6/25
  */
 public abstract class ObInit implements HttpRespond {
@@ -78,6 +78,11 @@ public abstract class ObInit implements HttpRespond {
         return GetParameter.onInit(appKey, appSecret);
     }
 
+    /**
+     * 初始化成功
+     *
+     * @param token 企业的访问令牌
+     */
     public abstract void onInitSuc(String token);
 
     /**

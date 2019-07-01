@@ -6,7 +6,7 @@ import java.util.List;
  * Created by adolf on 2019/6/28.
  *
  */
-public class Groups  {
+public class Group  {
     private String group_id;
     private String group_name;
     private String group_type;
@@ -14,11 +14,11 @@ public class Groups  {
     private String group_child_type;
     private String obox_serial_id;
     private String groupAddr;
-    private List<DeviceConfig> group_member;
+    private List<Device> group_member;
     private String group_style;
 
-    public Groups(List<DeviceConfig> group_member, String group_id, String group_name,
-                  String group_type, String group_state, String group_child_type, String group_style, String obox_serial_id, String groupAddr) {
+    public Group(List<Device> group_member, String group_id, String group_name,
+                 String group_type, String group_state, String group_child_type, String group_style, String obox_serial_id, String groupAddr) {
         this.group_member = group_member;
         this.group_id = group_id;
         this.group_name = group_name;
@@ -29,7 +29,7 @@ public class Groups  {
         this.obox_serial_id = obox_serial_id;
         this.groupAddr = groupAddr;
     }
-    public Groups() {
+    public Group() {
 
     }
 
@@ -73,11 +73,11 @@ public class Groups  {
         this.group_child_type = group_child_type;
     }
 
-    public List<DeviceConfig> getGroup_member() {
+    public List<Device> getGroup_member() {
         return group_member;
     }
 
-    public void setGroup_member(List<DeviceConfig> group_member) {
+    public void setGroup_member(List<Device> group_member) {
         this.group_member = group_member;
     }
 

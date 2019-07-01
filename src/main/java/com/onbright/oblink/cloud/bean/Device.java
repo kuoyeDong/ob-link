@@ -1,10 +1,10 @@
 package com.onbright.oblink.cloud.bean;
 
 /**
- * 服务器版本设备
- * Created by adolf_dong on 2016/1/7.
+ * 设备
+ * Created by adolf_dong on 2019/7/1.
  */
-public class DeviceConfig   {
+public class Device {
     /**
      * 设备id
      */
@@ -44,14 +44,14 @@ public class DeviceConfig   {
      */
     private String obox_serial_id;
 
-    public DeviceConfig() {
+    public Device() {
 
     }
 
-    public DeviceConfig(String name, String serialId, String addr, String groupAddr,
-                        String state, String device_type,
-                        String device_child_type,
-                        String version) {
+    public Device(String name, String serialId, String addr, String groupAddr,
+                  String state, String device_type,
+                  String device_child_type,
+                  String version) {
         this.name = name;
         this.serialId = serialId;
         this.addr = addr;

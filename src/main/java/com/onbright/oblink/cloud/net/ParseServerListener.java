@@ -9,8 +9,8 @@ import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.bean.Action;
 import com.onbright.oblink.cloud.bean.CloudScene;
 import com.onbright.oblink.cloud.bean.Condition;
-import com.onbright.oblink.cloud.bean.DeviceConfig;
-import com.onbright.oblink.cloud.bean.Groups;
+import com.onbright.oblink.cloud.bean.Device;
+import com.onbright.oblink.cloud.bean.Group;
 import com.onbright.oblink.local.net.OBConstant;
 import com.onbright.oblink.local.net.Transformation;
 import com.orhanobut.logger.Logger;
@@ -233,9 +233,9 @@ public class ParseServerListener {
                         if (CloudDataPool.getDevices().get(i).getObox_serial_id() != null) {
                             if (CloudDataPool.getDevices().get(i).getObox_serial_id().equals(obox_serial_id)) {
                                 if (CloudDataPool.getDevices().get(i).getAddr().equals(nodeAddr)) {
-                                    DeviceConfig deviceConfig = CloudDataPool.getDevices().get(i);
+                                    Device device = CloudDataPool.getDevices().get(i);
                                     // FIXME: 2017/11/26 飞机不进行广播更新，太频繁
-                                    if (deviceConfig.getDevice_type().equals("10")) {
+                                    if (device.getDevice_type().equals("10")) {
                                         state = data.substring(16, 36);
                                         CloudDataPool.getDevices().get(i).setState(state);
                                         serialId = CloudDataPool.getDevices().get(i).getSerialId();
@@ -252,22 +252,22 @@ public class ParseServerListener {
                         }
                     }
                 } else {
-                    for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                        if (CloudDataPool.getGroupList().get(i).getObox_serial_id() != null) {
-                            if (CloudDataPool.getGroupList().get(i).getObox_serial_id().equals(obox_serial_id)) {
-                                if (CloudDataPool.getGroupList().get(i).getGroupAddr().equals(groupAddr)) {
-                                    Groups groups = CloudDataPool.getGroupList().get(i);
+                    for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                        if (CloudDataPool.getGroups().get(i).getObox_serial_id() != null) {
+                            if (CloudDataPool.getGroups().get(i).getObox_serial_id().equals(obox_serial_id)) {
+                                if (CloudDataPool.getGroups().get(i).getGroupAddr().equals(groupAddr)) {
+                                    Group group = CloudDataPool.getGroups().get(i);
                                     // FIXME: 2017/11/26 飞机不进行广播更新，太频繁
-                                    if (groups.getGroup_type().equals("10")) {
+                                    if (group.getGroup_type().equals("10")) {
                                         state = data.substring(16, 36);
-                                        CloudDataPool.getGroupList().get(i).setGroup_state(state);
+                                        CloudDataPool.getGroups().get(i).setGroup_state(state);
                                         Intent intent = new Intent();
                                         intent.putExtra("serialId", serialId);
                                         intent.setAction(OBConstant.StringKey.UPDATE_FLIGHT_CLOUD);
                                         context.sendBroadcast(intent);
                                         return;
                                     }
-                                    CloudDataPool.getGroupList().get(i).setGroup_state(state);
+                                    CloudDataPool.getGroups().get(i).setGroup_state(state);
                                 }
                             }
                         }
@@ -303,11 +303,11 @@ public class ParseServerListener {
                             isDeleteGroup = true;
                             isDeleteNode = false;
                         } else {
-                            for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                                if (CloudDataPool.getGroupList().get(i).getObox_serial_id() != null) {
-                                    if (CloudDataPool.getGroupList().get(i).getObox_serial_id().equals(obox_serial_id)) {
-                                        if (CloudDataPool.getGroupList().get(i).getGroupAddr().equals(groupAddr)) {
-                                            CloudDataPool.getGroupList().remove(i);
+                            for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                                if (CloudDataPool.getGroups().get(i).getObox_serial_id() != null) {
+                                    if (CloudDataPool.getGroups().get(i).getObox_serial_id().equals(obox_serial_id)) {
+                                        if (CloudDataPool.getGroups().get(i).getGroupAddr().equals(groupAddr)) {
+                                            CloudDataPool.getGroups().remove(i);
                                         }
                                     }
                                 }
@@ -340,7 +340,7 @@ public class ParseServerListener {
 //                        groups.setGroup_addr(groupAddr);
 //                        groups.setObox_serial_id(obox_serial_id);
 //                        groups.setGroup_name(name);
-//                        List<DeviceConfig> group_member = new ArrayList<>();
+//                        List<Device> group_member = new ArrayList<>();
 //                        for (int i = 0; i < CloudDataPool.getDevices().size(); i++) {
 //                            if (CloudDataPool.getDevices().get(i).getObox_serial_id().equals(obox_serial_id)) {
 //                                if (CloudDataPool.getDevices().get(i).getAddr().equals(nodeAddr) && CloudDataPool.getDevices().get(i).getGroupAddr().equals(groupAddr)) {
@@ -364,11 +364,11 @@ public class ParseServerListener {
                                 }
                             }
                         } else {
-                            for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                                if (CloudDataPool.getGroupList().get(i).getObox_serial_id() != null) {
-                                    if (CloudDataPool.getGroupList().get(i).getObox_serial_id().equals(obox_serial_id)) {
-                                        if (CloudDataPool.getGroupList().get(i).getGroupAddr().equals(groupAddr)) {
-                                            CloudDataPool.getGroupList().get(i).setGroup_name(name);
+                            for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                                if (CloudDataPool.getGroups().get(i).getObox_serial_id() != null) {
+                                    if (CloudDataPool.getGroups().get(i).getObox_serial_id().equals(obox_serial_id)) {
+                                        if (CloudDataPool.getGroups().get(i).getGroupAddr().equals(groupAddr)) {
+                                            CloudDataPool.getGroups().get(i).setGroup_name(name);
                                         }
                                     }
                                 }
@@ -391,25 +391,25 @@ public class ParseServerListener {
                 groupAddr = data.substring(12, 14);
                 nodeAddr = data.substring(14, 16);
                 String operatype = data.substring(16, 18);
-                List<DeviceConfig> group_member;
+                List<Device> groupMember;
                 if (operatype.equals("01")) {//delete
-                    for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                        if (groupAddr.equals(CloudDataPool.getGroupList().get(i).getGroupAddr()) && obox_serial_id.equals(CloudDataPool.getGroupList().get(i).getObox_serial_id())) {
-                            group_member = CloudDataPool.getGroupList().get(i).getGroup_member();
-                            for (int j = 0; j < group_member.size(); j++) {
-                                if (group_member.get(i).getAddr().equals(nodeAddr)) {
-                                    group_member.remove(i);
+                    for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                        if (groupAddr.equals(CloudDataPool.getGroups().get(i).getGroupAddr()) && obox_serial_id.equals(CloudDataPool.getGroups().get(i).getObox_serial_id())) {
+                            groupMember = CloudDataPool.getGroups().get(i).getGroup_member();
+                            for (int j = 0; j < groupMember.size(); j++) {
+                                if (groupMember.get(i).getAddr().equals(nodeAddr)) {
+                                    groupMember.remove(i);
                                 }
                             }
                         }
                     }
                 } else if (operatype.equals("02")) {//add
-                    for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                        if (groupAddr.equals(CloudDataPool.getGroupList().get(i).getGroupAddr()) && obox_serial_id.equals(CloudDataPool.getGroupList().get(i).getObox_serial_id())) {
-                            group_member = CloudDataPool.getGroupList().get(i).getGroup_member();
+                    for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                        if (groupAddr.equals(CloudDataPool.getGroups().get(i).getGroupAddr()) && obox_serial_id.equals(CloudDataPool.getGroups().get(i).getObox_serial_id())) {
+                            groupMember = CloudDataPool.getGroups().get(i).getGroup_member();
                             for (int j = 0; j < CloudDataPool.getDevices().size(); j++) {
                                 if (CloudDataPool.getDevices().get(j).getAddr().equals(nodeAddr)) {
-                                    group_member.add(CloudDataPool.getDevices().get(j));
+                                    groupMember.add(CloudDataPool.getDevices().get(j));
                                 }
                             }
                         }
@@ -456,24 +456,24 @@ public class ParseServerListener {
                 if (serialId.equals("0000000000")) {
                     return;
                 }
-                DeviceConfig deviceConfig = new DeviceConfig();
-                deviceConfig.setName(deviceName);
-                deviceConfig.setDevice_child_type(deviceChildType);
-                deviceConfig.setDevice_type(deviceType);
-                deviceConfig.setSerialId(serialId);
-                deviceConfig.setObox_serial_id(obox_serial_id);
-                deviceConfig.setAddr(nodeAddr);
-                deviceConfig.setGroupAddr(groupAddr);
-                deviceConfig.setState("00000000000000");
-                List<DeviceConfig> deviceConfigList = CloudDataPool.getDevices();
+                Device newDevice = new Device();
+                newDevice.setName(deviceName);
+                newDevice.setDevice_child_type(deviceChildType);
+                newDevice.setDevice_type(deviceType);
+                newDevice.setSerialId(serialId);
+                newDevice.setObox_serial_id(obox_serial_id);
+                newDevice.setAddr(nodeAddr);
+                newDevice.setGroupAddr(groupAddr);
+                newDevice.setState("00000000000000");
+                List<Device> devices = CloudDataPool.getDevices();
                 /*去除重复处理*/
-                for (int i = 0; i < deviceConfigList.size(); i++) {
-                    DeviceConfig deviceConfigIndex = deviceConfigList.get(i);
-                    if (deviceConfig.getSerialId().equals(deviceConfigIndex.getSerialId())) {
+                for (int i = 0; i < devices.size(); i++) {
+                    Device deviceIndex = devices.get(i);
+                    if (newDevice.getSerialId().equals(deviceIndex.getSerialId())) {
                         return;
                     }
                 }
-                deviceConfigList.add(deviceConfig);
+                devices.add(newDevice);
                 Intent intent = new Intent();
                 intent.setAction(OBConstant.StringKey.UPDATE_SCAN_INFO);
                 intent.putExtra("cmd", cmd);
@@ -517,7 +517,7 @@ public class ParseServerListener {
         String scene_name;
         String scene_status;
         int scene_number;
-        List<DeviceConfig> group_member = new ArrayList<>();
+        List<Device> group_member = new ArrayList<>();
         List<List<Condition>> conditionList = new ArrayList<>();
         List<Action> actionList = new ArrayList<>();
         List<String> serialIdList = new ArrayList<>();
@@ -552,7 +552,7 @@ public class ParseServerListener {
                     JSONArray jsonArray_device = jsonObject.getJSONArray("device_config");
                     if (jsonArray_device.length() > 0) {
                         for (int i = 0; i < jsonArray_device.length(); i++) {
-                            DeviceConfig dev = gson.fromJson(jsonArray_device.getString(i), DeviceConfig.class);
+                            Device dev = gson.fromJson(jsonArray_device.getString(i), Device.class);
                             CloudDataPool.getDevices().add(dev);
                         }
                     }
@@ -589,22 +589,22 @@ public class ParseServerListener {
                 }
                 switch (operate_type) {
                     case "00": //删除组
-                        for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                            if (group_id.equals(CloudDataPool.getGroupList().get(i).getGroup_id())) {
-                                CloudDataPool.getGroupList().remove(i);
+                        for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                            if (group_id.equals(CloudDataPool.getGroups().get(i).getGroup_id())) {
+                                CloudDataPool.getGroups().remove(i);
                                 break;
                             }
                         }
                         break;
                     case "01": //设置 、相当于创建:
-                        Groups groups = new Groups(group_member, group_id, group_name, group_type, group_state, group_child_type, group_style, obox_serial_id, group_addr);
+                        Group groups = new Group(group_member, group_id, group_name, group_type, group_state, group_child_type, group_style, obox_serial_id, group_addr);
                         groups.setGroupAddr(group_addr);
                         if (obox_serial_id != null && !obox_serial_id.equals("")) {
                             groups.setObox_serial_id(obox_serial_id);
                         }
                         boolean isHave = false;
-                        for (Groups g :
-                                CloudDataPool.getGroupList()) {
+                        for (Group g :
+                                CloudDataPool.getGroups()) {
                             if (g.getGroup_id().equals(groups.getGroup_id())) {
                                 isHave = true;
                                 break;
@@ -617,30 +617,30 @@ public class ParseServerListener {
                     case "02": //覆盖成员
                     case "03": //添加成员
                         Gson gson = new Gson();
-                        for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                            if (group_id.equals(CloudDataPool.getGroupList().get(i).getGroup_id())) {
-                                CloudDataPool.getGroupList().get(i).setGroup_type(group_type);
-                                CloudDataPool.getGroupList().get(i).setGroup_child_type(group_child_type);
+                        for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                            if (group_id.equals(CloudDataPool.getGroups().get(i).getGroup_id())) {
+                                CloudDataPool.getGroups().get(i).setGroup_type(group_type);
+                                CloudDataPool.getGroups().get(i).setGroup_child_type(group_child_type);
                                 break;
                             }
                         }
                         try {
                             JSONArray jsonArray = groupsObject.optJSONArray("group_member");
                             if (jsonArray.length() > 0) {
-                                for (int j = 0; j < CloudDataPool.getGroupList().size(); j++) {
-                                    if (group_id.equals(CloudDataPool.getGroupList().get(j).getGroup_id())) {
-                                        List<DeviceConfig> group_member_list = CloudDataPool.getGroupList().get(j).getGroup_member();
+                                for (int j = 0; j < CloudDataPool.getGroups().size(); j++) {
+                                    if (group_id.equals(CloudDataPool.getGroups().get(j).getGroup_id())) {
+                                        List<Device> groupMember = CloudDataPool.getGroups().get(j).getGroup_member();
                                         for (int i = 0; i < jsonArray.length(); i++) {
                                             boolean isCanAdd = true;
-                                            DeviceConfig dev = gson.fromJson(jsonArray.getString(i), DeviceConfig.class);
-                                            for (int m = 0; m < group_member_list.size(); m++) {
-                                                if (dev.getSerialId().equals(group_member_list.get(m).getSerialId())) {
+                                            Device dev = gson.fromJson(jsonArray.getString(i), Device.class);
+                                            for (int m = 0; m < groupMember.size(); m++) {
+                                                if (dev.getSerialId().equals(groupMember.get(m).getSerialId())) {
                                                     isCanAdd = false;
                                                     break;
                                                 }
                                             }
                                             if (isCanAdd) {
-                                                group_member_list.add(dev);
+                                                groupMember.add(dev);
                                             }
                                         }
                                         break;
@@ -654,13 +654,13 @@ public class ParseServerListener {
 
                     case "04": //删除成员
                         Gson gson1 = new Gson();
-                        DeviceConfig dev;
+                        Device dev;
                         try {
                             JSONArray jsonArray1;
                             jsonArray1 = groupsObject.optJSONArray("group_member");
                             serialIdList.clear();
                             for (int i = 0; i < jsonArray1.length(); i++) {
-                                dev = gson1.fromJson(jsonArray1.getString(i), DeviceConfig.class);
+                                dev = gson1.fromJson(jsonArray1.getString(i), Device.class);
                                 serialIdList.add(dev.getSerialId());
                             }
                         } catch (JSONException e) {
@@ -668,11 +668,11 @@ public class ParseServerListener {
                         }
                         for (int k = 0; k < serialIdList.size(); k++) {
                             String serial_Id = serialIdList.get(k);
-                            for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                                if (group_id.equals(CloudDataPool.getGroupList().get(i).getGroup_id())) {
-                                    for (int j = 0; j < CloudDataPool.getGroupList().get(i).getGroup_member().size(); j++) {
-                                        if (serial_Id.equals(CloudDataPool.getGroupList().get(i).getGroup_member().get(j).getSerialId())) {
-                                            CloudDataPool.getGroupList().get(i).getGroup_member().remove(j);
+                            for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                                if (group_id.equals(CloudDataPool.getGroups().get(i).getGroup_id())) {
+                                    for (int j = 0; j < CloudDataPool.getGroups().get(i).getGroup_member().size(); j++) {
+                                        if (serial_Id.equals(CloudDataPool.getGroups().get(i).getGroup_member().get(j).getSerialId())) {
+                                            CloudDataPool.getGroups().get(i).getGroup_member().remove(j);
                                         }
                                     }
                                 }
@@ -681,16 +681,16 @@ public class ParseServerListener {
                         break;
 
                     case "05": //改名
-                        for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                            if (group_id.equals(CloudDataPool.getGroupList().get(i).getGroup_id())) {
-                                CloudDataPool.getGroupList().get(i).setGroup_name(group_name);
+                        for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                            if (group_id.equals(CloudDataPool.getGroups().get(i).getGroup_id())) {
+                                CloudDataPool.getGroups().get(i).setGroup_name(group_name);
                             }
                         }
                         break;
                     case "06": //执行
-                        for (int i = 0; i < CloudDataPool.getGroupList().size(); i++) {
-                            if (group_id.equals(CloudDataPool.getGroupList().get(i).getGroup_id())) {
-                                CloudDataPool.getGroupList().get(i).setGroup_state(group_state);
+                        for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
+                            if (group_id.equals(CloudDataPool.getGroups().get(i).getGroup_id())) {
+                                CloudDataPool.getGroups().get(i).setGroup_state(group_state);
                             }
                         }
                         break;

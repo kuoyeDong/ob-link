@@ -3,7 +3,7 @@ package com.onbright.oblink.cloud.net;
 
 import com.google.gson.Gson;
 import com.onbright.oblink.cloud.bean.CloudScene;
-import com.onbright.oblink.cloud.bean.DeviceConfig;
+import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.bean.LockPush;
 import com.onbright.oblink.local.Obox;
 
@@ -34,41 +34,41 @@ public class GetParameter {
     /**
      * 设置单节点或者组节点的状态,会修改状态最后一个字节
      *
-     * @param deviceConfig 节点
+     * @param device 节点
      * @param isBili       是否闪烁
      */
-    public static FormBody.Builder onSetNodeState(DeviceConfig deviceConfig, boolean isBili) {
+    public static FormBody.Builder onSetNodeState(Device device, boolean isBili) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
-        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceConfig.getSerialId());
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
         builder.add(CloudConstant.ParameterKey.STATE, !isBili ?
-                deviceConfig.getState().substring(0, 12) + "02" : deviceConfig.getState().substring(0, 12) + "ff");
+                device.getState().substring(0, 12) + "02" : device.getState().substring(0, 12) + "ff");
         return builder;
     }
 
     /**
      * 设置节点状态不会修改状态的最后一个字节
      *
-     * @param deviceConfig 节点
+     * @param device 节点
      */
-    public static FormBody.Builder onSetNodeState(DeviceConfig deviceConfig) {
+    public static FormBody.Builder onSetNodeState(Device device) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
-        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceConfig.getSerialId());
-        builder.add(CloudConstant.ParameterKey.STATE, deviceConfig.getState());
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
+        builder.add(CloudConstant.ParameterKey.STATE, device.getState());
         return builder;
     }
 
     /**
      * 设置节点状态
      *
-     * @param deviceConfig 节点
+     * @param device 节点
      * @param status       要设置的状态
      */
-    public static FormBody.Builder onSetNodeState(DeviceConfig deviceConfig, String status) {
+    public static FormBody.Builder onSetNodeState(Device device, String status) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
-        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceConfig.getSerialId());
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
         builder.add(CloudConstant.ParameterKey.STATE, status);
         return builder;
     }
@@ -246,12 +246,12 @@ public class GetParameter {
     /**
      * 获取设备真实状态
      *
-     * @param deviceConfig 目标设备
+     * @param device 目标设备
      */
-    public static FormBody.Builder getNodeStatus(DeviceConfig deviceConfig) {
+    public static FormBody.Builder getNodeStatus(Device device) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_NODE_REAL_STATUS);
-        builder.add(CloudConstant.ParameterKey.SERIALID, deviceConfig.getSerialId());
+        builder.add(CloudConstant.ParameterKey.SERIALID, device.getSerialId());
         return builder;
     }
 

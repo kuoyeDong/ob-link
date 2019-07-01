@@ -20,7 +20,7 @@ public class AliConfig implements Serializable {
     private String name;
     /**
      * 设备类型，对应单品DEVICE还是obox OBOX,
-     * 参照Wifi设备#{@link com.ob.obsmarthouse.common.constant.OBConstant.NodeType#WIFI_IR}
+     * 参照Wifi设备#{@link com.onbright.oblink.local.net.OBConstant.NodeType#WIFI_IR}
      */
     private String type;
 

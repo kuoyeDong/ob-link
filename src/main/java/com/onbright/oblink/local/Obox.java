@@ -1,8 +1,8 @@
 package com.onbright.oblink.local;
 
 import com.onbright.oblink.cloud.bean.CloudScene;
-import com.onbright.oblink.cloud.bean.DeviceConfig;
-import com.onbright.oblink.cloud.bean.Groups;
+import com.onbright.oblink.cloud.bean.Device;
+import com.onbright.oblink.cloud.bean.Group;
 import com.onbright.oblink.local.net.Transformation;
 
 import java.io.Serializable;
@@ -34,13 +34,13 @@ public class Obox implements Serializable {
     /**
      * obox里面的设备配置信息
      */
-    private List<DeviceConfig> device_config;
+    private List<Device> device_config;
 
-    public List<Groups> getGroup_config() {
+    public List<Group> getGroup_config() {
         return group_config;
     }
 
-    public void setGroup_config(List<Groups> group_config) {
+    public void setGroup_config(List<Group> group_config) {
         this.group_config = group_config;
     }
 
@@ -55,7 +55,7 @@ public class Obox implements Serializable {
     /**
      * 组
      */
-    private List<Groups> group_config;
+    private List<Group> group_config;
     /**
      * 场景
      */
@@ -84,7 +84,7 @@ public class Obox implements Serializable {
     }
 
 
-    public Obox(String obox_serial_id, String obox_version, String obox_name, String obox_pwd, List<DeviceConfig> device_config) {
+    public Obox(String obox_serial_id, String obox_version, String obox_name, String obox_pwd, List<Device> device_config) {
         this.obox_serial_id = obox_serial_id;
         this.obox_version = obox_version;
         this.obox_name = obox_name;
@@ -147,11 +147,11 @@ public class Obox implements Serializable {
         this.obox_pwd = obox_pwd;
     }
 
-    public List<DeviceConfig> getDevice_config() {
+    public List<Device> getDevice_config() {
         return device_config;
     }
 
-    public void setDevice_config(List<DeviceConfig> device_config) {
+    public void setDevice_config(List<Device> device_config) {
         this.device_config = device_config;
     }
 

@@ -2,20 +2,16 @@ package com.onbright.oblink;
 
 
 import android.annotation.SuppressLint;
-import android.util.Base64;
 
-import com.onbright.oblink.cloud.bean.DeviceConfig;
-import com.onbright.oblink.cloud.bean.Groups;
+import com.onbright.oblink.cloud.bean.Device;
+import com.onbright.oblink.cloud.bean.Group;
 import com.onbright.oblink.local.bean.EnvironmentSensor;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
 import com.onbright.oblink.local.net.OBConstant;
 
 import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 算法工具
@@ -241,11 +237,11 @@ public class MathUtil {
      * @param groupses       待判断组数据总集
      * @return 可以添加则返回true
      */
-    public static boolean isCan(DeviceConfig dev, List<DeviceConfig> groupMember, String group_style,
-                                String obox_serial_id, List<Groups> groupses) {
+    public static boolean isCan(Device dev, List<Device> groupMember, String group_style,
+                                String obox_serial_id, List<Group> groupses) {
         boolean can = true;
         for (int j = 0; j < groupMember.size(); j++) {
-            DeviceConfig decCache = groupMember.get(j);
+            Device decCache = groupMember.get(j);
             if (decCache.getSerialId().equals(dev.getSerialId())) {
                 can = false;
                 break;
@@ -260,15 +256,15 @@ public class MathUtil {
             }
             if (can) {
                 for (int i = 0; i < groupses.size(); i++) {
-                    Groups groups = groupses.get(i);
-                    if (groups.getGroup_style() != null
-                            && groups.getGroup_style().equals("00")
+                    Group group = groupses.get(i);
+                    if (group.getGroup_style() != null
+                            && group.getGroup_style().equals("00")
                             ) {
-                        List<DeviceConfig> deviceConfigs = groups.getGroup_member();
-                        if (deviceConfigs != null) {
-                            for (int j = 0; j < deviceConfigs.size(); j++) {
-                                DeviceConfig deviceConfig = deviceConfigs.get(j);
-                                if (deviceConfig.getSerialId().equals(dev.getSerialId())) {
+                        List<Device> devices = group.getGroup_member();
+                        if (devices != null) {
+                            for (int j = 0; j < devices.size(); j++) {
+                                Device device = devices.get(j);
+                                if (device.getSerialId().equals(dev.getSerialId())) {
                                     can = false;
                                     break;
                                 }
@@ -281,6 +277,4 @@ public class MathUtil {
         }
         return can;
     }
-
-
 }

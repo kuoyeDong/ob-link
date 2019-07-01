@@ -2,7 +2,7 @@ package com.onbright.oblink.cloud.net;
 
 
 import com.google.gson.Gson;
-import com.onbright.oblink.cloud.bean.DeviceConfig;
+import com.onbright.oblink.cloud.bean.Device;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,14 +92,14 @@ public class CloudParseUtil {
         return val;
     }
 
-    public static void initDevice(String json, List<DeviceConfig> deviceConfigs) {
+    public static void initDevice(String json, List<Device> devices) {
         Gson gson = new Gson();
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray(CloudConstant.ParameterKey.CONFIG);
             for (int i = 0; i < jsonArray.length(); i++) {
-                DeviceConfig deviceConfig = gson.fromJson(jsonArray.getString(i), DeviceConfig.class);
-                deviceConfigs.add(deviceConfig);
+                Device deviceConfig = gson.fromJson(jsonArray.getString(i), Device.class);
+                devices.add(deviceConfig);
             }
         } catch (JSONException e) {
             e.printStackTrace();
