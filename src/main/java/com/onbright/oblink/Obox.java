@@ -1,4 +1,4 @@
-package com.onbright.oblink.local;
+package com.onbright.oblink;
 
 import com.onbright.oblink.cloud.bean.CloudScene;
 import com.onbright.oblink.cloud.bean.Device;
@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * obox
- * Created by adolf_dong on 2016/1/7.
+ * obox,昂宝设备中枢，此设备上连接云，下连接下级节点设备
+ * Created by adolf_dong on 2019/7/2.
  */
 public class Obox implements Serializable {
 

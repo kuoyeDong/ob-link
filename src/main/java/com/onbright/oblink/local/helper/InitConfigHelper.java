@@ -9,7 +9,7 @@ import android.text.format.Time;
 
 import com.onbright.oblink.MathUtil;
 import com.onbright.oblink.Share;
-import com.onbright.oblink.local.Obox;
+import com.onbright.oblink.Obox;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
 import com.onbright.oblink.local.bean.ObScene;

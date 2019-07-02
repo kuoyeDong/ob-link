@@ -16,7 +16,7 @@ import com.onbright.oblink.Share;
 import com.onbright.oblink.StringUtil;
 import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.bean.Action;
-import com.onbright.oblink.cloud.bean.AliConfig;
+import com.onbright.oblink.cloud.bean.WifiDevice;
 import com.onbright.oblink.cloud.bean.AliDevState;
 import com.onbright.oblink.cloud.bean.AliSpec;
 import com.onbright.oblink.cloud.bean.CloudScene;
@@ -29,7 +29,7 @@ import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 import com.onbright.oblink.local.LocalDataPool;
-import com.onbright.oblink.local.Obox;
+import com.onbright.oblink.Obox;
 import com.onbright.oblink.local.bean.Handset;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
@@ -541,8 +541,8 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                     AliDevState aliDevState = new AliDevState(keyStrs.get(i), valueStrs.get(i));
                     aliDevStates.add(aliDevState);
                 }
-                AliConfig aliConfig = new AliConfig(serNum, "Socket", "50", aliSpecsAction, aliDevStates);
-                configStr = new Gson().toJson(aliConfig);
+                WifiDevice wifiDevice = new WifiDevice(serNum, "Socket", "50", aliSpecsAction, aliDevStates);
+                configStr = new Gson().toJson(wifiDevice);
                 break;
         }
         HttpRequst.getHttpRequst().request(ConnectDeviceHandler.this, CloudConstant.CmdValue.UPLOAD_CONFIG);

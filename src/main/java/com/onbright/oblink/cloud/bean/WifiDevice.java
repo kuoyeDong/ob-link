@@ -8,7 +8,7 @@ import java.util.List;
  * Created by adolf_dong on 2018/3/19.
  */
 
-public class AliConfig implements Serializable {
+public class WifiDevice implements Serializable {
     /**
      * 阿里对应设备唯一id，即以产品序列号
      */
@@ -35,7 +35,7 @@ public class AliConfig implements Serializable {
      */
     private List<AliDevState> state;
 
-    public AliConfig(String deviceId, String name, String type, List<AliSpec> action, List<AliDevState> state) {
+    public WifiDevice(String deviceId, String name, String type, List<AliSpec> action, List<AliDevState> state) {
         this.deviceId = deviceId;
         this.name = name;
         this.type = type;

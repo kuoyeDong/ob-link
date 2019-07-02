@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.onbright.oblink.cloud.bean.CloudScene;
 import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.bean.LockPush;
-import com.onbright.oblink.local.Obox;
+import com.onbright.oblink.Obox;
 
 import java.util.List;
 

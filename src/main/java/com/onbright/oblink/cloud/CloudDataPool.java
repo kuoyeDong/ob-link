@@ -1,11 +1,10 @@
 package com.onbright.oblink.cloud;
 
-import com.onbright.oblink.cloud.bean.AliConfig;
+import com.onbright.oblink.cloud.bean.WifiDevice;
 import com.onbright.oblink.cloud.bean.CloudScene;
 import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.bean.Group;
-import com.onbright.oblink.cloud.handler.OboxHandler;
-import com.onbright.oblink.local.Obox;
+import com.onbright.oblink.Obox;
 import com.onbright.oblink.local.net.OBConstant;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class CloudDataPool {
     private static List<Device> devices = new ArrayList<>();
     private static List<Group> groups = new ArrayList<>();
     private static List<CloudScene> cloudScenes = new ArrayList<>();
-    private static List<AliConfig> aliDevices = new ArrayList<>();
+    private static List<WifiDevice> wifiDevices = new ArrayList<>();
 
 
     public static List<Device> getDevices() {
@@ -132,23 +131,23 @@ public class CloudDataPool {
     /**
      * @return 连接阿里云的wifi设备
      */
-    public static List<AliConfig> getAliDevices() {
-        return aliDevices;
+    public static List<WifiDevice> getWifiDevices() {
+        return wifiDevices;
     }
 
     /**
      * 添加wifi单品设备,防止数据重复
      *
-     * @param aliConfig 被添加的WiFi单品设备
+     * @param wifiDevice 被添加的WiFi单品设备
      */
-    public static void addAliDevice(AliConfig aliConfig) {
-        for (int i = 0; i < aliDevices.size(); i++) {
-            AliConfig aliConfigIndex = aliDevices.get(i);
-            if (aliConfigIndex.getDeviceId().equals(aliConfig.getDeviceId())) {
+    public static void addWifiDevice(WifiDevice wifiDevice) {
+        for (int i = 0; i < wifiDevices.size(); i++) {
+            WifiDevice wifiDeviceIndex = wifiDevices.get(i);
+            if (wifiDeviceIndex.getDeviceId().equals(wifiDevice.getDeviceId())) {
                 return;
             }
         }
-        getAliDevices().add(aliConfig);
+        getWifiDevices().add(wifiDevice);
     }
 
 }

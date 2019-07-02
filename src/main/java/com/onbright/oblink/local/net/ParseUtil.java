@@ -6,7 +6,7 @@ import android.os.Message;
 
 import com.onbright.oblink.MathUtil;
 import com.onbright.oblink.local.LocalDataPool;
-import com.onbright.oblink.local.Obox;
+import com.onbright.oblink.Obox;
 import com.onbright.oblink.local.bean.ActionReply;
 import com.onbright.oblink.local.bean.AirClean;
 import com.onbright.oblink.local.bean.Aircon;
