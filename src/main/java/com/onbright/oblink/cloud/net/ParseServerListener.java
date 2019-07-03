@@ -891,9 +891,9 @@ public class ParseServerListener {
         } else {
             status = "0";
         }
-        for (int i = 0; i < CloudDataPool.getAllOboxList().size(); i++) {
-            if (serialId.equals(CloudDataPool.getAllOboxList().get(i).getObox_serial_id())) {
-                CloudDataPool.getAllOboxList().get(i).setObox_status(status);
+        for (int i = 0; i < CloudDataPool.getOboxs().size(); i++) {
+            if (serialId.equals(CloudDataPool.getOboxs().get(i).getObox_serial_id())) {
+                CloudDataPool.getOboxs().get(i).setObox_status(status);
                 break;
             }
         }
@@ -906,9 +906,9 @@ public class ParseServerListener {
 
 
     private static void deleteObox(String obox_serial_id) {
-        for (int i = 0; i < CloudDataPool.getAllOboxList().size(); i++) {
-            if (obox_serial_id.equals(CloudDataPool.getAllOboxList().get(i).getObox_serial_id())) {
-                CloudDataPool.getAllOboxList().remove(i);
+        for (int i = 0; i < CloudDataPool.getOboxs().size(); i++) {
+            if (obox_serial_id.equals(CloudDataPool.getOboxs().get(i).getObox_serial_id())) {
+                CloudDataPool.getOboxs().remove(i);
             }
         }
     }

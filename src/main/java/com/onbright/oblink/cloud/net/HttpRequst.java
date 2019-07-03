@@ -119,6 +119,7 @@ public class HttpRequst {
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
+                            httpRespond.onFaild(HttpRespond.ErrorCode.exceptionError, 0, null,action);
                         }
                     }
                 } else {

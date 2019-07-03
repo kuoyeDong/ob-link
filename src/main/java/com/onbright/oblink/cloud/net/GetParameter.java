@@ -599,7 +599,7 @@ public class GetParameter {
      *
      * @param deviceId 设备序列号
      */
-    public static FormBody.Builder delAliDev(String deviceId) {
+    public static FormBody.Builder delWifiDev(String deviceId) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_ALI_DEV);
         builder.add(CloudConstant.ParameterKey.DEVICEID, deviceId);

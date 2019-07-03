@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 数据仓库
- * Created by adolf_dong on 2016/5/11.
+ * 数据仓库，设定观察者，数据发生变化时发出相应通知
+ * Created by adolf_dong on 2019/7/3.
  */
 public class CloudDataPool {
     private static List<Obox> oboxs = new ArrayList<>();
@@ -33,14 +33,14 @@ public class CloudDataPool {
     /**
      * 获取当前的obox列表
      */
-    public static List<Obox> getAllOboxList() {
+    public static List<Obox> getOboxs() {
         return oboxs;
     }
 
     /**
      * 添加obox到当前列表
      */
-    public static void addAllOboxs(Obox obox) {
+    public static void addObox(Obox obox) {
         oboxs.add(obox);
     }
 
@@ -97,7 +97,7 @@ public class CloudDataPool {
     /**
      * 删除obox数据，设备，组，
      *
-     * @param oboxSer
+     * @param oboxSer 删除数据的obox序列号
      */
     public static void deleteOboxData(String oboxSer) {
         if (devices != null) {
@@ -147,8 +147,22 @@ public class CloudDataPool {
                 return;
             }
         }
-        getWifiDevices().add(wifiDevice);
+        wifiDevices.add(wifiDevice);
     }
 
+    /**
+     * 删除wifi节点设备
+     *
+     * @param wifiDeviceId wifi节点设备序列号
+     */
+    public static void deleteWifiDevice(String wifiDeviceId) {
+        for (WifiDevice wifiDevice :
+                wifiDevices) {
+            if (wifiDeviceId.equals(wifiDevice.getDeviceId())) {
+                wifiDevices.remove(wifiDevice);
+                break;
+            }
+        }
+    }
 }
 

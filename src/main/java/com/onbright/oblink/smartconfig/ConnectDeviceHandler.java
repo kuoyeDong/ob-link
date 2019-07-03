@@ -183,9 +183,9 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
     private void onCloudAddOboxSuc() {
         String oboxSer = obox.getObox_serial_id();
         if (oboxSer != null) {
-            for (int i = 0; i < CloudDataPool.getAllOboxList().size(); i++) {
-                if (oboxSer.equals(CloudDataPool.getAllOboxList().get(i).getObox_serial_id())) {
-                    CloudDataPool.getAllOboxList().remove(i);
+            for (int i = 0; i < CloudDataPool.getOboxs().size(); i++) {
+                if (oboxSer.equals(CloudDataPool.getOboxs().get(i).getObox_serial_id())) {
+                    CloudDataPool.getOboxs().remove(i);
                     for (int j = 0; j < CloudDataPool.getDevices().size(); j++) {
                         if (CloudDataPool.getDevices().get(j).getObox_serial_id().equals(oboxSer)) {
                             CloudDataPool.getDevices().remove(j);
@@ -207,7 +207,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                 }
             }
         }
-        CloudDataPool.addAllOboxs(obox);
+        CloudDataPool.addObox(obox);
         CloudDataPool.getDevices().addAll(obox.getDevice_config());
         sendBroadUpdateDevice();
     }
@@ -602,22 +602,22 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
     public abstract void onReceive(byte[] bytes);
 
     /**
-     * 设备开始连接到路由器回调，tcp方式不会调用
+     * 设备开始连接到路由器
      */
     public abstract void onSendDeviceToRoute();
 
     /**
-     * 设备成功连接到目标路由器回调，tcp方式不会调用
+     * 设备成功连接到目标路由器
      */
     public abstract void onScendDeviceToRouteSuc();
 
     /**
-     * 连接路由器出错回调，tcp方式不会调用
+     * 连接路由器出错
      */
     public abstract void onConnectRouteError();
 
     /**
-     * 设备开始连接到云端回调
+     * 设备开始连接到云端
      */
     public abstract void onSendDeviceToCloud();
 
@@ -627,9 +627,18 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
     public abstract void onConnectCloudError();
 
     /**
-     * 整个过程成功完成
+     * 添加wifi设备成功
+     *
+     * @param configStr wifi设备的配置详情
      */
-    public abstract void onAllSuc(Obox obox);
+    protected abstract void addWifiDeviceSuc(String configStr);
+
+    /**
+     * 添加obox成功
+     *
+     * @param obox 新添加的obox
+     */
+    protected abstract void addOboxSuc(Obox obox);
 
     /**
      * 解析上下线消息
@@ -647,15 +656,18 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                         if (serialId.equals(serNum) && onLine.equals("true")) {
                             if (type == OBConstant.OnAddWifiDeviceType.OBOX) {
                                 onCloudAddOboxSuc();
+                                addOboxSuc(obox);
                             } else {
                                 sendBroadUpdateWifiDevice();
+                                addWifiDeviceSuc(configStr);
                             }
                             handler.removeMessages(CON_CLOUD_TIMEOUT);
-                            onAllSuc(obox);
                         }
                         break;
                 }
             }
         }
     }
+
+
 }
