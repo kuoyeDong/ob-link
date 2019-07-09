@@ -29,9 +29,9 @@ public abstract class ObInit implements HttpRespond {
     public static String APPLICATION_NAME;
 
     /**
-     * Android设备序列号
+     * 下级用户标识
      */
-    public static String DEVICE_ID;
+    public static String UNIQUE_KEY;
 
     public static String ACCESSTOKEN;
 
@@ -50,17 +50,17 @@ public abstract class ObInit implements HttpRespond {
     /**
      * @param appKey    key，昂宝分配的key
      * @param appSecret secret，与key对应的secret
-     * @param deviceId  Android设备序列号
+     * @param uniqueKey  下级用户唯一标识
      */
-    public ObInit(String appKey, String appSecret, String deviceId, Context context) {
+    public ObInit(String appKey, String appSecret, String uniqueKey, Context context) {
         this.appKey = appKey;
         this.appSecret = appSecret;
-        DEVICE_ID = deviceId;
+        UNIQUE_KEY = uniqueKey;
         CONTEXT = context;
     }
 
     /**
-     * 初始化
+     * 初始化，换取token
      */
     public void init() {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT);
@@ -68,7 +68,7 @@ public abstract class ObInit implements HttpRespond {
 
     @Override
     public void onSuccess(String action, String json) {
-        mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN, DEVICE_ID);
+        mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN, UNIQUE_KEY);
         ACCESSTOKEN = CloudParseUtil.getJsonParm(json, "token");
         onInitSuc(ACCESSTOKEN);
     }
@@ -92,7 +92,7 @@ public abstract class ObInit implements HttpRespond {
         CONTEXT = null;
         SYSTEM_NAME = null;
         APPLICATION_NAME = null;
-        DEVICE_ID = null;
+        UNIQUE_KEY = null;
         ACCESSTOKEN = null;
         if (mqttHandler != null) {
             mqttHandler.shutDown();

@@ -114,7 +114,7 @@ public class MqttHandler {
     private void publishMessage() {
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("appkey", ObInit.DEVICE_ID);
+            jsonObject.put("appkey", ObInit.UNIQUE_KEY);
             jsonObject.put("appId", "OB Smart" + ObInit.APPLICATION_NAME);
             jsonObject.put("system", "Android" + android.os.Build.VERSION.SDK_INT);
             jsonObject.put("type", 100);

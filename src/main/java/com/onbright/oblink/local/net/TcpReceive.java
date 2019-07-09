@@ -68,8 +68,6 @@ public class TcpReceive extends Thread {
     /**
      * 是否必须接收
      */
-
-
     public TcpReceive(Socket mSocket, Handler mHandler, Sbox sbox, TcpSend tcpSend) {
         this.mSocket = mSocket;
         this.mHandler = mHandler;
