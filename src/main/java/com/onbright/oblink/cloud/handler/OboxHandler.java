@@ -1,12 +1,9 @@
 package com.onbright.oblink.cloud.handler;
 
-import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
-
-import okhttp3.FormBody;
 
 /**
  * use by:删除Obox
@@ -19,11 +16,18 @@ public abstract class OboxHandler implements HttpRespond {
      */
     private String oboxSerId;
 
+    /**
+     * @param oboxSerId 要删除的obox序列号
+     */
+    public OboxHandler(String oboxSerId) {
+        this.oboxSerId = oboxSerId;
+    }
+
     @Override
     public void onSuccess(String action, String json) {
         switch (action) {
             case CloudConstant.CmdValue.DELETE_OBOX:
-                CloudDataPool.deleteOboxData(oboxSerId);
+//                CloudDataPool.deleteOboxData(oboxSerId);
                 oboxDeleteSuc(oboxSerId);
                 break;
             default:
@@ -31,27 +35,12 @@ public abstract class OboxHandler implements HttpRespond {
         }
     }
 
-    @Override
-    public FormBody.Builder getParamter(String action) {
-        switch (action) {
-            case CloudConstant.CmdValue.DELETE_OBOX:
-                GetParameter.onDeleteObox(true, oboxSerId);
-        }
-        return null;
-    }
-
     /**
      * 删除obox
      */
     public void deleteObox() {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_OBOX);
-    }
-
-    /**
-     * @param oboxSerId 要删除的obox序列号
-     */
-    public OboxHandler(String oboxSerId) {
-        this.oboxSerId = oboxSerId;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_OBOX, GetParameter.onDeleteObox(true, oboxSerId),
+                CloudConstant.Source.CONSUMER_OPEN + "obox", HttpRequst.DELETE);
     }
 
     /**

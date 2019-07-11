@@ -20,7 +20,6 @@ public class GetParameter {
      */
     public static FormBody.Builder onAddObox(Obox obox, String deviceName, String productKey, boolean isSmarConfig) {
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_OBOX);
         Gson gson = new Gson();
         String json = gson.toJson(obox);
         builder.add(CloudConstant.ParameterKey.OBOX, json);
@@ -35,11 +34,10 @@ public class GetParameter {
      * 设置单节点或者组节点的状态,会修改状态最后一个字节
      *
      * @param device 节点
-     * @param isBili       是否闪烁
+     * @param isBili 是否闪烁
      */
     public static FormBody.Builder onSetNodeState(Device device, boolean isBili) {
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
         builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
         builder.add(CloudConstant.ParameterKey.STATE, !isBili ?
                 device.getState().substring(0, 12) + "02" : device.getState().substring(0, 12) + "ff");
@@ -53,7 +51,6 @@ public class GetParameter {
      */
     public static FormBody.Builder onSetNodeState(Device device) {
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
         builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
         builder.add(CloudConstant.ParameterKey.STATE, device.getState());
         return builder;
@@ -63,11 +60,10 @@ public class GetParameter {
      * 设置节点状态
      *
      * @param device 节点
-     * @param status       要设置的状态
+     * @param status 要设置的状态
      */
     public static FormBody.Builder onSetNodeState(Device device, String status) {
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
         builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
         builder.add(CloudConstant.ParameterKey.STATE, status);
         return builder;
@@ -84,7 +80,6 @@ public class GetParameter {
      */
     public static FormBody.Builder onQueryScenes(boolean isMulti, int start, int count) {
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_SCENES);
         if (isMulti) {
             builder.add("start", String.valueOf(start));
             builder.add("count", String.valueOf(count));
@@ -849,11 +844,15 @@ public class GetParameter {
 
     /**
      * 初始化sdk，与昂宝云校验
-     *
-     * @param appKey    昂宝分配的key
-     * @param appSecret key对应的secret
      */
-    public static FormBody.Builder onInit(String appKey, String appSecret) {
-        return null;
+    public static FormBody.Builder onInit() {
+        return new FormBody.Builder();
+    }
+
+    /**
+     * @param deviceSerId 设备序列号
+     */
+    public static FormBody.Builder deleteDevice(String deviceSerId) {
+        return new FormBody.Builder();
     }
 }

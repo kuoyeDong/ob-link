@@ -16,9 +16,4 @@ public abstract class GroupHandler implements HttpRespond {
 
     }
 
-    @Override
-    public FormBody.Builder getParamter(String action) {
-
-        return null;
-    }
 }

@@ -18,10 +18,7 @@ import okhttp3.FormBody;
  */
 public abstract class ObInit implements HttpRespond {
     public static Context CONTEXT;
-    /**
-     * 系统名称版本号，如Android26
-     */
-    public static String SYSTEM_NAME;
+
 
     /**
      * app名称,如obsmart
@@ -38,23 +35,23 @@ public abstract class ObInit implements HttpRespond {
     /**
      * key，昂宝分配的key
      */
-    private String appKey;
+    public static String APP_KEY;
 
     /**
      * secret，与key对应的secret
      */
-    private String appSecret;
+    public static String APP_SECRET;
 
     private MqttHandler mqttHandler;
 
     /**
      * @param appKey    key，昂宝分配的key
      * @param appSecret secret，与key对应的secret
-     * @param uniqueKey  下级用户唯一标识
+     * @param uniqueKey 下级用户唯一标识
      */
     public ObInit(String appKey, String appSecret, String uniqueKey, Context context) {
-        this.appKey = appKey;
-        this.appSecret = appSecret;
+        APP_KEY = appKey;
+        APP_SECRET = appSecret;
         UNIQUE_KEY = uniqueKey;
         CONTEXT = context;
     }
@@ -63,20 +60,16 @@ public abstract class ObInit implements HttpRespond {
      * 初始化，换取token
      */
     public void init() {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT);
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT, GetParameter.onInit(), "/oauth/token", HttpRequst.POST);
     }
 
     @Override
     public void onSuccess(String action, String json) {
-        mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN, UNIQUE_KEY);
-        ACCESSTOKEN = CloudParseUtil.getJsonParm(json, "token");
+        mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN + "/" + UNIQUE_KEY, UNIQUE_KEY);
+        ACCESSTOKEN = CloudParseUtil.getJsonParm(json, "access_token");
         onInitSuc(ACCESSTOKEN);
     }
 
-    @Override
-    public FormBody.Builder getParamter(String action) {
-        return GetParameter.onInit(appKey, appSecret);
-    }
 
     /**
      * 初始化成功
@@ -86,11 +79,10 @@ public abstract class ObInit implements HttpRespond {
     public abstract void onInitSuc(String token);
 
     /**
-     * 释放所有资源
+     * 释放资源
      */
     public void destory() {
         CONTEXT = null;
-        SYSTEM_NAME = null;
         APPLICATION_NAME = null;
         UNIQUE_KEY = null;
         ACCESSTOKEN = null;

@@ -52,7 +52,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.FormBody;
 
 /**
  * author:Adolf_Dong  time: 2019/2/20 18:27
@@ -135,19 +134,6 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
         intentFilter.addAction(OBConstant.StringKey.WIFI_HEART_INFO);
         this.context.registerReceiver(heartBcr, intentFilter);
 
-    }
-
-    @Override
-    public FormBody.Builder getParamter(String action) {
-        switch (action) {
-            case CloudConstant.CmdValue.ADD_OBOX:
-                return GetParameter.onAddObox(obox, deviceName, productKey, true);
-            case CloudConstant.CmdValue.QUERY_GROUP:
-                return GetParameter.onQueryGroups();
-            case CloudConstant.CmdValue.UPLOAD_CONFIG:
-                return GetParameter.uploadConfig(deviceName, productKey, configStr);
-        }
-        return null;
     }
 
     @Override
@@ -248,7 +234,8 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
         initDeviceConfig();
         initGroup();
         initScene();
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_OBOX);
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_OBOX,
+                GetParameter.onAddObox(obox, deviceName, productKey, true), CloudConstant.Source.CONSUMER_OPEN + "obox", HttpRequst.POST);
     }
 
     /**
@@ -545,7 +532,8 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                 configStr = new Gson().toJson(wifiDevice);
                 break;
         }
-        HttpRequst.getHttpRequst().request(ConnectDeviceHandler.this, CloudConstant.CmdValue.UPLOAD_CONFIG);
+        HttpRequst.getHttpRequst().request(ConnectDeviceHandler.this, CloudConstant.CmdValue.UPLOAD_CONFIG,
+                GetParameter.uploadConfig(deviceName, productKey, configStr), CloudConstant.Source.CONSUMER_OPEN + "config", HttpRequst.POST);
     }
 
     /**

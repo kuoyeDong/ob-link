@@ -12,8 +12,6 @@ import com.onbright.oblink.smartconfig.SmartConnectDeviceHandler;
 
 import java.util.TimeZone;
 
-import okhttp3.FormBody;
-
 /**
  * use by:连接obox和wifi设备到云,运行sdk的设备必须连接目标路由
  * create by dky at 2019/7/3
@@ -69,7 +67,8 @@ public class ConnectHandler implements HttpRespond {
      * 开始执行连接
      */
     public void start() {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.REGIST_ALIDEV);
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.REGIST_ALIDEV,
+                GetParameter.registAliDev(TimeZone.getDefault().getID(), isObox ? "OBOX" : "DEVICE"), CloudConstant.Source.CONSUMER_OPEN + "registAliDev", HttpRequst.POST);
     }
 
     /**
@@ -165,14 +164,4 @@ public class ConnectHandler implements HttpRespond {
         connectCloudError
 
     }
-
-    @Override
-    public FormBody.Builder getParamter(String action) {
-        switch (action) {
-            case CloudConstant.CmdValue.REGIST_ALIDEV:
-                return GetParameter.registAliDev(TimeZone.getDefault().getID(), isObox ? "OBOX" : "DEVICE");
-        }
-        return null;
-    }
-
 }

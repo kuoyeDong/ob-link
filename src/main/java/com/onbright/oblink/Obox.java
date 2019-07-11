@@ -1,5 +1,6 @@
 package com.onbright.oblink;
 
+import com.google.gson.annotations.SerializedName;
 import com.onbright.oblink.cloud.bean.CloudScene;
 import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.bean.Group;
@@ -34,6 +35,7 @@ public class Obox implements Serializable {
     /**
      * obox里面的设备配置信息
      */
+    @SerializedName("")
     private List<Device> device_config;
 
     public List<Group> getGroup_config() {

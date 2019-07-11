@@ -1,7 +1,5 @@
 package com.onbright.oblink.cloud.net;
 
-import okhttp3.FormBody;
-
 /**
  * 服务器请求接口
  * Created by adolf_dongon 2019/6/24.
@@ -37,6 +35,4 @@ public interface HttpRespond {
      * @param action                请求失败时的命令
      */
     void onFaild(ErrorCode errorCode, int responseNotOkCode, String operationFailedReason, String action);
-
-    FormBody.Builder getParamter(String action);
 }

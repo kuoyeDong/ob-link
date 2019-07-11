@@ -3,9 +3,8 @@ package com.onbright.oblink.cloud.handler;
 import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
+import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
-
-import okhttp3.FormBody;
 
 /**
  * use by:管理wifi单品设备，例如wifi版本的红外转发器,删除wifi单品设备
@@ -24,6 +23,9 @@ public abstract class WifiDeviceHandler implements HttpRespond {
         this.wifiDeviceId = wifiDeviceId;
     }
 
+    public void removeWifiDevice() {
+        HttpRequst.getHttpRequst().request(this,CloudConstant.CmdValue.DELETE_ALI_DEV,GetParameter.delWifiDev(wifiDeviceId),"",HttpRequst.POST);
+    }
     @Override
     public void onSuccess(String action, String json) {
         switch (action) {
@@ -41,12 +43,4 @@ public abstract class WifiDeviceHandler implements HttpRespond {
      */
     public abstract void deleteWifiDeviceSuc(String wifiDeviceSerId);
 
-    @Override
-    public FormBody.Builder getParamter(String action) {
-        switch (action) {
-            case CloudConstant.CmdValue.DELETE_ALI_DEV:
-                return GetParameter.delWifiDev(wifiDeviceId);
-        }
-        return null;
-    }
 }

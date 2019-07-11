@@ -7,12 +7,17 @@ package com.onbright.oblink.cloud.net;
 public interface CloudConstant {
     class Source {
         public static String HTTPS = "https://";
-        public static String SERVER = SourceFrom.SERVER_CLOUD;
+        public static String SERVER = SourceFrom.SERVER_IOT;
+        public static final String CONSUMER_OPEN = "/consumer/open/";
     }
 
     interface SourceFrom {
         /**
-         * cloud
+         * iot测试
+         */
+        String SERVER_IOT = "aliiot.on-bright.com";
+        /**
+         * cloud生产
          */
         String SERVER_CLOUD = "alicloud.on-bright.com";
     }
@@ -215,6 +220,10 @@ public interface CloudConstant {
          * 光头强通道名字
          */
         String NAMES = "names";
+        /**
+         * 第三方唯一用户标识
+         */
+        String UNIQUE_KEY = "uniqueKey";
     }
 
     /**
@@ -705,9 +714,13 @@ public interface CloudConstant {
          */
         String DELETE_DEVICE_LOCATION = "delete_device_location";
         /**
-         * 初始化sdk
+         * 校验交换token
          */
-        String INIT ="init" ;
+        String INIT = "init";
+        /**
+         * 删除设备
+         */
+        String DELETE_DEVICE = "delete_device";
     }
 
 
