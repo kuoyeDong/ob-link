@@ -9,12 +9,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Credentials;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -60,18 +62,21 @@ public class HttpRequst {
             return;
         }
         if (okHttpClient == null) {
-            new OkHttpClient.Builder().authenticator(new Authenticator() {
-                @Override
-                public Request authenticate(Route route, @NonNull Response response) {
-                    return response.request().newBuilder().header("Authorization", Credentials.basic(ObInit.APP_SECRET, ObInit.APP_KEY)).build();
-                }
-            }).build();
+            okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).
+                    writeTimeout(10, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).
+                    authenticator(new Authenticator() {
+                        @Override
+                        public Request authenticate(Route route, @NonNull Response response) {
+                            return response.request().newBuilder().header("Authorization", Credentials.basic(ObInit.APP_SECRET, ObInit.APP_KEY)).build();
+                        }
+                    }).build();
         }
         builder.add(CloudConstant.ParameterKey.SYSTEM, "Android");
         builder.add(CloudConstant.ParameterKey.APP_ID, ObInit.APPLICATION_NAME);
-        builder.add(CloudConstant.ParameterKey.UNIQUE_KEY, ObInit.UNIQUE_KEY);
-        builder.add(CloudConstant.ParameterKey.ACCESS_TOKEN, ObInit.ACCESSTOKEN);
-        Request.Builder requestBuilder = new Request.Builder().url(CloudConstant.Source.HTTPS + CloudConstant.Source.SERVER + url);
+        HttpUrl httpUrlB = HttpUrl.get(CloudConstant.Source.HTTPS + CloudConstant.Source.SERVER + url);
+        httpUrlB.newBuilder().addQueryParameter(CloudConstant.ParameterKey.ACCESS_TOKEN, ObInit.ACCESSTOKEN).
+                addQueryParameter(CloudConstant.ParameterKey.UNIQUE_KEY, ObInit.UNIQUE_KEY);
+        Request.Builder requestBuilder = new Request.Builder().url(httpUrlB);
         switch (method) {
             case POST:
                 requestBuilder.post(builder.build());

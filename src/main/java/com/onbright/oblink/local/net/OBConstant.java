@@ -79,6 +79,9 @@ public interface OBConstant {
         String UPDATE_CREATE_LOCATION = "update_create_location";
         String UPDATE_ADD_OBOX = "update_add_obox";
         String UPDATE_GROUPS_INFO = "update_groups_info";
+        /**
+         * 扫描设备新入网设备的广播
+         */
         String UPDATE_SCAN_INFO = "update_scan_info";
         String OBOX_HEART_INFO = "obox_heart_info";
         /**

@@ -1,10 +1,12 @@
 package com.onbright.oblink.cloud.bean;
 
+import java.io.Serializable;
+
 /**
  * 设备
  * Created by adolf_dong on 2019/7/1.
  */
-public class Device {
+public class Device implements Serializable {
     /**
      * 设备id
      */

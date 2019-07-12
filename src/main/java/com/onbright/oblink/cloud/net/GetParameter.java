@@ -428,7 +428,6 @@ public class GetParameter {
     public static FormBody.Builder addIntelligentRemoteUser(String serialId, String authToken, String nickName,
                                                             String startTime, String endTime, String times, String mobile, boolean pushPhone, boolean isMax) {
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
         builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
         builder.add(CloudConstant.ParameterKey.NICKNAME, nickName);
@@ -853,6 +852,8 @@ public class GetParameter {
      * @param deviceSerId 设备序列号
      */
     public static FormBody.Builder deleteDevice(String deviceSerId) {
-        return new FormBody.Builder();
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.SERIALID, deviceSerId);
+        return builder;
     }
 }

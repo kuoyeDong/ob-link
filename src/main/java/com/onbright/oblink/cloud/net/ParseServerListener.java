@@ -466,22 +466,20 @@ public class ParseServerListener {
                 newDevice.setGroupAddr(groupAddr);
                 newDevice.setState("00000000000000");
                 List<Device> devices = CloudDataPool.getDevices();
-                /*去除重复处理*/
                 for (int i = 0; i < devices.size(); i++) {
                     Device deviceIndex = devices.get(i);
                     if (newDevice.getSerialId().equals(deviceIndex.getSerialId())) {
-                        return;
+                        devices.remove(deviceIndex);
+                        break;
                     }
                 }
                 devices.add(newDevice);
                 Intent intent = new Intent();
                 intent.setAction(OBConstant.StringKey.UPDATE_SCAN_INFO);
-                intent.putExtra("cmd", cmd);
-                intent.putExtra("device_name", deviceName);
-                intent.putExtra("obox_serial_id", obox_serial_id);
+                intent.putExtra("newDevice", newDevice);
                 context.sendBroadcast(intent);
                 break;
-            case "a00e":/*时间有限，先做重复请求统一刷新处理，后改为即时处理数据*/
+            case "a00e":
                 intent = new Intent();
                 intent.setAction(OBConstant.StringKey.UPDATE_SCENE_LOCAL_SETTING);
                 context.sendBroadcast(intent);

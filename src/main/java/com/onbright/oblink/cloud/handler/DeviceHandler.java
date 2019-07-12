@@ -1,5 +1,11 @@
 package com.onbright.oblink.cloud.handler;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.annotation.Nullable;
+
 import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
@@ -8,7 +14,7 @@ import com.onbright.oblink.cloud.net.HttpRespond;
 import com.onbright.oblink.local.net.OBConstant;
 
 /**
- * use by:扫描设备，释放设备,状态回调
+ * use by:设备处理基础类，功能点：扫描设备，释放设备,状态回调
  * create by dky at 2019/7/3
  */
 abstract class DeviceHandler implements HttpRespond {
@@ -16,51 +22,44 @@ abstract class DeviceHandler implements HttpRespond {
     /**
      * rf设备序列号
      */
-    private String deviceSerId;
+    protected String deviceSerId;
 
     /**
      * 扫描设备类型
      */
-    private String pType;
+    protected String pType;
     /**
      * 扫描设备子类型
      */
-    private String type;
+    protected String type;
 
     /**
      * 要添加设备的obox
      */
-    private String oboxSerId;
+    protected String oboxSerId;
 
     /**
      * 扫描持续时间
      */
-    private String time = "30";
+    protected String time = "30";
 
     /**
      * 操作现有设备用此方法
      *
      * @param deviceSerId 操作rf设备的序列号
      */
-    public DeviceHandler(String deviceSerId) {
+    protected DeviceHandler(@Nullable String deviceSerId) {
         this.deviceSerId = deviceSerId;
-    }
-
-    /**
-     * 添加设备用此方法
-     */
-    public DeviceHandler() {
-
     }
 
     /**
      * 添加设备
      *
-     * @param deviceEnum 添加的设备类型
-     * @param oboxSerId  通过哪个obox添加传该obox序列号
-     * @param time       添加持续的时间，超过该时间无法再添加,默认30s
+     * @param oboxSerId 通过哪个obox添加传该obox序列号
+     * @param time      添加持续的时间，超过该时间无法再添加,默认30s
      */
-    public void searchNewDevice(DeviceEnum deviceEnum, String oboxSerId, String time) {
+    protected void searchNewDevice(String oboxSerId, String time) {
+        DeviceEnum deviceEnum = getDeviceEnum();
         pType = String.valueOf(deviceEnum.getpType());
         type = String.valueOf(deviceEnum.getType());
         if (time != null) {
@@ -73,13 +72,15 @@ abstract class DeviceHandler implements HttpRespond {
                 CloudConstant.Source.CONSUMER_OPEN + "device", HttpRequst.POST);
     }
 
+    protected abstract DeviceEnum getDeviceEnum();
 
     /**
      * 删除设备
-     *
-     * @param deviceSerId 要删除的设备序列号
      */
-    public void deleteDevice(String deviceSerId) {
+    public void deleteDevice() {
+        if (deviceSerId == null) {
+            return;
+        }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.deleteDevice(deviceSerId),
                 CloudConstant.Source.CONSUMER_OPEN + "device", HttpRequst.DELETE);
     }
@@ -105,7 +106,6 @@ abstract class DeviceHandler implements HttpRespond {
      * 启动扫描成功
      */
     public abstract void searchNewDeviceSuc();
-
 
     /**
      * 获取设备入网是否为主动入网方式
@@ -136,5 +136,31 @@ abstract class DeviceHandler implements HttpRespond {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * 接收广播
+     *
+     * @param context un
+     */
+    public void registBrd(Context context) {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(OBConstant.StringKey.UPDATE_SCAN_INFO);
+        intentFilter.addAction(OBConstant.StringKey.UPDATE_NODES_CLOUD_2500);
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action != null) {
+                    switch (action) {
+                        case OBConstant.StringKey.UPDATE_SCAN_INFO:
+                            break;
+                        case OBConstant.StringKey.UPDATE_NODES_CLOUD_2500:
+                            break;
+                    }
+                }
+            }
+        }, intentFilter);
+
     }
 }

@@ -9,8 +9,6 @@ import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 import com.onbright.oblink.cloud.net.MqttHandler;
 
-import okhttp3.FormBody;
-
 
 /**
  * use by:sdk初始化,获取昂宝云交互令牌
@@ -65,11 +63,10 @@ public abstract class ObInit implements HttpRespond {
 
     @Override
     public void onSuccess(String action, String json) {
-        mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN + "/" + UNIQUE_KEY, UNIQUE_KEY);
+        mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN + "&" + UNIQUE_KEY, UNIQUE_KEY);
         ACCESSTOKEN = CloudParseUtil.getJsonParm(json, "access_token");
         onInitSuc(ACCESSTOKEN);
     }
-
 
     /**
      * 初始化成功
