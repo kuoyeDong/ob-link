@@ -1,22 +1,21 @@
 package com.onbright.oblink.smartconfig;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.Time;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.onbright.oblink.EventMsg;
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.Obox;
 import com.onbright.oblink.Share;
 import com.onbright.oblink.StringUtil;
 import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.bean.Action;
-import com.onbright.oblink.cloud.bean.WifiDevice;
 import com.onbright.oblink.cloud.bean.AliDevState;
 import com.onbright.oblink.cloud.bean.AliSpec;
 import com.onbright.oblink.cloud.bean.CloudScene;
@@ -24,12 +23,12 @@ import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.bean.Group;
 import com.onbright.oblink.cloud.bean.UpLoadWifiIr;
+import com.onbright.oblink.cloud.bean.WifiDevice;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 import com.onbright.oblink.local.LocalDataPool;
-import com.onbright.oblink.Obox;
 import com.onbright.oblink.local.bean.Handset;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
@@ -45,6 +44,9 @@ import com.onbright.oblink.local.net.Respond;
 import com.onbright.oblink.local.net.TcpSend;
 import com.onbright.oblink.local.net.Transformation;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,10 +118,6 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
     private Obox obox;
     boolean isReqOboxMsg;
 
-    /**
-     * 接受设备上下线消息
-     */
-    private HeartBcr heartBcr;
 
     ConnectDeviceHandler(Context context, String routePwd, String deviceSecret, String deviceName, String kitCenter, String productKey) {
         this.context = context;
@@ -128,12 +126,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
         this.deviceName = deviceName;
         this.kitCenter = kitCenter;
         this.productKey = productKey;
-        heartBcr = new HeartBcr();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(OBConstant.StringKey.OBOX_HEART_INFO);
-        intentFilter.addAction(OBConstant.StringKey.WIFI_HEART_INFO);
-        this.context.registerReceiver(heartBcr, intentFilter);
-
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -578,7 +571,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
      * 释放资源操作
      */
     public void releaseSource() {
-        context.unregisterReceiver(heartBcr);
+        EventBus.getDefault().unregister(this);
         LocalDataPool.newInstance().unRegist(this);
     }
 
@@ -628,34 +621,29 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
      */
     protected abstract void addOboxSuc(Obox obox);
 
-    /**
-     * 解析上下线消息
-     */
-    private class HeartBcr extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action != null) {
-                switch (action) {
-                    case OBConstant.StringKey.OBOX_HEART_INFO:
-                    case OBConstant.StringKey.WIFI_HEART_INFO:
-                        String onLine = intent.getStringExtra("onLine");
-                        String serialId = intent.getStringExtra("serialId");
-                        if (serialId.equals(serNum) && onLine.equals("true")) {
-                            if (type == OBConstant.OnAddWifiDeviceType.OBOX) {
-                                onCloudAddOboxSuc();
-                                addOboxSuc(obox);
-                            } else {
-                                sendBroadUpdateWifiDevice();
-                                addWifiDeviceSuc(configStr);
-                            }
-                            handler.removeMessages(CON_CLOUD_TIMEOUT);
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(EventMsg eventMsg) {
+        String action = eventMsg.getAction();
+        if (action != null) {
+            switch (action) {
+                case OBConstant.StringKey.OBOX_HEART_INFO:
+                case OBConstant.StringKey.WIFI_HEART_INFO:
+                    String onLine = (String) eventMsg.getExtra("onLine");
+                    String serialId = (String) eventMsg.getExtra("serialId");
+                    if (serialId.equals(serNum) && onLine.equals("true")) {
+                        if (type == OBConstant.OnAddWifiDeviceType.OBOX) {
+                            onCloudAddOboxSuc();
+                            addOboxSuc(obox);
+                        } else {
+                            sendBroadUpdateWifiDevice();
+                            addWifiDeviceSuc(configStr);
                         }
-                        break;
-                }
+                        handler.removeMessages(CON_CLOUD_TIMEOUT);
+                    }
+                    break;
             }
         }
     }
-
 
 }

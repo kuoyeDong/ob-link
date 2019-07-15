@@ -56,7 +56,7 @@ public class MqttHandler {
      */
     public MqttHandler(Context context, String token, String clientId) {
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
-        parseServerListener = new ParseServerListener(context);
+        parseServerListener = new ParseServerListener();
         pubAndSubTopic = "ob-smart." + token;
         Log.d(TAG, "MqttHandler: token =" + token + "clientId=" + clientId);
         setCallBack();
@@ -67,7 +67,7 @@ public class MqttHandler {
      * 连接mq
      */
     public void connect() {
-        if (mqttAndroidClient != null ) {
+        if (mqttAndroidClient != null) {
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
             mqttConnectOptions.setAutomaticReconnect(true);
             mqttConnectOptions.setCleanSession(false);

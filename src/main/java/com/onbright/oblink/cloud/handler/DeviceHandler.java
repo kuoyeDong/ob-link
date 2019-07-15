@@ -1,20 +1,23 @@
 package com.onbright.oblink.cloud.handler;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
+import com.onbright.oblink.EventMsg;
+import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 import com.onbright.oblink.local.net.OBConstant;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+
 /**
- * use by:设备处理基础类，功能点：扫描设备，释放设备,状态回调
+ * use by:设备处理基础类，功能点：扫描设备，释放设备，状态回调
  * create by dky at 2019/7/3
  */
 abstract class DeviceHandler implements HttpRespond {
@@ -44,12 +47,11 @@ abstract class DeviceHandler implements HttpRespond {
     protected String time = "30";
 
     /**
-     * 操作现有设备用此方法
-     *
-     * @param deviceSerId 操作rf设备的序列号
+     * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String)}操作
      */
     protected DeviceHandler(@Nullable String deviceSerId) {
         this.deviceSerId = deviceSerId;
+        EventBus.getDefault().register(this);
     }
 
     /**
@@ -138,29 +140,45 @@ abstract class DeviceHandler implements HttpRespond {
         return false;
     }
 
-    /**
-     * 接收广播
-     *
-     * @param context un
-     */
-    public void registBrd(Context context) {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(OBConstant.StringKey.UPDATE_SCAN_INFO);
-        intentFilter.addAction(OBConstant.StringKey.UPDATE_NODES_CLOUD_2500);
-        context.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action != null) {
-                    switch (action) {
-                        case OBConstant.StringKey.UPDATE_SCAN_INFO:
-                            break;
-                        case OBConstant.StringKey.UPDATE_NODES_CLOUD_2500:
-                            break;
-                    }
+    @SuppressWarnings("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(EventMsg eventMsg) {
+        switch (eventMsg.getAction()) {
+            case OBConstant.StringKey.UPDATE_SCAN_INFO:
+                Device device = (Device) eventMsg.getExtra("newDevice");
+                onNewDevice(device);
+                break;
+            case OBConstant.StringKey.STATUS_CHANGE_REPORT:
+                String serialId = (String) eventMsg.getExtra("serialId");
+                String status = (String) eventMsg.getExtra("status");
+                if (serialId.equals(this.deviceSerId)) {
+                    onStatusChange(status);
                 }
-            }
-        }, intentFilter);
-
+                break;
+            default:
+                break;
+        }
     }
+
+    /**
+     * 设备状态变更
+     *
+     * @param status 设备状态
+     */
+    protected abstract void onStatusChange(String status);
+
+    /**
+     * 扫描到新设备
+     *
+     * @param device 新设备
+     */
+    protected abstract void onNewDevice(Device device);
+
+    /**
+     * 解除监听
+     */
+    public void unRegist() {
+        EventBus.getDefault().unregister(this);
+    }
+
 }

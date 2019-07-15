@@ -1,9 +1,7 @@
 package com.onbright.oblink.cloud.net;
 
-import android.content.Context;
-import android.content.Intent;
-
 import com.google.gson.Gson;
+import com.onbright.oblink.EventMsg;
 import com.onbright.oblink.MathUtil;
 import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.bean.Action;
@@ -15,11 +13,11 @@ import com.onbright.oblink.local.net.OBConstant;
 import com.onbright.oblink.local.net.Transformation;
 import com.orhanobut.logger.Logger;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +28,8 @@ import java.util.List;
  */
 
 public class ParseServerListener {
-    private Context context;
     private String dataPrefix = "";
 
-    public ParseServerListener(Context context) {
-        this.context = context;
-    }
 
     public synchronized void parseServerData(String dataString) {
         String json = "";
@@ -86,21 +80,22 @@ public class ParseServerListener {
         String onLine;
         String serialId = CloudParseUtil.getJsonParm(json, "serialId");
         onLine = CloudParseUtil.getJsonParm(json, "onLine");
-        Intent intent = new Intent();
-        intent.setAction(OBConstant.StringKey.WIFI_HEART_INFO);
-        intent.putExtra("serialId", serialId);
-        intent.putExtra("onLine", onLine);
-        context.sendBroadcast(intent);
+        EventMsg eventMsg = new EventMsg();
+        eventMsg.setAction(OBConstant.StringKey.WIFI_HEART_INFO);
+        eventMsg.putExtra("serialId", serialId);
+        eventMsg.putExtra("onLine", onLine);
+        EventBus.getDefault().post(eventMsg);
+
     }
 
     /**
      * @param json 待处理的推送数据
      */
     private void downIrRemote(String json) {
-        Intent intent = new Intent();
-        intent.putExtra(OBConstant.StringKey.DOWN_IR_REMOTE, json);
-        intent.setAction(OBConstant.StringKey.DOWN_IR_REMOTE);
-        context.sendBroadcast(intent);
+        EventMsg eventMsg = new EventMsg();
+        eventMsg.setAction(OBConstant.StringKey.DOWN_IR_REMOTE);
+        eventMsg.putExtra(OBConstant.StringKey.DOWN_IR_REMOTE, json);
+        EventBus.getDefault().post(eventMsg);
     }
 
     /**
@@ -109,10 +104,10 @@ public class ParseServerListener {
      * @param json 待处理的推送数据
      */
     private void pairIrRemote(String json) {
-        Intent intent = new Intent();
-        intent.putExtra(OBConstant.StringKey.PAIR_IR_REMOTE, json);
-        intent.setAction(OBConstant.StringKey.PAIR_IR_REMOTE);
-        context.sendBroadcast(intent);
+        EventMsg eventMsg = new EventMsg();
+        eventMsg.setAction(OBConstant.StringKey.PAIR_IR_REMOTE);
+        eventMsg.putExtra(OBConstant.StringKey.PAIR_IR_REMOTE, json);
+        EventBus.getDefault().post(eventMsg);
     }
 
     /**
@@ -121,23 +116,23 @@ public class ParseServerListener {
      * @param json 待处理的推送数据
      */
     private void learnRemote(String json) {
-        Intent intent = new Intent();
-        intent.putExtra(OBConstant.StringKey.LEARN_REMOTE, json);
-        intent.setAction(OBConstant.StringKey.LEARN_REMOTE);
-        context.sendBroadcast(intent);
+        EventMsg eventMsg = new EventMsg();
+        eventMsg.setAction(OBConstant.StringKey.LEARN_REMOTE);
+        eventMsg.putExtra(OBConstant.StringKey.LEARN_REMOTE, json);
+        EventBus.getDefault().post(eventMsg);
     }
 
     /**
      * 门锁重置密码
      */
     private void lockAdminPwdReset(String json) {
+        EventMsg eventMsg = new EventMsg();
         String serialId = CloudParseUtil.getJsonParm(json, "serialId");
         String data = CloudParseUtil.getJsonParm(json, "data");
-        Intent intent = new Intent();
-        intent.putExtra("code", data);
-        intent.putExtra("serial_id", serialId);
-        intent.setAction(OBConstant.StringKey.LOCK_ADMIN_PWD_RESET);
-        context.sendBroadcast(intent);
+        eventMsg.setAction(OBConstant.StringKey.LOCK_ADMIN_PWD_RESET);
+        eventMsg.putExtra("code", data);
+        eventMsg.putExtra("serial_id", serialId);
+        EventBus.getDefault().post(eventMsg);
     }
 
     /**
@@ -166,7 +161,7 @@ public class ParseServerListener {
                 nodeType = data.substring(10, 12);
                 nodeAddr = data.substring(12, 14);
                 Logger.d("2500设备上报数据" + "state =" + state + "nodeType =" + nodeType + "nodeAddr =" + nodeAddr + "state", state);
-                String status;
+                String status = null;
                 int pType, cType;
                 for (int i = 0; i < CloudDataPool.getDevices().size(); i++) {
                     if (CloudDataPool.getDevices().get(i).getObox_serial_id().equals(obox_serial_id)) {
@@ -218,10 +213,11 @@ public class ParseServerListener {
                         }
                     }
                 }
-                Intent intent = new Intent();
-                intent.putExtra("serialId", serialId);
-                intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD_2500);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg = new EventMsg();
+                eventMsg.putExtra("serialId", serialId);
+                eventMsg.putExtra("status", status);
+                eventMsg.setAction(OBConstant.StringKey.STATUS_CHANGE_REPORT);
+                EventBus.getDefault().post(eventMsg);
                 break;
             }
             case "a100": {/*设置状态回复*/
@@ -230,53 +226,33 @@ public class ParseServerListener {
                 groupAddr = data.substring(12, 14);
                 if (groupAddr.equals("00")) {
                     for (int i = 0; i < CloudDataPool.getDevices().size(); i++) {
-                        if (CloudDataPool.getDevices().get(i).getObox_serial_id() != null) {
-                            if (CloudDataPool.getDevices().get(i).getObox_serial_id().equals(obox_serial_id)) {
-                                if (CloudDataPool.getDevices().get(i).getAddr().equals(nodeAddr)) {
-                                    Device device = CloudDataPool.getDevices().get(i);
-                                    // FIXME: 2017/11/26 飞机不进行广播更新，太频繁
-                                    if (device.getDevice_type().equals("10")) {
-                                        state = data.substring(16, 36);
-                                        CloudDataPool.getDevices().get(i).setState(state);
-                                        serialId = CloudDataPool.getDevices().get(i).getSerialId();
-                                        Intent intent = new Intent();
-                                        intent.putExtra("serialId", serialId);
-                                        intent.setAction(OBConstant.StringKey.UPDATE_FLIGHT_CLOUD);
-                                        context.sendBroadcast(intent);
-                                        return;
-                                    }
-                                    CloudDataPool.getDevices().get(i).setState(state);
-                                    serialId = CloudDataPool.getDevices().get(i).getSerialId();
+                        Device device = CloudDataPool.getDevices().get(i);
+                        if (device.getObox_serial_id() != null) {
+                            if (device.getObox_serial_id().equals(obox_serial_id)) {
+                                if (device.getAddr().equals(nodeAddr)) {
+                                    device.setState(state);
+                                    serialId = device.getSerialId();
+                                    break;
                                 }
                             }
                         }
                     }
                 } else {
                     for (int i = 0; i < CloudDataPool.getGroups().size(); i++) {
-                        if (CloudDataPool.getGroups().get(i).getObox_serial_id() != null) {
-                            if (CloudDataPool.getGroups().get(i).getObox_serial_id().equals(obox_serial_id)) {
-                                if (CloudDataPool.getGroups().get(i).getGroupAddr().equals(groupAddr)) {
-                                    Group group = CloudDataPool.getGroups().get(i);
-                                    // FIXME: 2017/11/26 飞机不进行广播更新，太频繁
-                                    if (group.getGroup_type().equals("10")) {
-                                        state = data.substring(16, 36);
-                                        CloudDataPool.getGroups().get(i).setGroup_state(state);
-                                        Intent intent = new Intent();
-                                        intent.putExtra("serialId", serialId);
-                                        intent.setAction(OBConstant.StringKey.UPDATE_FLIGHT_CLOUD);
-                                        context.sendBroadcast(intent);
-                                        return;
-                                    }
-                                    CloudDataPool.getGroups().get(i).setGroup_state(state);
+                        Group group = CloudDataPool.getGroups().get(i);
+                        if (group.getObox_serial_id() != null) {
+                            if (group.getObox_serial_id().equals(obox_serial_id)) {
+                                if (group.getGroupAddr().equals(groupAddr)) {
+                                    group.setGroup_state(state);
                                 }
                             }
                         }
                     }
                 }
-                Intent intent = new Intent();
-                intent.putExtra("serialId", serialId);
-                intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg = new EventMsg();
+                eventMsg.putExtra("serialId", serialId);
+                eventMsg.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
+                EventBus.getDefault().post(eventMsg);
                 break;
             }
             case "a004":/*删除节点、删除组、创建组、重命名节点、组,因为服务器回复不靠谱所以在obox透传中做*/
@@ -315,23 +291,23 @@ public class ParseServerListener {
                             isDeleteNode = true;
                             isDeleteGroup = false;
                         }
-                        Intent intent = new Intent();
-                        intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
-                        intent.putExtra("isDeleteGroup", isDeleteGroup);
-                        intent.putExtra("isDeleteNode", isDeleteNode);
-                        intent.putExtra("cmd", cmd);
-                        intent.putExtra("isModifyStruct", true);
-                        intent.putExtra("operate_type", operation);
-                        context.sendBroadcast(intent);
+                        EventMsg eventMsg = new EventMsg();
+                        eventMsg.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
+                        eventMsg.putExtra("isDeleteGroup", isDeleteGroup);
+                        eventMsg.putExtra("isDeleteNode", isDeleteNode);
+                        eventMsg.putExtra("cmd", cmd);
+                        eventMsg.putExtra("isModifyStruct", true);
+                        eventMsg.putExtra("operate_type", operation);
+                        EventBus.getDefault().post(eventMsg);
                         Logger.d("删除节点或删除组" + "isDeleteNode=" + isDeleteNode + "isDeleteGroup= " + isDeleteGroup);
                         break;
                     }
                     case "01": {//add
-                        Intent intent = new Intent();
-                        intent.setAction(OBConstant.StringKey.UPDATE_GROUPS_INFO);
-                        intent.putExtra("cmd", cmd);
-                        intent.putExtra("operate_type", operation);
-                        context.sendBroadcast(intent);
+                        EventMsg eventMsg = new EventMsg();
+                        eventMsg.setAction(OBConstant.StringKey.UPDATE_GROUPS_INFO);
+                        eventMsg.putExtra("cmd", cmd);
+                        eventMsg.putExtra("operate_type", operation);
+                        EventBus.getDefault().post(eventMsg);
                         Logger.d("添加节点到组");
 //                    if (groupAddr.equals("00")) {
 //
@@ -360,6 +336,11 @@ public class ParseServerListener {
                                 if (CloudDataPool.getDevices().get(i).getObox_serial_id().equals(obox_serial_id)) {
                                     if (CloudDataPool.getDevices().get(i).getAddr().equals(nodeAddr)) {
                                         CloudDataPool.getDevices().get(i).setName(name);
+                                        EventMsg eventMsg = new EventMsg();
+                                        eventMsg.setAction(OBConstant.StringKey.UPDATE_NODE_ID);
+                                        EventBus.getDefault().post(eventMsg);
+                                        Logger.d("节点重命名");
+                                        break;
                                     }
                                 }
                             }
@@ -369,16 +350,16 @@ public class ParseServerListener {
                                     if (CloudDataPool.getGroups().get(i).getObox_serial_id().equals(obox_serial_id)) {
                                         if (CloudDataPool.getGroups().get(i).getGroupAddr().equals(groupAddr)) {
                                             CloudDataPool.getGroups().get(i).setGroup_name(name);
+                                            EventMsg eventMsg = new EventMsg();
+                                            eventMsg.setAction(OBConstant.StringKey.UPDATE_GROUP_ID);
+                                            EventBus.getDefault().post(eventMsg);
+                                            Logger.d("组重命名");
+                                            break;
                                         }
                                     }
                                 }
                             }
                         }
-                        Intent intent = new Intent();
-                        intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
-                        intent.putExtra("operate_type", operation);
-                        context.sendBroadcast(intent);
-                        Logger.d("节点或组重命名");
                         break;
                     }
                 }
@@ -415,14 +396,14 @@ public class ParseServerListener {
                         }
                     }
                 }
-                Intent intent = new Intent();
-                intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
-                intent.putExtra("cmd", cmd);
-                intent.putExtra("obox_serial_id", obox_serial_id);
-                intent.putExtra("group_addr", groupAddr);
-                intent.putExtra("isDeleteGroup", false);
-                intent.putExtra("isDeleteNode", false);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg = new EventMsg();
+                eventMsg.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
+                eventMsg.putExtra("cmd", cmd);
+                eventMsg.putExtra("obox_serial_id", obox_serial_id);
+                eventMsg.putExtra("group_addr", groupAddr);
+                eventMsg.putExtra("isDeleteGroup", false);
+                eventMsg.putExtra("isDeleteNode", false);
+                EventBus.getDefault().post(eventMsg);
                 Logger.d("修改组节点，组操作");
                 break;
             }
@@ -474,15 +455,15 @@ public class ParseServerListener {
                     }
                 }
                 devices.add(newDevice);
-                Intent intent = new Intent();
-                intent.setAction(OBConstant.StringKey.UPDATE_SCAN_INFO);
-                intent.putExtra("newDevice", newDevice);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg = new EventMsg();
+                eventMsg.setAction(OBConstant.StringKey.UPDATE_SCAN_INFO);
+                eventMsg.putExtra("newDevice", newDevice);
+                EventBus.getDefault().post(eventMsg);
                 break;
             case "a00e":
-                intent = new Intent();
-                intent.setAction(OBConstant.StringKey.UPDATE_SCENE_LOCAL_SETTING);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg1 = new EventMsg();
+                eventMsg1.setAction(OBConstant.StringKey.UPDATE_SCENE_LOCAL_SETTING);
+                EventBus.getDefault().post(eventMsg1);
                 break;
         }
     }
@@ -531,10 +512,10 @@ public class ParseServerListener {
                 }
                 CloudDataPool.deleteOboxData(obox_serial_id);
                 deleteObox(obox_serial_id);
-                Intent intent = new Intent();
-                intent.putExtra("delete_obox", true);
-                intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg = new EventMsg();
+                eventMsg.putExtra("delete_obox", true);
+                eventMsg.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
+                EventBus.getDefault().post(eventMsg);
                 break;
             }
             case "add_obox": {
@@ -557,9 +538,9 @@ public class ParseServerListener {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent();
-                intent.setAction(OBConstant.StringKey.UPDATE_ADD_OBOX);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg = new EventMsg();
+                eventMsg.setAction(OBConstant.StringKey.UPDATE_ADD_OBOX);
+                EventBus.getDefault().post(eventMsg);
                 break;
             }
             case "set_group": {
@@ -693,11 +674,11 @@ public class ParseServerListener {
                         }
                         break;
                 }
-                Intent intent = new Intent();
-                intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
-                intent.putExtra("operateType", operate_type);
-                intent.putExtra("cmd", cmd);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg = new EventMsg();
+                eventMsg.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
+                eventMsg.putExtra("operateType", operate_type);
+                eventMsg.putExtra("cmd", cmd);
+                EventBus.getDefault().post(eventMsg);
                 break;
             }
             case "setting_sc_info":
@@ -731,12 +712,12 @@ public class ParseServerListener {
                         cloudScene.setScene_status(sceneBean.getScene().get(j).getScene_status());
                         cloudSceneList.add(cloudScene);
                     }
-                    Intent intent = new Intent();
-                    intent.setAction(OBConstant.StringKey.UPDATE_SCENE_CLOUD_SETTING);
-                    intent.putExtra("sceneCloudList", (Serializable) cloudSceneList);
-                    intent.putExtra("scene_number", scene_number);
-                    intent.putExtra("scene_name", scene_name);
-                    context.sendBroadcast(intent);
+                    EventMsg eventMsg = new EventMsg();
+                    eventMsg.setAction(OBConstant.StringKey.UPDATE_SCENE_CLOUD_SETTING);
+                    eventMsg.putExtra("sceneCloudList", cloudSceneList);
+                    eventMsg.putExtra("scene_number", scene_number);
+                    eventMsg.putExtra("scene_name", scene_name);
+                    EventBus.getDefault().post(eventMsg);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -747,51 +728,15 @@ public class ParseServerListener {
                     dataObject = new JSONObject(dataJson);
                     scene_number = dataObject.getInt("scene_number");
                     scene_status = dataObject.getString("scene_status");
-                    Intent intent = new Intent();
-                    intent.setAction(OBConstant.StringKey.UPDATE_SCENE_CLOUD_EXUTE);
-                    intent.putExtra("scene_number", scene_number);
-                    intent.putExtra("scene_status", scene_status);
-                    context.sendBroadcast(intent);
+                    EventMsg eventMsg = new EventMsg();
+                    eventMsg.setAction(OBConstant.StringKey.UPDATE_SCENE_CLOUD_EXUTE);
+                    eventMsg.putExtra("scene_number", scene_number);
+                    eventMsg.putExtra("scene_status", scene_status);
+                    EventBus.getDefault().post(eventMsg);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 break;
-            case "modify_user":
-                String root_name = "";
-                String admin_name = "";
-                String user_name = "";
-                String weight = "";
-                String pwd = "";
-                String modify_type = "";
-                try {
-                    String requestJson = CloudParseUtil.getJsonParm(json, "request");
-                    requestJson = requestJson.replace("[", "").replace("]", "");
-                    requestObject = new JSONObject(requestJson);
-                    weight = requestObject.getString("weight");
-                    modify_type = requestObject.getString("modify_type");
-                    if (weight.equals("02")) {
-                        root_name = requestObject.getString("root_name");
-                    } else if (weight.equals("03")) {
-                        admin_name = requestObject.getString("admin_name");
-                    }
-                    user_name = requestObject.getString("user_name");
-                    if (!modify_type.equals("00")) {
-                        pwd = requestObject.getString("pwd");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Intent intentUser = new Intent();
-                intentUser.setAction(OBConstant.StringKey.UPDATE_MODIFY_USER);
-                intentUser.putExtra("root_name", root_name);
-                intentUser.putExtra("admin_name", admin_name);
-                intentUser.putExtra("user_name", user_name);
-                intentUser.putExtra("weight", weight);
-                intentUser.putExtra("pwd", pwd);
-                intentUser.putExtra("modify_type", modify_type);
-                context.sendBroadcast(intentUser);
-                break;
-
             case "set_device_location": {
                 try {
                     String dataJson = CloudParseUtil.getJsonParm(json, "data");
@@ -814,14 +759,14 @@ public class ParseServerListener {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent();
-                intent.setAction(OBConstant.StringKey.UPDATE_SET_DEVICE_LOCATION);
-                intent.putExtra("serialId", serialId);
-                intent.putExtra("location", location_d);
-                intent.putExtra("x_axis", x_axis);
-                intent.putExtra("y_axis", y_axis);
-                intent.putExtra("action", action);
-                context.sendBroadcast(intent);
+                EventMsg eventMsg1 = new EventMsg();
+                eventMsg1.setAction(OBConstant.StringKey.UPDATE_SET_DEVICE_LOCATION);
+                eventMsg1.putExtra("serialId", serialId);
+                eventMsg1.putExtra("location", location_d);
+                eventMsg1.putExtra("x_axis", x_axis);
+                eventMsg1.putExtra("y_axis", y_axis);
+                eventMsg1.putExtra("action", action);
+                EventBus.getDefault().post(eventMsg1);
                 break;
             }
             case "create_location":
@@ -839,14 +784,14 @@ public class ParseServerListener {
                     String building = requestObject.getString("building");
                     String room = requestObject.getString("room");
                     String download_url = requestObject.getString("download_url");
-                    Intent intent = new Intent();
-                    intent.setAction(OBConstant.StringKey.UPDATE_CREATE_LOCATION);
-                    intent.putExtra("action", action);
-                    intent.putExtra("location", location);
-                    intent.putExtra("building", building);
-                    intent.putExtra("room", room);
-                    intent.putExtra("download_url", download_url);
-                    context.sendBroadcast(intent);
+                    EventMsg eventMsg1 = new EventMsg();
+                    eventMsg1.setAction(OBConstant.StringKey.UPDATE_CREATE_LOCATION);
+                    eventMsg1.putExtra("action", action);
+                    eventMsg1.putExtra("location", location);
+                    eventMsg1.putExtra("building", building);
+                    eventMsg1.putExtra("room", room);
+                    eventMsg1.putExtra("download_url", download_url);
+                    EventBus.getDefault().post(eventMsg1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -861,12 +806,12 @@ public class ParseServerListener {
                     scene_number = requestObject.getInt("scene_number");
                     location = requestObject.getInt("location");
                     action = requestObject.getString("CMD");
-                    Intent intent = new Intent();
-                    intent.setAction(OBConstant.StringKey.UPDATE_SCENE_LOCATION);
-                    intent.putExtra("scene_number", String.valueOf(scene_number));
-                    intent.putExtra("location", String.valueOf(location));
-                    intent.putExtra("action", action);
-                    context.sendBroadcast(intent);
+                    EventMsg eventMsg1 = new EventMsg();
+                    eventMsg1.setAction(OBConstant.StringKey.UPDATE_SCENE_LOCATION);
+                    eventMsg1.putExtra("scene_number", String.valueOf(scene_number));
+                    eventMsg1.putExtra("location", String.valueOf(location));
+                    eventMsg1.putExtra("action", action);
+                    EventBus.getDefault().post(eventMsg1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -895,11 +840,11 @@ public class ParseServerListener {
                 break;
             }
         }
-        Intent intent = new Intent();
-        intent.setAction(OBConstant.StringKey.OBOX_HEART_INFO);
-        intent.putExtra("serialId", serialId);
-        intent.putExtra("onLine", onLine);
-        context.sendBroadcast(intent);
+        EventMsg eventMsg = new EventMsg();
+        eventMsg.setAction(OBConstant.StringKey.OBOX_HEART_INFO);
+        eventMsg.putExtra("serialId", serialId);
+        eventMsg.putExtra("onLine", onLine);
+        EventBus.getDefault().post(eventMsg);
     }
 
 
@@ -912,15 +857,15 @@ public class ParseServerListener {
     }
 
     private void sendBroadCast() {
-        Intent intent = new Intent();
-        intent.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
-        context.sendBroadcast(intent);
+        EventMsg eventMsg = new EventMsg();
+        eventMsg.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
+        EventBus.getDefault().post(eventMsg);
     }
 
     /**
      * 返回字符串名称
      */
-    public String getNodeId(byte[] id) {
+    private String getNodeId(byte[] id) {
         try {
             return new String(id, "UTF-8");
         } catch (UnsupportedEncodingException e) {

@@ -88,7 +88,10 @@ public interface OBConstant {
          * 单品wifi上下线推送时广播key
          */
         String WIFI_HEART_INFO = "wifi_heart_info";
-        String UPDATE_NODES_CLOUD_2500 = "update_nodes_cloud_2500";
+        /**
+         * obox状态改变主动上报
+         */
+        String STATUS_CHANGE_REPORT = "update_nodes_cloud_2500";
         /**
          * 刷新门锁是否有验证用户
          */
@@ -126,6 +129,14 @@ public interface OBConstant {
          * 存储服务器键start
          */
         String SERVER = "server";
+        /**
+         * rename node id
+         */
+        String UPDATE_NODE_ID = "update_node_id";
+        /**
+         * rename group id
+         */
+        String UPDATE_GROUP_ID = "update_group_id";
     }
 
     /**

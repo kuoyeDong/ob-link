@@ -56,12 +56,11 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param times     使用次数
      */
     public void editIntelligentRemoteUser(String serialId, String authToken, String nickName,
-                                         String startTime, String endTime, String times, boolean isMax) {
+                                          String startTime, String endTime, String times, boolean isMax) {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER,
                 GetParameter.addIntelligentRemoteUser(serialId, authToken, nickName,
                         startTime, endTime, times, null, false, isMax), CloudConstant.Source.CONSUMER_OPEN + "intelligentRemoteUser", HttpRequst.POST);
     }
-
 
 
 }
