@@ -409,7 +409,7 @@ public class GetParameter {
      * @param authToken 门锁口令
      * @param pin       临时用户pin
      */
-    public static FormBody.Builder delIntelligentRemote_user(int id, String serialId, String authToken, String pin) {
+    public static FormBody.Builder delIntelligentRemoteUser(int id, String serialId, String authToken, String pin) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DEL_INTELLIGENT_REMOTE_USER);
         builder.add(CloudConstant.ParameterKey.ID, id + "");
@@ -539,7 +539,7 @@ public class GetParameter {
     }
 
     /**
-     * 智能门锁修改远程用户
+     * 查询推送设置列表
      *
      * @param serialId 门锁序列号
      */
