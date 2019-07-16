@@ -55,12 +55,82 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param endTime   结束时间
      * @param times     使用次数
      */
-    public void editIntelligentRemoteUser(String serialId, String authToken, String nickName,
-                                          String startTime, String endTime, String times, boolean isMax) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER,
-                GetParameter.addIntelligentRemoteUser(serialId, authToken, nickName,
-                        startTime, endTime, times, null, false, isMax), CloudConstant.Source.CONSUMER_OPEN + "intelligentRemoteUser", HttpRequst.POST);
+    public void modifyIntelligentRemoteUser(int userId, String serialId, String userPin, String authToken, String nickName,
+                                            String startTime, String endTime, String times, boolean isMax) {
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.MODIFY_INTELLIGENT_REMOTE_USER,
+                GetParameter.modifyIntelligentRemoteUser(userId, serialId, userPin, authToken, null, nickName,
+                        startTime, endTime, times, isMax), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 查询门锁状态
+     */
+    public void queryIntelligentFingerhome() {
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_FINGERHOME, GetParameter.queryIntelligentFingerhome(deviceSerId),
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 查询OB智能门锁开门记录
+     */
+    public void queryIntelligentOpenrecord() {
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_OPENRECORD,
+                GetParameter.queryIntelligentOpenrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 查询门锁警告记录
+     */
+    public void queryIntelligentWarningrecord() {
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_WARNINGRECORD,
+                GetParameter.queryIntelligentWarningrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 查询OB智能门锁用户列表
+     */
+    public void queryIntelligentUseringrecord() {
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_USERINGRECORD,
+                GetParameter.queryIntelligentUseringrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 发送验证码到胁迫时目标手机
+     *
+     * @param pin
+     * @param phone
+     */
+    public void sendIntelligentValidatecode(String pin, String phone) {
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SEND_INTELLIGENT_VALIDATECODE,
+                GetParameter.sendIntelligentValidatecode(deviceSerId, pin, phone), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 编辑门锁用户
+     *
+     * @param pin
+     * @param nickName
+     * @param phone
+     * @param validateCode
+     * @param hasStressPwd
+     */
+    public void editIntelligentUser(String pin, String nickName, String phone, String validateCode, boolean hasStressPwd) {
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.EDIT_INTELLIGENT_USER,
+                GetParameter.editIntelligentUser(deviceSerId, pin, nickName, phone, validateCode, hasStressPwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
 
+    /**
+     * 从这里开始
+     */
+    public void queryIntelligentAuthpwd() {
+
+    }
+
+    @Override
+    public void onSuccess(String action, String json) {
+        super.onSuccess(action, json);
+        switch (action) {
+        }
+    }
 }

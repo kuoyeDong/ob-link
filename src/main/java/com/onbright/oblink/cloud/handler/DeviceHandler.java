@@ -71,7 +71,7 @@ abstract class DeviceHandler implements HttpRespond {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SEARCH_NEW_DEVICES,
                 GetParameter.onSearchNewDevicesOB(oboxSerId, isDc(deviceEnum.getpType(),
                         deviceEnum.getType()) ? "03" : "02", time, "", pType, type),
-                CloudConstant.Source.CONSUMER_OPEN + "device", HttpRequst.POST);
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
     protected abstract DeviceEnum getDeviceEnum();
@@ -83,8 +83,8 @@ abstract class DeviceHandler implements HttpRespond {
         if (deviceSerId == null) {
             return;
         }
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.deleteDevice(deviceSerId),
-                CloudConstant.Source.CONSUMER_OPEN + "device", HttpRequst.DELETE);
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.onModifyDevice(deviceSerId, null, true),
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.DELETE);
     }
 
     @Override

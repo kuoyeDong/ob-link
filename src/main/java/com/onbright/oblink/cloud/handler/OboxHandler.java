@@ -40,7 +40,7 @@ public abstract class OboxHandler implements HttpRespond {
      */
     public void deleteObox() {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_OBOX, GetParameter.onDeleteObox(true, oboxSerId),
-                CloudConstant.Source.CONSUMER_OPEN + "obox", HttpRequst.DELETE);
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.DELETE);
     }
 
     /**

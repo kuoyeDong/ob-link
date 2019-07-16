@@ -228,7 +228,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
         initGroup();
         initScene();
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_OBOX,
-                GetParameter.onAddObox(obox, deviceName, productKey, true), CloudConstant.Source.CONSUMER_OPEN + "obox", HttpRequst.POST);
+                GetParameter.onAddObox(obox, deviceName, productKey, true), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
     /**
@@ -526,7 +526,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                 break;
         }
         HttpRequst.getHttpRequst().request(ConnectDeviceHandler.this, CloudConstant.CmdValue.UPLOAD_CONFIG,
-                GetParameter.uploadConfig(deviceName, productKey, configStr), CloudConstant.Source.CONSUMER_OPEN + "config", HttpRequst.POST);
+                GetParameter.uploadConfig(deviceName, productKey, configStr), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
     /**

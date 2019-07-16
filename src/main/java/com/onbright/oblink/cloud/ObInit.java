@@ -17,17 +17,14 @@ import com.onbright.oblink.cloud.net.MqttHandler;
 public abstract class ObInit implements HttpRespond {
     public static Context CONTEXT;
 
-
-    /**
-     * app名称,如obsmart
-     */
-    public static String APPLICATION_NAME;
-
     /**
      * 下级用户标识
      */
-    public static String UNIQUE_KEY;
+    private String uniqueKey;
 
+    /**
+     * 口令
+     */
     public static String ACCESSTOKEN;
 
     /**
@@ -50,7 +47,7 @@ public abstract class ObInit implements HttpRespond {
     public ObInit(String appKey, String appSecret, String uniqueKey, Context context) {
         APP_KEY = appKey;
         APP_SECRET = appSecret;
-        UNIQUE_KEY = uniqueKey;
+        this.uniqueKey = uniqueKey;
         CONTEXT = context;
     }
 
@@ -58,20 +55,31 @@ public abstract class ObInit implements HttpRespond {
      * 初始化，换取token
      */
     public void init() {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT, GetParameter.onInit(), "/oauth/token", HttpRequst.POST);
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT,
+                GetParameter.onInit(), "oauth/token?grant_type=client_credentials", HttpRequst.POST);
     }
 
     @Override
     public void onSuccess(String action, String json) {
-        mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN + "&" + UNIQUE_KEY, UNIQUE_KEY);
-        ACCESSTOKEN = CloudParseUtil.getJsonParm(json, "access_token");
-        onInitSuc(ACCESSTOKEN);
+        switch (action) {
+            case CloudConstant.CmdValue.INIT:
+                String cacheToken = CloudParseUtil.getJsonParm(json, CloudConstant.ParameterKey.ACCESS_TOKEN);
+                HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT_SECOND,
+                        GetParameter.onInitSecond(), "/login/company?accessToken=" + cacheToken + "&uniqueKey=" + uniqueKey,
+                        HttpRequst.POST);
+                break;
+            case CloudConstant.CmdValue.INIT_SECOND:
+                ACCESSTOKEN = CloudParseUtil.getJsonParm(json, CloudConstant.ParameterKey.ACCESS_TOKEN);
+                mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN, uniqueKey);
+                onInitSuc(ACCESSTOKEN);
+                break;
+        }
     }
 
     /**
      * 初始化成功
      *
-     * @param token 企业的访问令牌
+     * @param token 访问令牌
      */
     public abstract void onInitSuc(String token);
 
@@ -80,8 +88,7 @@ public abstract class ObInit implements HttpRespond {
      */
     public void destory() {
         CONTEXT = null;
-        APPLICATION_NAME = null;
-        UNIQUE_KEY = null;
+        uniqueKey = null;
         ACCESSTOKEN = null;
         if (mqttHandler != null) {
             mqttHandler.shutDown();

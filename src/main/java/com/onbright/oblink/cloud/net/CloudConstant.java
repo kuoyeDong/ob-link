@@ -8,7 +8,7 @@ public interface CloudConstant {
     class Source {
         public static String HTTPS = "https://";
         public static String SERVER = SourceFrom.SERVER_IOT;
-        public static final String CONSUMER_OPEN = "/consumer/open/";
+        public static final String CONSUMER_OPEN = "/consumer/common";
     }
 
     interface SourceFrom {
@@ -714,9 +714,13 @@ public interface CloudConstant {
          */
         String DELETE_DEVICE_LOCATION = "delete_device_location";
         /**
-         * 校验交换token
+         * 第一次校验交换token
          */
         String INIT = "init";
+        /**
+         * 第二次校验交换token
+         */
+        String INIT_SECOND = "init_second";
         /**
          * 删除设备
          */

@@ -11,7 +11,8 @@ import org.json.JSONObject;
 import java.util.List;
 
 
-/**解析返回的
+/**
+ * 解析返回的
  * Created by adolf_dong on 2016/7/20.
  */
 public class CloudParseUtil {
@@ -41,6 +42,7 @@ public class CloudParseUtil {
         }
         return succeful;
     }
+
     /**
      * 获得对应的字符串参数
      *
@@ -48,7 +50,7 @@ public class CloudParseUtil {
      * @param key  example {@link CloudConstant.ParameterKey#ACCESS_TOKEN}
      * @return 对应的字符串参数
      */
-    public static String getJsonParm(String json,String key) {
+    public static String getJsonParm(String json, String key) {
         JSONObject jsonObject = null;
         String val = "null";
         try {
@@ -67,11 +69,13 @@ public class CloudParseUtil {
         return val;
     }
 
-    /**获取服务器返回数据中的jsonArray
+    /**
+     * 获取服务器返回数据中的jsonArray
+     *
      * @param json 返回json字符串
-     * @param key jsonArray键
+     * @param key  jsonArray键
      */
-    public static JSONArray getJsonArryParm(String json,String key) {
+    public static JSONArray getJsonArryParm(String json, String key) {
         JSONObject jsonObject = null;
         JSONArray val = new JSONArray();
         try {

@@ -50,11 +50,13 @@ public class MqttHandler {
      */
     private ParseServerListener parseServerListener;
 
+    private String clientId;
     /**
      * @param context  un
-     * @param clientId appkey
+     * @param clientId clientId
      */
     public MqttHandler(Context context, String token, String clientId) {
+        this.clientId = clientId;
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
         parseServerListener = new ParseServerListener();
         pubAndSubTopic = "ob-smart." + token;
@@ -66,7 +68,7 @@ public class MqttHandler {
     /**
      * 连接mq
      */
-    public void connect() {
+    private void connect() {
         if (mqttAndroidClient != null) {
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
             mqttConnectOptions.setAutomaticReconnect(true);
@@ -114,8 +116,8 @@ public class MqttHandler {
     private void publishMessage() {
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("appkey", ObInit.UNIQUE_KEY);
-            jsonObject.put("appId", "OB Smart" + ObInit.APPLICATION_NAME);
+            jsonObject.put("appkey", clientId);
+            jsonObject.put("appId", "OB Smart" + ObInit.APP_KEY);
             jsonObject.put("system", "Android" + android.os.Build.VERSION.SDK_INT);
             jsonObject.put("type", 100);
             String pubMsg = jsonObject.toString();

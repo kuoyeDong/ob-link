@@ -58,7 +58,7 @@ public class HttpRequst {
      * @param method      请求类型
      */
     public void request(final HttpRespond httpRespond, final String action, FormBody.Builder builder, String url, int method) {
-        if (httpRespond == null || action == null || builder == null || url == null) {
+        if (httpRespond == null || action == null || url == null) {
             return;
         }
         if (okHttpClient == null) {
@@ -72,11 +72,9 @@ public class HttpRequst {
                     }).build();
         }
         builder.add(CloudConstant.ParameterKey.SYSTEM, "Android");
-        builder.add(CloudConstant.ParameterKey.APP_ID, ObInit.APPLICATION_NAME);
-        HttpUrl httpUrlB = HttpUrl.get(CloudConstant.Source.HTTPS + CloudConstant.Source.SERVER + url);
-        httpUrlB.newBuilder().addQueryParameter(CloudConstant.ParameterKey.ACCESS_TOKEN, ObInit.ACCESSTOKEN).
-                addQueryParameter(CloudConstant.ParameterKey.UNIQUE_KEY, ObInit.UNIQUE_KEY);
-        Request.Builder requestBuilder = new Request.Builder().url(httpUrlB);
+        builder.add(CloudConstant.ParameterKey.APP_ID, ObInit.APP_KEY);
+        builder.add(CloudConstant.ParameterKey.ACCESS_TOKEN, ObInit.ACCESSTOKEN);
+        Request.Builder requestBuilder = new Request.Builder().url(CloudConstant.Source.HTTPS + CloudConstant.Source.SERVER + url);
         switch (method) {
             case POST:
                 requestBuilder.post(builder.build());

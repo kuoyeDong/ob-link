@@ -20,6 +20,7 @@ public class GetParameter {
      */
     public static FormBody.Builder onAddObox(Obox obox, String deviceName, String productKey, boolean isSmarConfig) {
         FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_OBOX);
         Gson gson = new Gson();
         String json = gson.toJson(obox);
         builder.add(CloudConstant.ParameterKey.OBOX, json);
@@ -282,6 +283,9 @@ public class GetParameter {
         return builder;
     }
 
+
+    /*以下昂宝智能门锁接口*/
+
     /**
      * 查询OB智能门锁主页信息,返回电量，上下线，状态
      *
@@ -428,6 +432,7 @@ public class GetParameter {
     public static FormBody.Builder addIntelligentRemoteUser(String serialId, String authToken, String nickName,
                                                             String startTime, String endTime, String times, String mobile, boolean pushPhone, boolean isMax) {
         FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
         builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
         builder.add(CloudConstant.ParameterKey.NICKNAME, nickName);
@@ -576,7 +581,7 @@ public class GetParameter {
         builder.add(CloudConstant.ParameterKey.PASS_WORD, pwd);
         return builder;
     }
-
+    /*以上昂宝智能门锁接口*/
     /*以下为更新后的红外转发器对应的接口*/
 
     /**
@@ -848,12 +853,7 @@ public class GetParameter {
         return new FormBody.Builder();
     }
 
-    /**
-     * @param deviceSerId 设备序列号
-     */
-    public static FormBody.Builder deleteDevice(String deviceSerId) {
-        FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.SERIALID, deviceSerId);
-        return builder;
+    public static FormBody.Builder onInitSecond() {
+        return new FormBody.Builder();
     }
 }
