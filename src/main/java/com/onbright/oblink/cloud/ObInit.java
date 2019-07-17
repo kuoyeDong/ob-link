@@ -52,7 +52,7 @@ public abstract class ObInit implements HttpRespond {
     }
 
     /**
-     * 初始化，换取token
+     * 初始化
      */
     public void init() {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT,
@@ -71,17 +71,21 @@ public abstract class ObInit implements HttpRespond {
             case CloudConstant.CmdValue.INIT_SECOND:
                 ACCESSTOKEN = CloudParseUtil.getJsonParm(json, CloudConstant.ParameterKey.ACCESS_TOKEN);
                 mqttHandler = new MqttHandler(CONTEXT, ACCESSTOKEN, uniqueKey);
-                onInitSuc(ACCESSTOKEN);
+                HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_DEVICE,
+                        GetParameter.onQueryDevice(0, 0), CloudConstant.Source.CONSUMER_OPEN,
+                        HttpRequst.POST);
+                break;
+            case CloudConstant.CmdValue.QUERY_DEVICE:
+                CloudParseUtil.initDevice(json, CloudDataPool.getDevices());
+                onInitSuc();
                 break;
         }
     }
 
     /**
      * 初始化成功
-     *
-     * @param token 访问令牌
      */
-    public abstract void onInitSuc(String token);
+    public abstract void onInitSuc();
 
     /**
      * 释放资源

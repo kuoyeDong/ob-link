@@ -60,7 +60,7 @@ abstract class DeviceHandler implements HttpRespond {
      * @param oboxSerId 通过哪个obox添加传该obox序列号
      * @param time      添加持续的时间，超过该时间无法再添加,默认30s
      */
-    protected void searchNewDevice(String oboxSerId, String time) {
+    public void searchNewDevice(String oboxSerId, String time) {
         DeviceEnum deviceEnum = getDeviceEnum();
         pType = String.valueOf(deviceEnum.getpType());
         type = String.valueOf(deviceEnum.getType());
@@ -83,7 +83,7 @@ abstract class DeviceHandler implements HttpRespond {
         if (deviceSerId == null) {
             return;
         }
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.onModifyDevice(deviceSerId, null, true),
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.onModifyDevice(deviceSerId, "", true),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.DELETE);
     }
 
