@@ -20,7 +20,7 @@ public class LockTempUser implements Serializable {
      */
     private String serialId;
     /**
-     * 开始时间
+     * 开始时间yyyy-MM-dd HH:mm:ss
      */
     private String start;
     /**
@@ -28,7 +28,7 @@ public class LockTempUser implements Serializable {
      */
     private String pin;
     /**
-     * 结束时间
+     * 结束时间yyyy-MM-dd HH:mm:ss
      */
     private String end;
     /**

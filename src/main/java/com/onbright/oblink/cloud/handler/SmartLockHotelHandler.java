@@ -4,14 +4,28 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.onbright.oblink.DeviceEnum;
+import com.onbright.oblink.EventMsg;
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.cloud.bean.LockAlarm;
+import com.onbright.oblink.cloud.bean.LockHistory;
 import com.onbright.oblink.cloud.bean.LockPush;
 import com.onbright.oblink.cloud.bean.LockStatus;
+import com.onbright.oblink.cloud.bean.LockTempUser;
+import com.onbright.oblink.cloud.bean.LockUser;
 import com.onbright.oblink.cloud.net.CloudConstant;
+import com.onbright.oblink.cloud.net.CloudParseUtil;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
+import com.onbright.oblink.local.net.OBConstant;
 import com.onbright.oblink.local.net.Transformation;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +33,19 @@ import java.util.List;
  * create by dky at 2019/7/5
  */
 public abstract class SmartLockHotelHandler extends DeviceHandler {
+    /**
+     * 开门上报
+     */
+    private static final int OPEN = 0xc3;
+    /**
+     * 刷卡开锁
+     */
+    private static final int CARD = 0xcd;
 
+    /**
+     * 关门上报
+     */
+    private static final int CLOSED = 0xc6;
     /**
      * 是否有权限密码
      */
@@ -29,6 +55,8 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * 门锁通讯口令
      */
     private String authToken;
+
+    private Gson gson = new Gson();
 
     public SmartLockHotelHandler(@Nullable String deviceSerId) {
         super(deviceSerId);
@@ -40,40 +68,6 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
     }
 
     /**
-     * 添加门锁临时用户
-     *
-     * @param serialId  门锁序列号
-     * @param authToken 门锁口令
-     * @param nickName  昵称
-     * @param startTime 开始时间
-     * @param endTime   结束时间
-     * @param times     使用次数
-     */
-    public void addIntelligentRemoteUser(String serialId, String authToken, String nickName,
-                                         String startTime, String endTime, String times) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER,
-                GetParameter.addIntelligentRemoteUser(serialId, authToken, nickName,
-                        startTime, endTime, times, null, false, false), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
-    }
-
-    /**
-     * 修改门锁临时用户
-     *
-     * @param serialId  门锁序列号
-     * @param authToken 门锁口令
-     * @param nickName  昵称
-     * @param startTime 开始时间
-     * @param endTime   结束时间
-     * @param times     使用次数
-     */
-    public void modifyIntelligentRemoteUser(int userId, String serialId, String userPin, String authToken, String nickName,
-                                            String startTime, String endTime, String times, boolean isMax) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.MODIFY_INTELLIGENT_REMOTE_USER,
-                GetParameter.modifyIntelligentRemoteUser(userId, serialId, userPin, authToken, null, nickName,
-                        startTime, endTime, times, isMax), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
-    }
-
-    /**
      * 查询门锁状态,成功后必然回调{@link #onStatusChange(String)}，可能回调{@link #batteryValue(int)}
      */
     public void queryIntelligentFingerhome() {
@@ -82,107 +76,168 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
     }
 
     /**
-     * 查询OB智能门锁开门记录
+     * 查询门锁开门记录
      *
-     * @param openRecordLsn
+     * @param openRecordLsn 回调接口
      */
     private void queryIntelligentOpenrecord(OpenRecordLsn openRecordLsn) {
+        mOpenRecordLsn = openRecordLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_OPENRECORD,
                 GetParameter.queryIntelligentOpenrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private OpenRecordLsn mOpenRecordLsn;
+
+    /**
+     * 查询门锁开门记录回调接口
+     */
+    public interface OpenRecordLsn {
+        void openRecordLoad(List<LockHistory> lockHistories);
     }
 
     /**
      * 查询门锁警告记录
      */
-    private void queryIntelligentWarningRecord() {
+    private void queryIntelligentWarningRecord(WarnRecordLsn warnRecordLsn) {
+        mWarnRecordLsn = warnRecordLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_WARNINGRECORD,
                 GetParameter.queryIntelligentWarningrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    private WarnRecordLsn mWarnRecordLsn;
+
     /**
-     * 查询OB智能门锁用户列表
+     * 查询警报记录回调接口
      */
-    public void queryIntelligentUseringRecord() {
+    public interface WarnRecordLsn {
+        void warnRecordLoad(List<LockAlarm> lockAlarms);
+    }
+
+    /**
+     * 查询门锁用户列表
+     */
+    public void queryIntelligentUseringRecord(UserRecordLsn userRecordLsn) {
+        mUserRecordLsn = userRecordLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_USERINGRECORD,
                 GetParameter.queryIntelligentUseringrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    private UserRecordLsn mUserRecordLsn;
+
     /**
-     * 发送验证码到胁迫时目标手机，此方法用于设定短信接受人时，获得接受人许可
-     *
-     * @param pin
-     * @param phone
+     * 查询门锁用户回调接口
      */
-    public void sendIntelligentValidateCode(String pin, String phone) {
+    public interface UserRecordLsn {
+        void userRecordLoad(List<LockUser> lockUsers);
+    }
+
+    /**
+     * 发送验证码到胁迫时目标手机，此方法用于设定短信接受人时，获得接受人许可,(要使用此功能首先要在门锁设置用户胁迫指纹)
+     * 并且，获得验证码后还需要调用{@link #editIntelligentUser(LockUser, String, ModifyUserLsn)}完成推送手机的绑定
+     *
+     * @param lockUser 用户
+     * @param phone    手机号
+     */
+    public void sendIntelligentValidateCode(LockUser lockUser, String phone, SendCodeLsn sendCodeLsn) {
+        mSendCodeLsn = sendCodeLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SEND_INTELLIGENT_VALIDATECODE,
-                GetParameter.sendIntelligentValidatecode(deviceSerId, pin, phone), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+                GetParameter.sendIntelligentValidatecode(deviceSerId, lockUser.getPin(), phone), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    private SendCodeLsn mSendCodeLsn;
+
     /**
-     * 编辑门锁用户
-     *
-     * @param pin
-     * @param nickName
-     * @param phone
-     * @param validateCode
-     * @param hasStressPwd
+     * 发送验证码到手机回调接口
      */
-    public void editIntelligentUser(String pin, String nickName, String phone, String validateCode, boolean hasStressPwd) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.EDIT_INTELLIGENT_USER,
-                GetParameter.editIntelligentUser(deviceSerId, pin, nickName, phone, validateCode, hasStressPwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    public interface SendCodeLsn {
+        void sendCodeOk();
     }
 
+    /**
+     * 修改门锁用户
+     *
+     * @param lockUser     门锁用户
+     * @param validateCode 验证码，如无胁迫指纹可为null
+     */
+    public void editIntelligentUser(LockUser lockUser, String validateCode, ModifyUserLsn modifyUserLsn) {
+        mModifyUserLsn = modifyUserLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.EDIT_INTELLIGENT_USER,
+                GetParameter.editIntelligentUser(deviceSerId, lockUser.getPin(), lockUser.getNickName(), lockUser.getMobile(), validateCode,
+                        lockUser.hasStressPwd()), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private ModifyUserLsn mModifyUserLsn;
 
     /**
-     * 智能门锁验证权限密码
+     * 修改门锁用户回调接口
+     */
+    public interface ModifyUserLsn {
+        void modifyUserOk();
+    }
+
+    /**
+     * 验证门锁权限密码(要操作门锁临时用户，必须验证权限密码，
+     * 如没有在权限密码则此方法不会执行任何操作，请使用创建权限密码方法{@link #addIntelligentAuthPwd(String, CreatAuthPwdLsn)})
      *
      * @param verficationPwd 门锁密码
      */
-    public void queryIntelligentAuthPwd(String verficationPwd) {
+    public void queryIntelligentAuthPwd(String verficationPwd, QueryAuthPwdLsn queryAuthPwdLsn) {
+        if (!isAuth) {
+            return;
+        }
+        mQueryAuthPwdLsn = queryAuthPwdLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_AUTHPWD,
                 GetParameter.queryIntelligentAuthpwd(deviceSerId, verficationPwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    private QueryAuthPwdLsn mQueryAuthPwdLsn;
+
     /**
-     * 查询门锁临时用户
-     *
-     * @param authToken 门锁token
+     * 验证门锁权限密码回调接口
      */
-    public void queryIntelligentRemoteUnlocking(String authToken) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_REMOTE_UNLOCKING,
-                GetParameter.queryIntelligentRemoteUnlocking(deviceSerId, authToken), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    public interface QueryAuthPwdLsn {
+        /**
+         * @param authToken 口令
+         */
+        void queryAuthPwdOk(String authToken);
     }
 
     /**
-     * 删除临时门锁用户
+     * 门锁创建权限密码
      *
-     * @param id
-     * @param authToken
-     * @param pin
+     * @param pwd 权限密码,此密码请自行记录，不会在回调中回传
      */
-    public void delIntelligentRemoteUser(int id, String authToken, String pin) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DEL_INTELLIGENT_REMOTE_USER,
-                GetParameter.delIntelligentRemoteUser(id, deviceSerId, authToken, pin), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    public void addIntelligentAuthPwd(String pwd, CreatAuthPwdLsn creatAuthPwdLsn) {
+        mCreatAuthPwdLsn = creatAuthPwdLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_INTELLIGENT_AUTHPWD,
+                GetParameter.addIntelligentAuthpwd(deviceSerId, pwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    private CreatAuthPwdLsn mCreatAuthPwdLsn;
+
     /**
-     * 发送密码给临时用户
-     *
-     * @param pin
-     * @param authToken
-     * @param mobile
+     * 创建权限密码回调接口
      */
-    public void sendRemotePwd(String pin, String authToken, String mobile) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SEND_REMOTE_PWD,
-                GetParameter.sendRemotePwd(deviceSerId, pin, authToken, mobile), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    public interface CreatAuthPwdLsn {
+        void CreatAuthPwdOk();
     }
 
     /**
      * 智能门锁忘记权限密码
      */
-    public void forgetIntelligentPwd() {
+    public void forgetIntelligentPwd(ForgetPwdLsn forgetPwdLsn) {
+        mForgetPwdLsn = forgetPwdLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.FORGET_INTELLIGENT_PWD,
                 GetParameter.forgetIntelligentPwd(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private ForgetPwdLsn mForgetPwdLsn;
+
+    /**
+     * 忘记权限密码回调接口
+     */
+    public interface ForgetPwdLsn {
+        void forgetPwdOk();
     }
 
     /**
@@ -190,28 +245,206 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      *
      * @param pwd 密码
      */
-    public void resetIntelligentPwdByCode(String pwd) {
+    public void resetIntelligentPwdByCode(String pwd, ResetPwdLsn resetPwdLsn) {
+        mResetPwdLsn = resetPwdLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.RESET_INTELLIGENT_PWD_BY_CODE,
                 GetParameter.resetIntelligentPwdByCode(deviceSerId, pwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    private ResetPwdLsn mResetPwdLsn;
+
     /**
-     * 智能门锁修改权限密码
+     * 门锁重置权限密码回调
+     */
+    public interface ResetPwdLsn {
+
+        /**
+         * 等待门锁操作
+         */
+        void waitLockReset();
+
+        /**
+         * 重置权限密码成功
+         */
+        void resetPwdOk();
+    }
+
+    /**
+     * 修改门锁权限密码
      *
      * @param oldPwd 旧密码
      * @param newPwd 新密码
      */
-    public void resetIntelligentPwd(String oldPwd, String newPwd) {
+    public void resetIntelligentPwd(String oldPwd, String newPwd, ModifyPwdLsn modifyPwdLsn) {
+        mModifyPwdLsn = modifyPwdLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.RESET_INTELLIGENT_PWD,
                 GetParameter.resetIntelligentPwd(deviceSerId, oldPwd, newPwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private ModifyPwdLsn mModifyPwdLsn;
+
+    /**
+     * 修改门锁权限密码回调
+     */
+    public interface ModifyPwdLsn {
+        void modifyPwdOk();
+    }
+
+    /**
+     * 查询门锁临时用户
+     *
+     * @param authToken 门锁token
+     */
+    public void queryIntelligentRemoteUnlocking(String authToken, QueryTemporaryUserLsn queryTemporaryUserLsn) {
+        mQueryTemporaryUserLsn = queryTemporaryUserLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_REMOTE_UNLOCKING,
+                GetParameter.queryIntelligentRemoteUnlocking(deviceSerId, authToken), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private QueryTemporaryUserLsn mQueryTemporaryUserLsn;
+
+    /**
+     * 查询门锁临时用户回调
+     */
+    public interface QueryTemporaryUserLsn {
+        /**
+         * @param lockTempUsers 临时用户list
+         */
+        void queryTemporaryUserOk(List<LockTempUser> lockTempUsers);
+    }
+
+    /**
+     * 添加门锁临时用户
+     *
+     * @param authToken 门锁口令
+     * @param nickName  昵称
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @param times     使用次数
+     */
+    public void addIntelligentRemoteUser(String authToken, String nickName,
+                                         String startTime, String endTime, String times, AddTemporaryUserLsn addTemporaryUserLsn) {
+        mAddTemporaryUserLsn = addTemporaryUserLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER,
+                GetParameter.addIntelligentRemoteUser(deviceSerId, authToken, nickName,
+                        startTime, endTime, times, null, false, false), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private AddTemporaryUserLsn mAddTemporaryUserLsn;
+
+    /**
+     * 添加门锁临时用户回调
+     */
+    public interface AddTemporaryUserLsn {
+        /**
+         * @param newLockTempUser 新创建的临时用户
+         */
+        void addTemporaryUserOk(LockTempUser newLockTempUser);
+    }
+
+    /**
+     * 删除门锁临时用户
+     *
+     * @param lockTempUser
+     * @param authToken
+     */
+    public void delIntelligentRemoteUser(LockTempUser lockTempUser, String authToken, DeleteTemporaryUserLsn deleteTemporaryUserLsn) {
+        mDeleteTemporaryUserLsn = deleteTemporaryUserLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DEL_INTELLIGENT_REMOTE_USER,
+                GetParameter.delIntelligentRemoteUser(lockTempUser.getId(), deviceSerId, authToken, lockTempUser.getPin()), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private DeleteTemporaryUserLsn mDeleteTemporaryUserLsn;
+
+    /**
+     * 删除门锁临时用户回调
+     */
+    public interface DeleteTemporaryUserLsn {
+        void deleteTemporaryUserOk();
+    }
+
+    /**
+     * Returns the number of milliseconds since January 1, 1970, 00:00:00 GMT
+     */
+    private long getLongTime(String time) {
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date != null ? date.getTime() : 0;
+    }
+
+    /**
+     * 修改门锁临时用户
+     *
+     * @param lockTempUser 临时用户
+     * @param authToken    门锁口令
+     */
+    public void modifyIntelligentRemoteUser(LockTempUser lockTempUser, String authToken, ModifyTemporaryUserLsn modifyTemporaryUserLsn) {
+        mModifyTemporaryUserLsn = modifyTemporaryUserLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.MODIFY_INTELLIGENT_REMOTE_USER,
+                GetParameter.modifyIntelligentRemoteUser(lockTempUser.getId(), deviceSerId, lockTempUser.getPin(), authToken, null, lockTempUser.getNickName(),
+                        String.valueOf(getLongTime(lockTempUser.getStart())), String.valueOf(getLongTime(lockTempUser.getEnd())),
+                        lockTempUser.getShowTimes(), lockTempUser.getIsMax() == 1), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private ModifyTemporaryUserLsn mModifyTemporaryUserLsn;
+
+    /**
+     * 修改临时用户回调
+     */
+    public interface ModifyTemporaryUserLsn {
+        /**
+         * @param lockTempUser 被修改后的临时用户
+         */
+        void modifyTemporaryUserOk(LockTempUser lockTempUser);
+    }
+
+    /**
+     * 发送密码给临时用户
+     *
+     * @param lockTempUser 临时用户
+     * @param authToken
+     */
+    public void sendRemotePwd(LockTempUser lockTempUser, String authToken, SendTemporaryUserPwdLsn sendTemporaryUserPwdLsn) {
+        mSendTemporaryUserPwdLsn = sendTemporaryUserPwdLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SEND_REMOTE_PWD,
+                GetParameter.sendRemotePwd(deviceSerId, lockTempUser.getPin(), authToken, lockTempUser.getMobile()),
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private SendTemporaryUserPwdLsn mSendTemporaryUserPwdLsn;
+
+    /**
+     * 发送临时用户的密码到临时用户
+     */
+    public interface SendTemporaryUserPwdLsn {
+        void sendTemporaryUserPwdOk();
     }
 
     /**
      * 查询推送设置列表
      */
-    public void queryIntelligentPushList() {
+    private void queryIntelligentPushList(QueryPushLsn queryPushLsn) {
+        mQueryPushLsn = queryPushLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_PUSH_LIST,
                 GetParameter.queryIntelligentPushList(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private QueryPushLsn mQueryPushLsn;
+
+    /**
+     * 查询推送设置列表回调
+     */
+    public interface QueryPushLsn {
+
+        /**
+         * @param mobile     电话号码
+         * @param lockPushes 推送列表
+         */
+        void queryPushOk(String mobile, List<LockPush> lockPushes);
     }
 
     /**
@@ -220,19 +453,19 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param mobile     电话
      * @param lockPushes 推送数据集合
      */
-    public void modifyIntelligentPush(String mobile, List<LockPush> lockPushes) {
+    private void modifyIntelligentPush(String mobile, List<LockPush> lockPushes, ModifyPushLsn modifyPushLsn) {
+        mModifyPushLsn = modifyPushLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.MODIFY_INTELLIGENT_PUSH,
                 GetParameter.modifyIntelligentPush(deviceSerId, mobile, lockPushes), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    private ModifyPushLsn mModifyPushLsn;
+
     /**
-     * 门锁创建权限密码
-     *
-     * @param pwd 权限密码
+     * 修改推送回调
      */
-    public void addIntelligentAuthPwd(String pwd) {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_INTELLIGENT_AUTHPWD,
-                GetParameter.addIntelligentAuthpwd(deviceSerId, pwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    public interface ModifyPushLsn {
+        void modifyPushOk();
     }
 
     @Override
@@ -240,29 +473,160 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
         super.onSuccess(action, json);
         switch (action) {
             case CloudConstant.CmdValue.QUERY_INTELLIGENT_FINGERHOME:
-                Gson gson = new Gson();
                 LockStatus lockStatus = gson.fromJson(json, LockStatus.class);
                 isAuth = lockStatus.getIsAuth() > 0;
                 freshlockStatusWithType((byte) lockStatus.getType());
                 int betty = lockStatus.getBetty();
                 showBattery(betty);
                 break;
+            case CloudConstant.CmdValue.QUERY_INTELLIGENT_OPENRECORD:
+                List<LockHistory> lockHistories = new ArrayList<>();
+                JSONArray recordsJA = CloudParseUtil.getJsonArryParm(json, "records");
+                for (int i = 0; i < recordsJA.length(); i++) {
+                    try {
+                        String historyJson = recordsJA.getString(i);
+                        LockHistory lockHistory = gson.fromJson(historyJson, LockHistory.class);
+                        lockHistories.add(lockHistory);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (mOpenRecordLsn != null) {
+                    mOpenRecordLsn.openRecordLoad(lockHistories);
+                }
+                break;
+            case CloudConstant.CmdValue.QUERY_INTELLIGENT_WARNINGRECORD:
+                List<LockAlarm> lockAlarms = new ArrayList<>();
+                JSONArray warnRecordJA = CloudParseUtil.getJsonArryParm(json, "warnRecord");
+                for (int i = 0; i < warnRecordJA.length(); i++) {
+                    try {
+                        String lockAlarmStr = warnRecordJA.getString(i);
+                        LockAlarm lockAlarm = gson.fromJson(lockAlarmStr, LockAlarm.class);
+                        lockAlarms.add(lockAlarm);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (mWarnRecordLsn != null) {
+                    mWarnRecordLsn.warnRecordLoad(lockAlarms);
+                }
+                break;
+            case CloudConstant.CmdValue.QUERY_INTELLIGENT_USERINGRECORD:
+                List<LockUser> lockUsers = new ArrayList<>();
+                JSONArray userJA = CloudParseUtil.getJsonArryParm(json, "list");
+                for (int i = 0; i < userJA.length(); i++) {
+                    try {
+                        String lockUserStr = userJA.getString(i);
+                        LockUser lockUser = gson.fromJson(lockUserStr, LockUser.class);
+                        lockUsers.add(lockUser);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (mUserRecordLsn != null) {
+                    mUserRecordLsn.userRecordLoad(lockUsers);
+                }
+                break;
+            case CloudConstant.CmdValue.SEND_INTELLIGENT_VALIDATECODE:
+                if (mSendCodeLsn != null) {
+                    mSendCodeLsn.sendCodeOk();
+                }
+                break;
+            case CloudConstant.CmdValue.EDIT_INTELLIGENT_USER:
+                if (mModifyUserLsn != null) {
+                    mModifyUserLsn.modifyUserOk();
+                }
+                break;
+            case CloudConstant.CmdValue.QUERY_INTELLIGENT_AUTHPWD:
+                String authToken = CloudParseUtil.getJsonParm(json, "authToken");
+                if (mQueryAuthPwdLsn != null) {
+                    mQueryAuthPwdLsn.queryAuthPwdOk(authToken);
+                }
+                break;
+            case CloudConstant.CmdValue.ADD_INTELLIGENT_AUTHPWD:
+                if (mCreatAuthPwdLsn != null) {
+                    mCreatAuthPwdLsn.CreatAuthPwdOk();
+                }
+                break;
+            case CloudConstant.CmdValue.FORGET_INTELLIGENT_PWD:
+                if (mForgetPwdLsn != null) {
+                    mForgetPwdLsn.forgetPwdOk();
+                }
+                break;
+            case CloudConstant.CmdValue.RESET_INTELLIGENT_PWD_BY_CODE:
+                if (mResetPwdLsn != null) {
+                    mResetPwdLsn.waitLockReset();
+                }
+                break;
+            case CloudConstant.CmdValue.RESET_INTELLIGENT_PWD:
+                if (mModifyPwdLsn != null) {
+                    mModifyPwdLsn.modifyPwdOk();
+                }
+                break;
+            case CloudConstant.CmdValue.QUERY_INTELLIGENT_REMOTE_UNLOCKING:
+                List<LockTempUser> lockTempUsers = new ArrayList<>();
+                JSONArray tempUserJA = CloudParseUtil.getJsonArryParm(json, "list");
+                for (int i = 0; i < tempUserJA.length(); i++) {
+                    try {
+                        String tempUserStr = tempUserJA.getString(i);
+                        LockTempUser lockTempUser = gson.fromJson(tempUserStr, LockTempUser.class);
+                        lockTempUsers.add(lockTempUser);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (mQueryTemporaryUserLsn != null) {
+                    mQueryTemporaryUserLsn.queryTemporaryUserOk(lockTempUsers);
+                }
+                break;
+            case CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER:
+                String authCode = CloudParseUtil.getJsonParm(json, "authCode");
+                LockTempUser newLockTempUser = gson.fromJson(CloudParseUtil.getJsonParm(json, "remoteUser"), LockTempUser.class);
+                newLockTempUser.setPwd(authCode);
+                if (mAddTemporaryUserLsn != null) {
+                    mAddTemporaryUserLsn.addTemporaryUserOk(newLockTempUser);
+                }
+                break;
+            case CloudConstant.CmdValue.DEL_INTELLIGENT_REMOTE_USER:
+                if (mDeleteTemporaryUserLsn != null) {
+                    mDeleteTemporaryUserLsn.deleteTemporaryUserOk();
+                }
+                break;
+            case CloudConstant.CmdValue.MODIFY_INTELLIGENT_REMOTE_USER:
+                LockTempUser lockTempUser = gson.fromJson(CloudParseUtil.getJsonParm(json, "remoteUser"), LockTempUser.class);
+                if (mModifyTemporaryUserLsn != null) {
+                    mModifyTemporaryUserLsn.modifyTemporaryUserOk(lockTempUser);
+                }
+                break;
+            case CloudConstant.CmdValue.SEND_REMOTE_PWD:
+                if (mSendTemporaryUserPwdLsn != null) {
+                    mSendTemporaryUserPwdLsn.sendTemporaryUserPwdOk();
+                }
+                break;
+            case CloudConstant.CmdValue.QUERY_INTELLIGENT_PUSH_LIST:
+                String mobile = CloudParseUtil.getJsonParm(json, "mobile");
+                JSONArray pushJA = CloudParseUtil.getJsonArryParm(json, "list");
+                List<LockPush> lockPushes = new ArrayList<>();
+                for (int i = 0; i < pushJA.length(); i++) {
+                    try {
+                        String pushStr = pushJA.getString(i);
+                        LockPush lockPush = gson.fromJson(pushStr, LockPush.class);
+                        lockPushes.add(lockPush);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (mQueryPushLsn != null) {
+                    mQueryPushLsn.queryPushOk(mobile, lockPushes);
+                }
+                break;
+            case CloudConstant.CmdValue.MODIFY_INTELLIGENT_PUSH:
+                if (mModifyPushLsn != null) {
+                    mModifyPushLsn.modifyPushOk();
+                }
+                break;
         }
     }
-
-    /**
-     * 开门上报
-     */
-    public static final int OPEN = 0xc3;
-    /**
-     * 刷卡开锁
-     */
-    public static final int CARD = 0xcd;
-
-    /**
-     * 关门上报
-     */
-    public static final int CLOSED = 0xc6;
 
     /**
      * 门锁状态变化
@@ -400,12 +764,18 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
         back_lock_release
     }
 
-    private OpenRecordLsn mOpenRecordLsn;
-
-    /**
-     * 查询OB智能门锁开门记录回调接口
-     */
-    public interface OpenRecordLsn {
-        void openRecordLoad();
+    @Override
+    public void onMessage(EventMsg eventMsg) {
+        super.onMessage(eventMsg);
+        switch (eventMsg.getAction()) {
+            case OBConstant.StringKey.LOCK_ADMIN_PWD_RESET:
+                String serialId = (String) eventMsg.getExtra("serialId");
+                if (serialId.equals(deviceSerId)) {
+                    if (mResetPwdLsn != null) {
+                        mResetPwdLsn.resetPwdOk();
+                    }
+                }
+                break;
+        }
     }
 }

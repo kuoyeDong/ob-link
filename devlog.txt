@@ -1,2 +1,2 @@
 https://tpyliujunjie.github.io/apiForOb/api
-完成门锁接口回调接口
+authToken看是否要公开

@@ -131,7 +131,7 @@ public class ParseServerListener {
         String data = CloudParseUtil.getJsonParm(json, "data");
         eventMsg.setAction(OBConstant.StringKey.LOCK_ADMIN_PWD_RESET);
         eventMsg.putExtra("code", data);
-        eventMsg.putExtra("serial_id", serialId);
+        eventMsg.putExtra("serialId", serialId);
         EventBus.getDefault().post(eventMsg);
     }
 
