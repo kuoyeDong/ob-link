@@ -143,7 +143,7 @@ public abstract class OrganizationHelper {
                 break;
             /*组重命名， 单节点重命名，删除组,新增组*/
             case OBConstant.ReplyType.EDIT_NODE_OR_GROUP_SUC:
-                ParseUtil.onEditNodeOrGroupSuc(message, isSingle, mObNode, mObGroup, null, null);
+                ParseUtil.onEditNodeOrGroup(message, isSingle, mObNode, mObGroup);
                 onEditNodeOrGroupSuc(mObNode, mObGroup);
                 break;
             case OBConstant.ReplyType.EDIT_NODE_OR_GROUP_FAL:

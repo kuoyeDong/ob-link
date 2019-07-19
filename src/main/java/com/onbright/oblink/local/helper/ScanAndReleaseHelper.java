@@ -2,6 +2,7 @@ package com.onbright.oblink.local.helper;
 
 import android.os.Message;
 
+import com.onbright.oblink.local.LocalDataPool;
 import com.onbright.oblink.local.bean.ObNode;
 import com.onbright.oblink.local.net.OBConstant;
 import com.onbright.oblink.local.net.ParseUtil;
@@ -95,14 +96,14 @@ public abstract class ScanAndReleaseHelper {
      *
      * @param message 回调携带参数message
      */
-    public void onRecieve(Message message) {
+    public void onReceive(Message message) {
         switch (message.what) {
             case OBConstant.ReplyType.FORCE_SEARCH_SUC:
                 onScanSuc();
                 break;
 
             case OBConstant.ReplyType.ON_GET_NEW_NODE:
-                ParseUtil.parseNewNode(message, obNodes);
+                ParseUtil.parseNewNode(message,LocalDataPool.newInstance().getObNodeMap() );
                 int i = obNodes.size() - 1;
                 ObNode obNode = obNodes.get(i);
                 onGetNewNode(obNode);
@@ -115,7 +116,7 @@ public abstract class ScanAndReleaseHelper {
                 onStopScanSuc(obNodes);
                 break;
             case OBConstant.ReplyType.EDIT_NODE_OR_GROUP_SUC:
-                ParseUtil.onEditNodeOrGroupSuc(message, true, mObNode, null, mObNodeMap, null);
+                ParseUtil.onEditNodeOrGroup(message, true, mObNode, null);
                 onRemoveNodeSuc(mObNode);
                 break;
             case OBConstant.ReplyType.EDIT_NODE_OR_GROUP_FAL:

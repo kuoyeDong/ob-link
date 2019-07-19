@@ -13,16 +13,17 @@ public class LockPush implements Serializable {
      */
     private String serialId;
     /**
-     * jimmy(撬门) 1，
-     * stress 2,
-     * multiple_validation_failed 3，
-     * overdoor 4,
-     * back_lock 5，
-     * low_betty 6
+     * 1.撬门
+     * 3.多次验证失败，
+     * 4.门虚掩
+     * 5.反锁
+     * 6.低电量
      */
     private int value;
     /**
-     * 0 close,1 open
+     * 是否开启此value相关推送
+     * 0 关闭,
+     * 1 开启
      */
     private int enable;
 

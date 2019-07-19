@@ -1,6 +1,7 @@
 package com.onbright.oblink.local.bean;
 
-import com.ob.obsmarthouse.common.util.MathUtil;
+
+import com.onbright.oblink.MathUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;

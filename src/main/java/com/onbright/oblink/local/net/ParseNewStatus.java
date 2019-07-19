@@ -19,11 +19,13 @@ import java.util.List;
 
 public class ParseNewStatus {
     private static int[] index = new int[65];
+
     static {
         for (int i = 0; i < index.length; i++) {
             index[i] = i - 1;
         }
     }
+
     public static void parseNewStatus(byte[] bf) {
         Message message = Message.obtain();
         Bundle bundle = new Bundle();
@@ -33,7 +35,7 @@ public class ParseNewStatus {
         switch (cmd) {
             /*设置节点状态回复*/
             case 0xa100:
-                 /*byte7是否成功,8-14节点完整地址，接节点状态*/
+                /*byte7是否成功,8-14节点完整地址，接节点状态*/
                 if (bf[7] == OBConstant.ReplyType.SUC) {
                     message.what = OBConstant.ReplyType.SET_STATUS_SUC;
                 } else if (bf[7] == OBConstant.ReplyType.FAL) {
@@ -56,7 +58,7 @@ public class ParseNewStatus {
                 byte[] oboxStrArryS = Arrays.copyOfRange(bf, index[8], index[8] + 5);
                 String oboxStrS = Transformation.byteArryToHexString(oboxStrArryS);
                 List<ObNode> obNodesS = LocalDataPool.newInstance().getObnodesForOneObox(oboxStrS);
-                for (int m = 0;m< LocalDataPool.newInstance().getOboxs().size();m++) {
+                for (int m = 0; m < LocalDataPool.newInstance().getOboxs().size(); m++) {
                     if (LocalDataPool.newInstance().getOboxs().get(m).getObox_serial_id().equals(oboxStrS)) {
                         oboxS = LocalDataPool.newInstance().getOboxs().get(m);
                         obGroupLists = LocalDataPool.newInstance().getObGroupsForOneObox(oboxS);
@@ -76,7 +78,7 @@ public class ParseNewStatus {
                         }
                     }
                 }
-                ParseUtil.onSetStatusRec(message, isSingle, isGroupS, obNodeS,obGroupS);
+                ParseUtil.onSetStatusRec(message, isSingle, obNodeS, obGroupS);
                 break;
         }
     }

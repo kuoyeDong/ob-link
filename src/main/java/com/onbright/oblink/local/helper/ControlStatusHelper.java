@@ -103,7 +103,7 @@ public abstract class ControlStatusHelper {
     public void onReceive(Message message) {
         switch (message.what) {
             case OBConstant.ReplyType.SET_STATUS_SUC:
-                ParseUtil.onSetStatusRecSuc(message, !mIsGroup, mObNode, mObGroup);
+                ParseUtil.onSetStatusRec(message, !mIsGroup, mObNode, mObGroup);
                 onControlSuc(mObNode, mObGroup);
                 break;
             case OBConstant.ReplyType.SET_STATUS_FAL:

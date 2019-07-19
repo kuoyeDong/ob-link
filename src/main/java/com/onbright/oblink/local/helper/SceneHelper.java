@@ -5,6 +5,7 @@ import android.os.Message;
 
 import com.onbright.oblink.ParseCondition;
 import com.onbright.oblink.StringUtil;
+import com.onbright.oblink.local.LocalDataPool;
 import com.onbright.oblink.local.bean.ActionReply;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
@@ -304,7 +305,7 @@ public abstract class SceneHelper {
             case OBConstant.ReplyType.ON_SETSCENE_SUC:
                 ParseUtil.onEditScene(false, obScene,
                         obScenes,
-                        message, null);
+                        message, null, LocalDataPool.newInstance().getObnodesForOneObox(LocalDataPool.newInstance().getObox()));
                 byte[] bytes = ParseUtil.getBytes(message);
                 switch (bytes[8]) {
                     case ObScene.OBSCENE_ID:
@@ -431,7 +432,7 @@ public abstract class SceneHelper {
      * @param b       是否删除
      */
     private void checkFinish(List<SceneAction> obNodes, boolean b) {
-        ActionReply actionReply = ParseUtil.batAction(obScene, obNodes, actionIndex, b,
+        ActionReply actionReply = ParseUtil.batAction(obNodes, actionIndex, b,
                 mTcpSend, false);
         actionIndex = actionReply.getIndex();
         isActionFinish = actionReply.isFinish();

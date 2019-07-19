@@ -949,13 +949,12 @@ public class ParseUtil {
     /**
      * 设置节点状态返回
      *
-     * @param message      传入message
-     * @param isSingle     是否单节点
-     * @param isGroup
+     * @param message  传入message
+     * @param isSingle 是否单节点
      * @param obNode
      * @param obGroup
      */
-    public static void onSetStatusRec(Message message, boolean isSingle, boolean isGroup, ObNode obNode, ObGroup obGroup) {
+    public static void onSetStatusRec(Message message, boolean isSingle, ObNode obNode, ObGroup obGroup) {
         byte[] bytes = getBytes(message);
         if (bytes == null) {
             return;
@@ -973,7 +972,7 @@ public class ParseUtil {
 
                     break;
             }
-        } else if (isGroup) {
+        } else {
             if (obGroup == null) {
                 return;
             }
@@ -1015,7 +1014,7 @@ public class ParseUtil {
      */
     public static void onEditNodeOrGroup(Message message, boolean isSingle,
                                          ObNode obNode, ObGroup obGroup
-                                         ) {
+    ) {
         switch (message.what) {
             case OBConstant.ReplyType.EDIT_NODE_OR_GROUP_SUC:
                 byte[] datas = ParseUtil.getBytes(message);
