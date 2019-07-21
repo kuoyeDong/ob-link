@@ -1,2 +1,1 @@
 https://tpyliujunjie.github.io/apiForOb/api
-authToken看是否要公开
