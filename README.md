@@ -15,6 +15,7 @@
     dependencies {
     	api(name:'oblink-1.0.3', ext:'aar')
 	}
+
 # 主要模块
 ## ObInit(初始化)
 ### 功能：与昂宝云交互获得口令并建立mq连。
@@ -31,9 +32,10 @@
             }
         };
 		obInit.init();
-	在整个程序退出时请使用 obInit.destory();释放资源
-## ConnectHandler(连接工具) ##
-### 功能：连接obox或wifi设备到云。 ###
+	在整个程序退出时请使用 obInit.destory()释放资源
+
+## ConnectHandler(连接工具)
+### 功能：连接obox或wifi设备到云。
 	
 	ConnectHandler connectHandler = new ConnectHandler(this, "mymm1234", new ConnectHandler.ConnectOboxLsn() {
                     @Override
@@ -53,8 +55,9 @@
                     }
                 }, true);
                 connectHandler.start();
-## OboxHandler(删除obox) ##
-### 功能：删除obox，但不断开obox与云的连接。 ###
+
+## OboxHandler(删除obox)
+### 功能：删除obox，但不断开obox与云的连接。
 
 	OboxHandler oboxHandler = new OboxHandler(oboxSerId) {
                     @Override
@@ -69,9 +72,11 @@
                     }
                 };
                 oboxHandler.deleteObox();
-## SmartLockHotelHandler(门锁处理者) ##
-### 功能：提供一切与门锁相关的操作。 ###
-#### 对象的初始化 ####
+
+## SmartLockHotelHandler(门锁处理者)
+### 功能：提供一切与门锁相关的操作。
+#### 对象的初始化
+
 	smartLockHotelHandler = new SmartLockHotelHandler(getSpString("lockSerId")) {
             @Override
             protected void lockStatusChange(LockStatusEnum lockStatusEnum) {
@@ -105,9 +110,12 @@
                 onFaildHandle(errorCode, s1);
             }
         };
-#### 添加门锁 ####
+
+#### 添加门锁
+
 	smartLockHotelHandler.searchNewDevice(oboxSerId, "30");
-#### 删除门锁 ####
+
+#### 删除门锁 mark####
 	smartLockHotelHandler.deleteDevice();
 ####获取用户列表####
 	smartLockHotelHandler.queryUser(new SmartLockHotelHandler.queryUserLsn() {
