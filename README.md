@@ -1,28 +1,32 @@
 # ob-link
+# 流程图 #
+
 # 使用方法：（待bintray审核通过后替换为在线模式）
-##将aar文件拷贝到libs目录下
-##在gradle中添加如下代码
+#将aar文件拷贝到libs目录下#
+
+#在gradle中添加如下代码#
 
 	repositories {
-
     	flatDir {
        		 dirs 'libs'
     	}
-
 	}
     
     dependencies {
-   		 api(name:'oblink-1.0.3', ext:'aar')
-    }
+    	api(name:'oblink-1.0.3', ext:'aar')
+	}
 
-#主要模块
-##ObInit(初始化)
-###功能：与昂宝云交互获得口令并建立mq连接。
+
+
+
+#主要模块#
+## ObInit(初始化) ##
+###功能：与昂宝云交互获得口令并建立mq连接。###
     
 	obInit = new ObInit("Tencent", "Tencent", "uniqueKey", this) {
             @Override
             public void onInitSuc() {
-                
+                //初始化成功，
             }
 
             @Override
@@ -32,8 +36,8 @@
         };
 		obInit.init();
 	在整个程序退出时请使用 obInit.destory();释放资源
-##ConnectHandler(连接工具)
-###功能：连接obox或wifi设备到云。
+##ConnectHandler(连接工具)##
+###功能：连接obox或wifi设备到云。###
 	
 	ConnectHandler connectHandler = new ConnectHandler(this, "mymm1234", new ConnectHandler.ConnectOboxLsn() {
                     @Override
@@ -53,8 +57,8 @@
                     }
                 }, true);
                 connectHandler.start();
-##OboxHandler(删除obox)
-###功能：删除obox，但不断开obox与云的连接。
+##OboxHandler(删除obox)##
+###功能：删除obox，但不断开obox与云的连接。###
 
 	OboxHandler oboxHandler = new OboxHandler(oboxSerId) {
                     @Override
@@ -69,9 +73,9 @@
                     }
                 };
                 oboxHandler.deleteObox();
-##SmartLockHotelHandler(门锁处理者)
-###功能：提供一切与门锁相关的操作。
-####对象的初始化
+##SmartLockHotelHandler(门锁处理者)##
+###功能：提供一切与门锁相关的操作。###
+####对象的初始化####
 	smartLockHotelHandler = new SmartLockHotelHandler(getSpString("lockSerId")) {
             @Override
             protected void lockStatusChange(LockStatusEnum lockStatusEnum) {
@@ -96,7 +100,7 @@
             @Override
             protected void onNewDevice(Device device) {
                 showMsg("扫描到新设备,设备名称为：" + device.getName()
-                        + "设备序列号为：" + device.getSerialId());
+	                        + "设备序列号为：" + device.getSerialId());
                 putSpString("lockSerId", device.getSerialId());
             }
 
@@ -105,11 +109,11 @@
                 onFaildHandle(errorCode, s1);
             }
         };
-####添加门锁
+####添加门锁####
 	smartLockHotelHandler.searchNewDevice(oboxSerId, "30");
-####删除门锁
+####删除门锁####
 	smartLockHotelHandler.deleteDevice();
-####获取用户列表
+####获取用户列表####
 	smartLockHotelHandler.queryUser(new SmartLockHotelHandler.queryUserLsn() {
                     @Override
                     public void userRecordLoad(List<LockUser> list) {
@@ -117,14 +121,14 @@
                         lockUsers = list;
                     }
                 });
-####发送验证码到胁迫时目标手机，此方法用于设定短信接受人时，获得接受人许可,(要使用此功能首先要在门锁设置用户胁迫指纹)
+####发送验证码到胁迫时目标手机，此方法用于设定短信接受人时，获得接受人许可,(要使用此功能首先要在门锁设置用户胁迫指纹)####
 	smartLockHotelHandler.sendValidateCode(lockUser, "18666860862", new SmartLockHotelHandler.SendCodeLsn() {
                     @Override
                     public void sendCodeOk() {
                         showMsg("sendCodeOk");
                     }
                 });
-####修改门锁用户
+####修改门锁用户####
 	lockUser.setNickName("newNickName");
                 smartLockHotelHandler.modifyUser(lockUser, "收到的短信验证码", new SmartLockHotelHandler.ModifyUserLsn() {
                     @Override
@@ -132,7 +136,7 @@
                         showMsg("modifyUserOk");
                     }
                 });
-####验证门锁权限密码(要操作门锁临时用户，必须验证权限密码，如没有在权限密码则此方法不会执行任何操作，请使用创建权限密码方法{@link #createAdminPwd(String, CreatAuthPwdLsn)})
+####验证门锁权限密码(要操作门锁临时用户，必须验证权限密码，如没有在权限密码则此方法不会执行任何操作，请使用创建权限密码方法createAdminPwd(String, CreatAuthPwdLsn)####
 	smartLockHotelHandler.validateAdminPwd("123456", new SmartLockHotelHandler.ValidateAdminPwdLsn() {
                     @Override
                     public void validateAdminPwdOk() {
@@ -149,7 +153,7 @@
                         showMsg("areadyHasAdminPwd");
                     }
                 });
-####门锁创建权限密码
+####门锁创建权限密码####
 	smartLockHotelHandler.createAdminPwd("123456", new SmartLockHotelHandler.CreatAuthPwdLsn() {
                     @Override
                     public void CreatAuthPwdOk() {
@@ -166,7 +170,7 @@
                         showMsg("areadyHasAdminPwd");
                     }
                 });
-####智能门锁忘记权限密码
+####智能门锁忘记权限密码####
 	smartLockHotelHandler.forgetAdminPwd(new SmartLockHotelHandler.ForgetPwdLsn() {
                     @Override
                     public void forgetPwdOk() {
@@ -183,7 +187,7 @@
                         showMsg("areadyHasAdminPwd");
                     }
                 });
-####智能门锁根据推送重置权限密码
+####智能门锁根据推送重置权限密码####
 	smartLockHotelHandler.resetAdminPwdByCode("123456", new SmartLockHotelHandler.ResetPwdLsn() {
                     @Override
                     public void waitLockReset() {
@@ -205,7 +209,7 @@
                         showMsg("areadyHasAdminPwd");
                     }
                 });
-####修改门锁权限密码
+####修改门锁权限密码####
 	smartLockHotelHandler.modifyAdminPwd("123456", "123456", new SmartLockHotelHandler.ModifyPwdLsn() {
                     @Override
                     public void modifyPwdOk() {
@@ -222,7 +226,7 @@
                         showMsg("areadyHasAdminPwd");
                     }
                 });
-####查询门锁临时用户
+####查询门锁临时用户####
 	smartLockHotelHandler.queryTemporaryUser(new SmartLockHotelHandler.QueryTemporaryUserLsn() {
                     @Override
                     public void queryTemporaryUserOk(List<LockTempUser> list) {
@@ -234,7 +238,7 @@
                         showMsg("noAuthToken");
                     }
                 });
-####添加门锁临时用户
+####添加门锁临时用户####
 	smartLockHotelHandler.addTemporaryUser("nickName", "2019-07-22 00:00:00", "2019-07-22 23:00:00", "3", new SmartLockHotelHandler.AddTemporaryUserLsn() {
                     @Override
                     public void addTemporaryUserOk(LockTempUser lockTempUser) {
@@ -250,7 +254,7 @@
                         showMsg("noAuthToken");
                     }
                 });
-####删除门锁临时用户
+####删除门锁临时用户####
 	smartLockHotelHandler.deleteTemporaryUser(lockTempUsers.get(0), new SmartLockHotelHandler.DeleteTemporaryUserLsn() {
                     @Override
                     public void deleteTemporaryUserOk() {
@@ -263,7 +267,7 @@
                         showMsg("noAuthToken");
                     }
                 });
-####修改门锁临时用户
+####修改门锁临时用户####
 				final LockTempUser modifyLockTempUser = lockTempUsers.get(0);
                 modifyLockTempUser.setNickName("newNickName");
                 smartLockHotelHandler.modifyTemporaryUser(modifyLockTempUser, new SmartLockHotelHandler.ModifyTemporaryUserLsn() {
@@ -279,7 +283,7 @@
                         showMsg("noAuthToken");
                     }
                 });
-####发送密码给临时用户
+####发送密码给临时用户####
 				LockTempUser sendPwdTempUser = lockTempUsers.get(0);
                 smartLockHotelHandler.sendTemporaryUserPwd(sendPwdTempUser, new SmartLockHotelHandler.SendTemporaryUserPwdLsn() {
                     @Override
@@ -292,7 +296,7 @@
                         showMsg("noAuthToken");
                     }
                 });
-####查询推送设置列表
+####查询推送设置列表####
 	smartLockHotelHandler.queryPush(new SmartLockHotelHandler.QueryPushLsn() {
                     @Override
                     public void queryPushOk(String s, List<LockPush> list) {
@@ -300,7 +304,7 @@
                         lockPushes = list;
                     }
                 });
-####修改推送设置
+####修改推送设置####
 				if (lockPushes == null) {
                     lockPushes = new ArrayList<>();
                 }
@@ -316,7 +320,7 @@
                         showMsg("modifyPushOk");
                     }
                 });
-####释放资源
+####释放资源####
 	@Override
     protected void onDestroy() {
         super.onDestroy();
