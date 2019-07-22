@@ -10,11 +10,11 @@ public enum DeviceEnum {
     /**
      * 智能门锁(酒店)
      */
-    HOTEL_LOCK(OBConstant.NodeType.SMART_LOCK, OBConstant.NodeType.SMART_LOCK_OB_HOTEL);
-//    /**
-//     * 智能门锁（家居）
-//     */
-//    HOUSE_LOCK(OBConstant.NodeType.SMART_LOCK, OBConstant.NodeType.SMART_LOCK_OB_HOUSE),
+    HOTEL_LOCK(OBConstant.NodeType.SMART_LOCK, OBConstant.NodeType.SMART_LOCK_OB_HOTEL),
+    /**
+     * 智能门锁（家居）
+     */
+    HOUSE_LOCK(OBConstant.NodeType.SMART_LOCK, OBConstant.NodeType.SMART_LOCK_OB_HOUSE);
 
 
 //    单键单线开关，

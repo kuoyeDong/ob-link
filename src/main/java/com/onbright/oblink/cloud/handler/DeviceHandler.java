@@ -54,6 +54,10 @@ abstract class DeviceHandler implements HttpRespond {
         EventBus.getDefault().register(this);
     }
 
+    public void setDeviceSerId(String deviceSerId) {
+        this.deviceSerId = deviceSerId;
+    }
+
     /**
      * 添加设备
      *

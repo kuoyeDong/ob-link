@@ -16,7 +16,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Credentials;
 import okhttp3.FormBody;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -99,7 +98,7 @@ public class HttpRequst {
             }
 
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) {
+            public void onResponse(@NonNull Call call, @NonNull final Response response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
                         try {
@@ -150,16 +149,31 @@ public class HttpRequst {
                                         });
                                     }
                                 } else {
-                                    httpRespond.onSuccess(action, json);
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            httpRespond.onSuccess(action, json);
+                                        }
+                                    });
                                 }
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
-                            httpRespond.onFaild(HttpRespond.ErrorCode.exceptionError, 0, null, action);
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    httpRespond.onFaild(HttpRespond.ErrorCode.exceptionError, 0, null, action);
+                                }
+                            });
                         }
                     }
                 } else {
-                    httpRespond.onFaild(HttpRespond.ErrorCode.responseNotOk, response.code(), null, action);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            httpRespond.onFaild(HttpRespond.ErrorCode.responseNotOk, response.code(), null, action);
+                        }
+                    });
                 }
             }
         });

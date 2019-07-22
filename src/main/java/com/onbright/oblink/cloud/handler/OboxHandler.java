@@ -48,6 +48,6 @@ public abstract class OboxHandler implements HttpRespond {
      *
      * @param oboxSerId 被删除的obox序列号
      */
-    abstract void oboxDeleteSuc(String oboxSerId);
+    protected abstract void oboxDeleteSuc(String oboxSerId);
 
 }

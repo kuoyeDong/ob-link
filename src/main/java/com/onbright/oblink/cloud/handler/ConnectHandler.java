@@ -74,7 +74,7 @@ public class ConnectHandler implements HttpRespond {
     /**
      * 释放资源
      */
-    public void destroy() {
+    private void destroy() {
         if (smartConnectDeviceHandler != null) {
             smartConnectDeviceHandler.releaseSource();
         }
@@ -103,6 +103,7 @@ public class ConnectHandler implements HttpRespond {
                     public void onConnectRouteError() {
                         if (connectOboxLsn != null) {
                             connectOboxLsn.error(ConnectError.connectRouteError);
+                            destroy();
                         }
                     }
 
@@ -115,6 +116,7 @@ public class ConnectHandler implements HttpRespond {
                     public void onConnectCloudError() {
                         if (connectOboxLsn != null) {
                             connectOboxLsn.error(ConnectError.connectCloudError);
+                            destroy();
                         }
                     }
 
@@ -122,6 +124,7 @@ public class ConnectHandler implements HttpRespond {
                     protected void addWifiDeviceSuc(String configStr) {
                         if (connectOboxLsn != null) {
                             connectOboxLsn.connectWifiDeviceSuc(configStr);
+                            destroy();
                         }
                     }
 
@@ -129,6 +132,7 @@ public class ConnectHandler implements HttpRespond {
                     protected void addOboxSuc(Obox obox) {
                         if (connectOboxLsn != null) {
                             connectOboxLsn.connectOboxSuc(obox);
+                            destroy();
                         }
                     }
                 };
@@ -142,6 +146,7 @@ public class ConnectHandler implements HttpRespond {
             case CloudConstant.CmdValue.REGIST_ALIDEV:
                 if (connectOboxLsn != null) {
                     connectOboxLsn.error(ConnectError.registError);
+                    destroy();
                 }
         }
     }
