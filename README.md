@@ -15,13 +15,9 @@
     dependencies {
     	api(name:'oblink-1.0.3', ext:'aar')
 	}
-
-
-
-
-# 主要模块 #
-## ObInit(初始化) ##
-### 功能：与昂宝云交互获得口令并建立mq连接. ###
+# 主要模块
+## ObInit(初始化)
+### 功能：与昂宝云交互获得口令并建立mq连。
     
 	obInit = new ObInit("Tencent", "Tencent", "uniqueKey", this) {
             @Override
