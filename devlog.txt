@@ -1,1 +1,5 @@
 https://tpyliujunjie.github.io/apiForOb/api
+DeviceHandler外部使用setDeviceSerId
+noSerialId在子类中的处理
+Obox处理类中增加noSerialId处理
+画完流程图

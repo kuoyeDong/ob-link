@@ -7,11 +7,6 @@ import java.io.Serializable;
  */
 public class LockPush implements Serializable {
 
-
-    /**
-     * 序列号
-     */
-    private String serialId;
     /**
      * 1.撬门
      * 3.多次验证失败，
@@ -26,14 +21,6 @@ public class LockPush implements Serializable {
      * 1 开启
      */
     private int enable;
-
-    public String getSerialId() {
-        return serialId;
-    }
-
-    public void setSerialId(String serialId) {
-        this.serialId = serialId;
-    }
 
     public int getValue() {
         return value;

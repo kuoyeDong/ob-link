@@ -105,8 +105,7 @@
 
         @Override
         protected void onNewDevice(Device device) {
-            showMsg("扫描到新设备,设备名称为：" + device.getName()
-                        + "设备序列号为：" + device.getSerialId());
+            showMsg("扫描到新设备,设备名称为：" + device.getName() + "设备序列号为：" + device.getSerialId());
             putSpString("lockSerId", device.getSerialId());
         }
 

@@ -23,7 +23,7 @@ import org.greenrobot.eventbus.ThreadMode;
 abstract class DeviceHandler implements HttpRespond {
 
     /**
-     * rf设备序列号
+     * 设备序列号
      */
     protected String deviceSerId;
 
@@ -54,6 +54,20 @@ abstract class DeviceHandler implements HttpRespond {
         EventBus.getDefault().register(this);
     }
 
+    /**
+     * 获取控制的设备序列号
+     *
+     * @return 设备序列号
+     */
+    public String getDeviceSerId() {
+        return deviceSerId;
+    }
+
+    /**
+     * 设置要控制的设备序列号
+     *
+     * @param deviceSerId 设备序列号
+     */
     public void setDeviceSerId(String deviceSerId) {
         this.deviceSerId = deviceSerId;
     }
@@ -78,13 +92,22 @@ abstract class DeviceHandler implements HttpRespond {
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    /**
+     * @return 子类实现，获取对应的设备枚举
+     */
     protected abstract DeviceEnum getDeviceEnum();
+
+    /**
+     * 没有设备号时，进行了需要设备号的操作，只有添加设备{@link #searchNewDevice(String, String)}不需要设备号，其余都需要
+     */
+    protected abstract void noSerialId();
 
     /**
      * 删除设备
      */
     public void deleteDevice() {
         if (deviceSerId == null) {
+            noSerialId();
             return;
         }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.onModifyDevice(deviceSerId, "", true),
