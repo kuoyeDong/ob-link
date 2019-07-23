@@ -71,6 +71,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * 查询门锁状态,成功后必然回调{@link #onStatusChange(String)}，可能回调{@link #batteryValue(int)}
      */
     public void queryLockStatus() {
+        if (isNoSerId()) {
+            return;
+        }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_FINGERHOME, GetParameter.queryIntelligentFingerhome(deviceSerId),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
@@ -81,6 +84,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param openRecordLsn 回调
      */
     private void queryLockOpenRecord(OpenRecordLsn openRecordLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mOpenRecordLsn = openRecordLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_OPENRECORD,
                 GetParameter.queryIntelligentOpenrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
@@ -99,6 +105,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * 查询门锁警告记录
      */
     private void queryLockWarnRecord(WarnRecordLsn warnRecordLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mWarnRecordLsn = warnRecordLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_WARNINGRECORD,
                 GetParameter.queryIntelligentWarningrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
@@ -119,6 +128,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param queryUserLsn 回调
      */
     public void queryUser(queryUserLsn queryUserLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mQueryUserLsn = queryUserLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_USERINGRECORD,
                 GetParameter.queryIntelligentUseringrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
@@ -142,6 +154,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param sendCodeLsn 回调
      */
     public void sendValidateCode(LockUser lockUser, String phone, SendCodeLsn sendCodeLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mSendCodeLsn = sendCodeLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SEND_INTELLIGENT_VALIDATECODE,
                 GetParameter.sendIntelligentValidatecode(deviceSerId, lockUser.getPin(), phone), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
@@ -164,6 +179,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param modifyUserLsn 回调
      */
     public void modifyUser(LockUser lockUser, String validateCode, ModifyUserLsn modifyUserLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mModifyUserLsn = modifyUserLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.EDIT_INTELLIGENT_USER,
                 GetParameter.editIntelligentUser(deviceSerId, lockUser.getPin(), lockUser.getNickName(), lockUser.getMobile(), validateCode,
@@ -203,6 +221,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param queryAuthPwdLsn 回调
      */
     public void validateAdminPwd(String pwd, ValidateAdminPwdLsn queryAuthPwdLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mValidateAdminPwdLsn = queryAuthPwdLsn;
         if (!hasAdminPwd) {
             mValidateAdminPwdLsn.noAdminPwd();
@@ -228,6 +249,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param creatAuthPwdLsn 回调
      */
     public void createAdminPwd(String adminPwd, CreatAuthPwdLsn creatAuthPwdLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mCreatAuthPwdLsn = creatAuthPwdLsn;
         if (hasAdminPwd) {
             mCreatAuthPwdLsn.areadyHasAdminPwd();
@@ -252,6 +276,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param forgetPwdLsn 回调
      */
     public void forgetAdminPwd(ForgetPwdLsn forgetPwdLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mForgetPwdLsn = forgetPwdLsn;
         if (!hasAdminPwd) {
             mForgetPwdLsn.noAdminPwd();
@@ -277,6 +304,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param resetPwdLsn 回调
      */
     public void resetAdminPwdByCode(String pwd, ResetPwdLsn resetPwdLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mResetPwdLsn = resetPwdLsn;
         if (!hasAdminPwd) {
             mResetPwdLsn.noAdminPwd();
@@ -312,6 +342,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param modifyPwdLsn 回调
      */
     public void modifyAdminPwd(String oldPwd, String newPwd, ModifyPwdLsn modifyPwdLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mModifyPwdLsn = modifyPwdLsn;
         if (!hasAdminPwd) {
             mModifyPwdLsn.noAdminPwd();
@@ -346,6 +379,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param queryTemporaryUserLsn 回调
      */
     public void queryTemporaryUser(QueryTemporaryUserLsn queryTemporaryUserLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mQueryTemporaryUserLsn = queryTemporaryUserLsn;
         if (mAuthToken == null) {
             mQueryTemporaryUserLsn.noAuthToken();
@@ -378,6 +414,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      */
     public void addTemporaryUser(String nickName,
                                  String startTime, String endTime, String times, AddTemporaryUserLsn addTemporaryUserLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mAddTemporaryUserLsn = addTemporaryUserLsn;
         if (mAuthToken == null) {
             mAddTemporaryUserLsn.noAuthToken();
@@ -407,6 +446,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param deleteTemporaryUserLsn 回调
      */
     public void deleteTemporaryUser(LockTempUser lockTempUser, DeleteTemporaryUserLsn deleteTemporaryUserLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mDeleteTemporaryUserLsn = deleteTemporaryUserLsn;
         if (mAuthToken == null) {
             mDeleteTemporaryUserLsn.noAuthToken();
@@ -445,6 +487,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param modifyTemporaryUserLsn
      */
     public void modifyTemporaryUser(LockTempUser lockTempUser, ModifyTemporaryUserLsn modifyTemporaryUserLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mModifyTemporaryUserLsn = modifyTemporaryUserLsn;
         if (mAuthToken == null) {
             mModifyTemporaryUserLsn.noAuthToken();
@@ -475,6 +520,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param sendTemporaryUserPwdLsn 回调
      */
     public void sendTemporaryUserPwd(LockTempUser lockTempUser, SendTemporaryUserPwdLsn sendTemporaryUserPwdLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mSendTemporaryUserPwdLsn = sendTemporaryUserPwdLsn;
         if (mAuthToken == null) {
             mSendTemporaryUserPwdLsn.noAuthToken();
@@ -498,6 +546,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * 查询推送设置列表
      */
     public void queryPush(QueryPushLsn queryPushLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mQueryPushLsn = queryPushLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_PUSH_LIST,
                 GetParameter.queryIntelligentPushList(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
@@ -524,6 +575,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * @param lockPushes 推送数据集合
      */
     public void modifyPush(String mobile, List<LockPush> lockPushes, ModifyPushLsn modifyPushLsn) {
+        if (isNoSerId()) {
+            return;
+        }
         mModifyPushLsn = modifyPushLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.MODIFY_INTELLIGENT_PUSH,
                 GetParameter.modifyIntelligentPush(deviceSerId, mobile, lockPushes), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);

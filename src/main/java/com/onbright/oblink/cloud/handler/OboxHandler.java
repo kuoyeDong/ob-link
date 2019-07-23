@@ -9,7 +9,7 @@ import com.onbright.oblink.cloud.net.HttpRespond;
  * use by:删除Obox
  * create by dky at 2019/7/1
  */
-public abstract class OboxHandler implements HttpRespond {
+public abstract class OboxHandler implements HttpRespond, NoSerialId {
 
     /**
      * obox序列号
@@ -27,7 +27,6 @@ public abstract class OboxHandler implements HttpRespond {
     public void onSuccess(String action, String json) {
         switch (action) {
             case CloudConstant.CmdValue.DELETE_OBOX:
-//                CloudDataPool.deleteOboxData(oboxSerId);
                 oboxDeleteSuc(oboxSerId);
                 break;
             default:
@@ -39,6 +38,10 @@ public abstract class OboxHandler implements HttpRespond {
      * 删除obox
      */
     public void deleteObox() {
+        if (oboxSerId == null) {
+            noSerialId();
+            return;
+        }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_OBOX, GetParameter.onDeleteObox(true, oboxSerId),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.DELETE);
     }

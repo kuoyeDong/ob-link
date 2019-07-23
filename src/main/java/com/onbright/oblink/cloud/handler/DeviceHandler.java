@@ -20,7 +20,7 @@ import org.greenrobot.eventbus.ThreadMode;
  * use by:设备处理基础类，功能点：扫描设备，释放设备，状态回调
  * create by dky at 2019/7/3
  */
-abstract class DeviceHandler implements HttpRespond {
+abstract class DeviceHandler implements HttpRespond, NoSerialId {
 
     /**
      * 设备序列号
@@ -55,6 +55,19 @@ abstract class DeviceHandler implements HttpRespond {
     }
 
     /**
+     * 检查序列号
+     *
+     * @return 无序列号返回true
+     */
+    protected boolean isNoSerId() {
+        if (deviceSerId == null) {
+            noSerialId();
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 获取控制的设备序列号
      *
      * @return 设备序列号
@@ -79,6 +92,9 @@ abstract class DeviceHandler implements HttpRespond {
      * @param time      添加持续的时间，超过该时间无法再添加,默认30s
      */
     public void searchNewDevice(String oboxSerId, String time) {
+        if (isNoSerId()) {
+            return;
+        }
         DeviceEnum deviceEnum = getDeviceEnum();
         pType = String.valueOf(deviceEnum.getpType());
         type = String.valueOf(deviceEnum.getType());
@@ -98,16 +114,10 @@ abstract class DeviceHandler implements HttpRespond {
     protected abstract DeviceEnum getDeviceEnum();
 
     /**
-     * 没有设备号时，进行了需要设备号的操作，只有添加设备{@link #searchNewDevice(String, String)}不需要设备号，其余都需要
-     */
-    protected abstract void noSerialId();
-
-    /**
      * 删除设备
      */
     public void deleteDevice() {
-        if (deviceSerId == null) {
-            noSerialId();
+        if (isNoSerId()) {
             return;
         }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.onModifyDevice(deviceSerId, "", true),
