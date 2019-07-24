@@ -1,7 +1,8 @@
 # ob-link
 
-# 流程图
+# 流程图，请详细参阅，大部分不合规操作都将不被执行，如遇此情况，重新查阅此流程图。
 
+![](https://raw.githubusercontent.com/kuoyeDong/ob-link/master/lockStep.png)
 # 使用方法：（待bintray审核通过后替换为在线模式）
 
 # 将aar文件拷贝到libs目录下
@@ -22,7 +23,7 @@
 
 ## ObInit(初始化)
 
-### 功能：与昂宝云交互获得口令并建立mq连。
+### 功能：与昂宝云交互获得口令并建立mq连接。
 
 	//昂宝分配的key，与key对应的secret，下级用户的唯一标识(可为自行管理用户账户的唯一标识)，上下文
 	obInit = new ObInit("Tencent", "Tencent", "uniqueKey", this) {
