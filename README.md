@@ -1,6 +1,6 @@
 # ob-link
 
-# 流程图，请详细参阅，大部分不合规操作都将不被执行，如遇此情况，重新查阅此流程图。
+# 流程图，请详细参阅，大部分不合规操作都将不被执行，并回调提示函数，如遇此情况，重新查阅此流程图。
 
 ![](https://raw.githubusercontent.com/kuoyeDong/ob-link/master/lockStep.png)
 # 使用方法：（待bintray审核通过后替换为在线模式）
