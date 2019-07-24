@@ -16,7 +16,7 @@ public class LockTempUser implements Serializable {
      */
     private String nickName;
     /**
-     * 不知道干嘛的
+     * 归属的门锁序列号
      */
     private String serialId;
     /**
@@ -199,5 +199,12 @@ public class LockTempUser implements Serializable {
      */
     public String getShowTimeLeft() {
         return timeLeft + "Min";
+    }
+
+    /**
+     * @return 有效返回true
+     */
+    public boolean isEffective() {
+        return isEnd != 1;
     }
 }

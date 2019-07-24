@@ -8,7 +8,7 @@ public interface CloudConstant {
     class Source {
         public static String HTTPS = "https://";
         public static String SERVER = SourceFrom.SERVER_IOT;
-        public static final String CONSUMER_OPEN = "/consumer/common";
+        public static final String CONSUMER_OPEN = "/consumer/common2";
     }
 
     interface SourceFrom {
