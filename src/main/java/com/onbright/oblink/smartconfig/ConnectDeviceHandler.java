@@ -405,6 +405,11 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
         cls.setActions(scActions);
     }
 
+    /**
+     * 快速模式，不获取配置
+     */
+    public static final boolean IS_FAST_MODE = true;
+
     @Override
     public void onReceive(Message message) {
         switch (message.what) {
@@ -415,7 +420,11 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                 break;
             case OBConstant.ReplyType.ON_SETOBOXTIME_SUC:
             case OBConstant.ReplyType.ON_SETOBOXTIME_FAL:
-                tcpSend.getDevice(1, false);
+                if (IS_FAST_MODE) {
+                    getParmFinish();
+                } else {
+                    tcpSend.getDevice(1, false);
+                }
                 break;
             case OBConstant.ReplyType.GET_OBOX_MSG_BACK:
                 isReqOboxMsg = false;
