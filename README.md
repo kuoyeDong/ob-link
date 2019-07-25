@@ -227,8 +227,8 @@
 	smartLockHotelHandler.createAdminPwd("123456", new SmartLockHotelHandler.CreatAuthPwdLsn() {
 
         @Override
-        public void CreatAuthPwdOk() {
-            //创建权限密码成功
+        public void creatAdminPwdOk() {
+            //创建权限密码成功，请自行保存此密码
 
         }
 
@@ -310,7 +310,7 @@
 
         @Override
         public void queryTemporaryUserOk(List<LockTempUser> list) {
-            //查询临时用户成功
+            //查询临时用户成功，请自取回调实例处理
 
         }
 

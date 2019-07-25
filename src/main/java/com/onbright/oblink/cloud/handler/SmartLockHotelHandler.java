@@ -276,7 +276,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
         /**
          * 创建权限密码成功
          */
-        void CreatAuthPwdOk();
+        void creatAdminPwdOk();
 
         /**
          * 已经有权限密码，不能重复创建
@@ -691,7 +691,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
             case CloudConstant.CmdValue.ADD_INTELLIGENT_AUTHPWD:
                 if (mCreatAuthPwdLsn != null) {
                     hasAdminPwd = true;
-                    mCreatAuthPwdLsn.CreatAuthPwdOk();
+                    mCreatAuthPwdLsn.creatAdminPwdOk();
                 }
                 break;
             case CloudConstant.CmdValue.FORGET_INTELLIGENT_PWD:
