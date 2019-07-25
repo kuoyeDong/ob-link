@@ -92,7 +92,8 @@ abstract class DeviceHandler implements HttpRespond, NoSerialId {
      * @param time      添加持续的时间，超过该时间无法再添加,默认30s
      */
     public void searchNewDevice(String oboxSerId, String time) {
-        if (isNoSerId()) {
+        if (oboxSerId == null) {
+            noSerialId();
             return;
         }
         DeviceEnum deviceEnum = getDeviceEnum();

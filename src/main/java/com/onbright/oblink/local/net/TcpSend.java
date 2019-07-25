@@ -4,13 +4,13 @@ import android.os.Handler;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.onbright.oblink.LogUtil;
 import com.onbright.oblink.local.bean.ObGroup;
 import com.onbright.oblink.local.bean.ObNode;
 import com.onbright.oblink.local.bean.ObScene;
 import com.onbright.oblink.local.bean.SceneAction;
 import com.onbright.oblink.local.bean.SceneCondition;
 import com.onbright.oblink.smartconfig.ConnectDeviceHandler;
-import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -91,7 +91,7 @@ public class TcpSend extends Thread {
         byte[] cmd = new byte[62];
         cmd[4] = (byte) 0x05;
         cmd[61] = 0x55;
-        Logger.d("收到2500上报后，回0500应答");
+        LogUtil.log(this, "收到2500上报后，回0500应答");
         sendACKCMD(cmd);
     }
 
@@ -135,7 +135,7 @@ public class TcpSend extends Thread {
         cmd[8] = (byte) 0x01;
         System.arraycopy(addr, 0, cmd, index[10], addr.length);
         cmd[61] = 0x55;
-        Logger.d("读取版本信息");
+        LogUtil.log(this, "读取版本信息");
         sendCMD(cmd);
     }
 
@@ -332,7 +332,7 @@ public class TcpSend extends Thread {
     public void reqOboxSSID() {
         byte[] cmd = new byte[62];
         tsOboxSSID(cmd);
-        Logger.d(TAG, "获取ssid");
+        LogUtil.log(this, "获取ssid");
         sendCMD(cmd);
     }
 
@@ -344,7 +344,7 @@ public class TcpSend extends Thread {
     public void changeOboxRfPsw(byte[] oldPsw, byte[] newPsw) {
         byte[] cmd = new byte[62];
         tsChangeOboxRfPsw(cmd, oldPsw, newPsw, (byte) oldPsw.length, (byte) newPsw.length);
-        Logger.d(TAG, "修改密码");
+        LogUtil.log(this, "修改密码");
         sendCMD(cmd);
     }
 
@@ -363,7 +363,7 @@ public class TcpSend extends Thread {
         byte[] cmd = new byte[62];
         //System.arraycopy(psw, 0, cmd, 0, 4);
         tsOboxToStation(cmd, ssid, pswdata, ipByte, codebytes, ssid.length, pswdata.length, ipByte.length, codebytes.length);
-        Logger.d(TAG, "setOboxToStation: 设置obox工作模式");
+        LogUtil.log(this, "setOboxToStation: 设置obox工作模式");
         sendCMD(cmd);
     }
 
@@ -378,7 +378,7 @@ public class TcpSend extends Thread {
     public void getDevice(int index, boolean isGroup) {
         byte[] cmd = new byte[62];
         tsGetDevice(cmd, index, isGroup);
-        Logger.d(TAG, "getDevice: 获取设备是否获取组" + isGroup);
+        LogUtil.log(this, "getDevice: 获取设备是否获取组" + isGroup);
         sendCMD(cmd);
     }
 
@@ -394,7 +394,7 @@ public class TcpSend extends Thread {
     public void getDeviceState(byte[] cplAddr, byte[] datamark) {
         byte[] cmd = new byte[62];
         tsGetDeviceState(cmd, cplAddr, datamark, cplAddr.length, datamark.length);
-        Logger.d(TAG, "getDeviceState: 获取状态");
+        LogUtil.log(this, "getDeviceState: 获取状态");
         getStatusIndex++;
         sendCMD(cmd);
     }
@@ -417,7 +417,7 @@ public class TcpSend extends Thread {
     public void reqOboxMsg() {
         byte[] cmd = new byte[62];
         tsReqOboxMsg(cmd);
-        Logger.d(TAG, "reqOboxMsg: 获取obox信息");
+        LogUtil.log(this, "reqOboxMsg: 获取obox信息");
         sendCMD(cmd);
     }
 
@@ -433,7 +433,7 @@ public class TcpSend extends Thread {
     public void makeOboxCloudState(boolean isAdd, byte[] ipByte) {
         byte[] cmd = new byte[62];
         tsMakeOboxCloudState(cmd, isAdd, ipByte, ipByte.length);
-        Logger.d(TAG, "makeOboxCloudState: 设置obox连接服务器 " + isAdd);
+        LogUtil.log(this, "makeOboxCloudState: 设置obox连接服务器 " + isAdd);
         sendCMD(cmd);
     }
 
@@ -450,7 +450,7 @@ public class TcpSend extends Thread {
     public void rfCmd(int mode, byte[] startId, int time) {
         byte[] cmd = new byte[62];
         tsRfCmd(cmd, mode, startId, time, startId.length);
-        Logger.d(TAG, "rfCmd: 扫描设备" + mode);
+        LogUtil.log(this, "rfCmd: 扫描设备" + mode);
         sendCMD(cmd);
     }
 
@@ -462,7 +462,7 @@ public class TcpSend extends Thread {
     public void release() {
         byte[] cmd = new byte[62];
         tsRelease(cmd);
-        Logger.d(TAG, "release: 释放设备");
+        LogUtil.log(this, "release: 释放设备");
         sendCMD(cmd);
     }
 
@@ -479,7 +479,7 @@ public class TcpSend extends Thread {
         time.setToNow();
         byte[] cmd = new byte[62];
         tsSetOboxTime(cmd, time.year, time.month, time.monthDay, time.weekDay, time.hour, time.minute, time.second);
-        Logger.d(TAG, "设置时间");
+        LogUtil.log(this, "设置时间");
         sendCMD(cmd);
     }
 
@@ -502,7 +502,7 @@ public class TcpSend extends Thread {
         } else {
             actionIndex = 1;
         }
-        Logger.d(TAG, "reqScene: 获取场景 = " + factorsOfScene);
+        LogUtil.log(this, "reqScene: 获取场景 = " + factorsOfScene);
         sendCMD(cmd);
     }
 
@@ -518,7 +518,7 @@ public class TcpSend extends Thread {
     public void setNodeState(ObNode obNode, byte[] status, boolean isGroup) {
         byte[] cmd = new byte[62];
         tsSetNodeState(cmd, obNode.getCplAddr(), status, isGroup, obNode.getCplAddr().length, status.length);
-        Logger.d(TAG, "setNodeState: 设置状态，是否设置组" + isGroup);
+        LogUtil.log(this, "setNodeState: 设置状态，是否设置组" + isGroup);
         sendCMD(cmd);
     }
 
@@ -537,7 +537,7 @@ public class TcpSend extends Thread {
     public void editNodeorGroup(int opreType, ObNode obNode, ObGroup obGroup, byte[] id, boolean isGroup) {
         byte[] cmd = new byte[62];
         tsEditNodeOrGroup(cmd, opreType, obNode == null ? 0 : obNode.getAddr(), obGroup == null ? 0 : obGroup.getAddr(), id == null ? new byte[8] : id, isGroup, id == null ? 8 : id.length, rfAddr, rfAddr.length);
-        Logger.d(TAG, "editNodeorGroup: 设置节点或者组信息");
+        LogUtil.log(this, "editNodeorGroup: 设置节点或者组信息");
         sendCMD(cmd);
     }
 
@@ -549,7 +549,7 @@ public class TcpSend extends Thread {
     public void organizGoup(ObNode obNode, ObGroup obGroup, boolean isAdd) {
         byte[] cmd = new byte[62];
         tsOrganizGroup(cmd, obGroup.getAddr(), obNode.getAddr(), isAdd, rfAddr, rfAddr.length);
-        Logger.d(TAG, "organizGoup: 管理组关系");
+        LogUtil.log(this, "organizGoup: 管理组关系");
         sendCMD(cmd);
     }
 
@@ -575,7 +575,7 @@ public class TcpSend extends Thread {
             public void run() {
                 try {
                     Thread.sleep(200);
-                    Logger.d(TAG, ": 管理场景id》》使能状态 = " + vailable + "操作类型 =" + operaType);
+                    LogUtil.log(this, ": 管理场景id》》使能状态 = " + vailable + "操作类型 =" + operaType);
                     sendCMD(cmd);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -620,7 +620,7 @@ public class TcpSend extends Thread {
             public void run() {
                 try {
                     Thread.sleep(200);
-                    Logger.d(TAG, ": 管理场景条件");
+                    LogUtil.log(this, ": 管理场景条件");
                     sendCMD(cmd);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -629,7 +629,6 @@ public class TcpSend extends Thread {
             }
         }).start();
     }
-
 
     private native void tsEditSceneAction(byte[] array, byte[] actionAddr, byte[] action, int actionAddrLen,
                                           int actionLen, boolean isGroup, int circlrIndex);
@@ -658,7 +657,7 @@ public class TcpSend extends Thread {
                 isGroup = false;
             }
             if (sceneAction.getActions(sceneSer) != null) {
-                Logger.d(TAG, "editSceneAction: ==" + Transformation.byteArryToHexString(sceneAction.getActions(sceneSer)));
+                LogUtil.log(this, "editSceneAction: ==" + Transformation.byteArryToHexString(sceneAction.getActions(sceneSer)));
             }
             tsEditSceneAction(cmd, sceneAction.getAddrs(), sceneAction.getActions(sceneSer) == null ? new byte[8] : sceneAction.getActions(sceneSer),
                     sceneAction.getAddrs().length, 8, isGroup, i);
@@ -669,7 +668,7 @@ public class TcpSend extends Thread {
             public void run() {
                 try {
                     Thread.sleep(200);
-                    Logger.d(TAG, ": 管理场景行为是否删除 " + isDel + "len := " + len);
+                    LogUtil.log(this, ": 管理场景行为是否删除 " + isDel + "len := " + len);
                     sendCMD(cmd);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -678,7 +677,6 @@ public class TcpSend extends Thread {
             }
         }).start();
     }
-
 
     public void setRfAddr(byte[] rfAddr) {
         this.rfAddr = rfAddr;
@@ -697,9 +695,7 @@ public class TcpSend extends Thread {
     public void setWifiConfig(int config) {
         byte[] cmd = new byte[62];
         tsSetWifiConfig(cmd, config);
-        Logger.d(TAG, ": 设置wifi配置 ,设置模式 --》" + config);
+        LogUtil.log(this, ": 设置wifi配置 ,设置模式 --》" + config);
         sendCMD(cmd);
     }
-
-
 }

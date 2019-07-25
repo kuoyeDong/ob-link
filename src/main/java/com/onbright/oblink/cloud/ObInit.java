@@ -56,7 +56,7 @@ public abstract class ObInit implements HttpRespond {
      */
     public void init() {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT,
-                GetParameter.onInit(), "oauth/token?grant_type=client_credentials", HttpRequst.POST);
+                GetParameter.onInit(), "/oauth/token?grant_type=client_credentials", HttpRequst.POST);
     }
 
     @Override
@@ -65,7 +65,7 @@ public abstract class ObInit implements HttpRespond {
             case CloudConstant.CmdValue.INIT:
                 String cacheToken = CloudParseUtil.getJsonParm(json, CloudConstant.ParameterKey.ACCESS_TOKEN);
                 HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.INIT_SECOND,
-                        GetParameter.onInitSecond(), "/login/company?accessToken=" + cacheToken + "&uniqueKey=" + uniqueKey,
+                        GetParameter.onInitSecond(), "/login/company?accessToken=" + cacheToken + "&" + "uniqueKey=" + uniqueKey,
                         HttpRequst.POST);
                 break;
             case CloudConstant.CmdValue.INIT_SECOND:

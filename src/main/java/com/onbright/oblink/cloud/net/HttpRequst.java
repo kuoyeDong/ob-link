@@ -3,6 +3,7 @@ package com.onbright.oblink.cloud.net;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.onbright.oblink.LogUtil;
 import com.onbright.oblink.cloud.ObInit;
 
 import org.json.JSONException;
@@ -11,15 +12,14 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Credentials;
 import okhttp3.FormBody;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.Route;
 
 @SuppressWarnings("deprecation")
 public class HttpRequst {
@@ -62,29 +62,38 @@ public class HttpRequst {
         }
         if (okHttpClient == null) {
             okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).
-                    writeTimeout(10, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).
-                    authenticator(new Authenticator() {
-                        @Override
-                        public Request authenticate(Route route, @NonNull Response response) {
-                            return response.request().newBuilder().header("Authorization", Credentials.basic(ObInit.APP_SECRET, ObInit.APP_KEY)).build();
-                        }
-                    }).build();
+                    writeTimeout(10, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).addInterceptor(new Interceptor() {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    Request originalRequest = chain.request();
+                    Request authorised = originalRequest.newBuilder()
+                            .header("Authorization", Credentials.basic(ObInit.APP_SECRET, ObInit.APP_KEY))
+                            .build();
+                    return chain.proceed(authorised);
+                }
+            }).build();
         }
         builder.add(CloudConstant.ParameterKey.SYSTEM, "Android");
-        builder.add(CloudConstant.ParameterKey.APP_ID, ObInit.APP_KEY);
-        builder.add(CloudConstant.ParameterKey.ACCESS_TOKEN, ObInit.ACCESSTOKEN);
+        builder.add(CloudConstant.ParameterKey.APP_ID, ObInit.APP_KEY == null ? "" : ObInit.APP_KEY);
+        builder.add(CloudConstant.ParameterKey.ACCESS_TOKEN, ObInit.ACCESSTOKEN == null ? "" : ObInit.ACCESSTOKEN);
         Request.Builder requestBuilder = new Request.Builder().url(CloudConstant.Source.HTTPS + CloudConstant.Source.SERVER + url);
+        FormBody formBody = builder.build();
         switch (method) {
             case POST:
-                requestBuilder.post(builder.build());
+                requestBuilder.post(formBody);
                 break;
             case PUT:
-                requestBuilder.put(builder.build());
+                requestBuilder.put(formBody);
                 break;
             case DELETE:
-                requestBuilder.delete(builder.build());
+                requestBuilder.delete(formBody);
                 break;
         }
+
+        for (int i = 0; i < formBody.size(); i++) {
+
+        }
+        LogUtil.log(this,formBody);
         okHttpClient.newCall(requestBuilder.build()).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull final IOException e) {
@@ -103,6 +112,7 @@ public class HttpRequst {
                     if (response.body() != null) {
                         try {
                             final String json = response.body().string();
+                            LogUtil.log(this,json);
                             JSONObject jsonObject = null;
                             try {
                                 jsonObject = new JSONObject(json);

@@ -2,7 +2,6 @@ package com.onbright.oblink.cloud.handler;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.onbright.oblink.DeviceEnum;

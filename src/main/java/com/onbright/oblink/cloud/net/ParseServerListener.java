@@ -2,6 +2,7 @@ package com.onbright.oblink.cloud.net;
 
 import com.google.gson.Gson;
 import com.onbright.oblink.EventMsg;
+import com.onbright.oblink.LogUtil;
 import com.onbright.oblink.MathUtil;
 import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.bean.Action;
@@ -11,7 +12,6 @@ import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.bean.Group;
 import com.onbright.oblink.local.net.OBConstant;
 import com.onbright.oblink.local.net.Transformation;
-import com.orhanobut.logger.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
@@ -160,7 +160,7 @@ public class ParseServerListener {
                 state = data.substring(16, 30);
                 nodeType = data.substring(10, 12);
                 nodeAddr = data.substring(12, 14);
-                Logger.d("2500设备上报数据" + "state =" + state + "nodeType =" + nodeType + "nodeAddr =" + nodeAddr + "state", state);
+                LogUtil.log(this,"2500设备上报数据" + "state =" + state + "nodeType =" + nodeType + "nodeAddr =" + nodeAddr + "state"+state);
                 String status = null;
                 int pType, cType;
                 for (int i = 0; i < CloudDataPool.getDevices().size(); i++) {
@@ -299,7 +299,7 @@ public class ParseServerListener {
                         eventMsg.putExtra("isModifyStruct", true);
                         eventMsg.putExtra("operate_type", operation);
                         EventBus.getDefault().post(eventMsg);
-                        Logger.d("删除节点或删除组" + "isDeleteNode=" + isDeleteNode + "isDeleteGroup= " + isDeleteGroup);
+                        LogUtil.log(this,"删除节点或删除组" + "isDeleteNode=" + isDeleteNode + "isDeleteGroup= " + isDeleteGroup);
                         break;
                     }
                     case "01": {//add
@@ -308,7 +308,7 @@ public class ParseServerListener {
                         eventMsg.putExtra("cmd", cmd);
                         eventMsg.putExtra("operate_type", operation);
                         EventBus.getDefault().post(eventMsg);
-                        Logger.d("添加节点到组");
+                        LogUtil.log(this,"添加节点到组");
 //                    if (groupAddr.equals("00")) {
 //
 //                    } else {
@@ -339,7 +339,7 @@ public class ParseServerListener {
                                         EventMsg eventMsg = new EventMsg();
                                         eventMsg.setAction(OBConstant.StringKey.UPDATE_NODE_ID);
                                         EventBus.getDefault().post(eventMsg);
-                                        Logger.d("节点重命名");
+                                        LogUtil.log(this,"节点重命名");
                                         break;
                                     }
                                 }
@@ -353,7 +353,7 @@ public class ParseServerListener {
                                             EventMsg eventMsg = new EventMsg();
                                             eventMsg.setAction(OBConstant.StringKey.UPDATE_GROUP_ID);
                                             EventBus.getDefault().post(eventMsg);
-                                            Logger.d("组重命名");
+                                            LogUtil.log(this,"组重命名");
                                             break;
                                         }
                                     }
@@ -404,7 +404,7 @@ public class ParseServerListener {
                 eventMsg.putExtra("isDeleteGroup", false);
                 eventMsg.putExtra("isDeleteNode", false);
                 EventBus.getDefault().post(eventMsg);
-                Logger.d("修改组节点，组操作");
+                LogUtil.log(this,"修改组节点，组操作");
                 break;
             }
             case "a008":  //release
@@ -428,7 +428,7 @@ public class ParseServerListener {
                 byte b = (byte) MathUtil.byteIndexValid(child[0], 0, 7);
                 deviceType = Transformation.byte2HexString(a);
                 deviceChildType = Transformation.byte2HexString(b);
-                Logger.d("扫描设备" + "deviceType = " + deviceType + "deviceChildType =" + deviceChildType);
+                LogUtil.log(this,"扫描设备" + "deviceType = " + deviceType + "deviceChildType =" + deviceChildType);
                 deviceName = getNodeId(Transformation.hexString2Bytes(data.substring(6, 38)));
                 serialId = data.substring(38, 48);
                 obox_serial_id = data.substring(48, 58);

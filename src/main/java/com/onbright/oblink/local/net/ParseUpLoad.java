@@ -3,10 +3,10 @@ package com.onbright.oblink.local.net;
 import android.content.Context;
 import android.content.Intent;
 
+import com.onbright.oblink.LogUtil;
 import com.onbright.oblink.MathUtil;
 import com.onbright.oblink.local.LocalDataPool;
 import com.onbright.oblink.local.bean.ObNode;
-import com.orhanobut.logger.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -94,11 +94,11 @@ public class ParseUpLoad {
                     context.sendBroadcast(intent);
                     break;
             }
-            Logger.d( "parseupload broad cast");
+            LogUtil.log(this,"parseupload broad cast");
         } else {
             /*2500上报*/
             byte[] oboxStrArry = Arrays.copyOfRange(upload, index[8], index[8] + 5);
-            Logger.d("oboxStrArry == " + Transformation.byteArryToHexString(oboxStrArry));
+            LogUtil.log(this,"oboxStrArry == " + Transformation.byteArryToHexString(oboxStrArry));
             String oboxStr = Transformation.byteArryToHexString(oboxStrArry);
             if (NeedReply) {
                 tcpSend.sendAck();
