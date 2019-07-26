@@ -568,10 +568,6 @@ public interface CloudConstant {
          */
         String DEL_INTELLIGENT_REMOTE_USER = "del_intelligent_remote_user";
         /**
-         * OB智能门锁忘记权限密码
-         */
-        String FORGET_INTELLIGENT_PWD = "forget_intelligent_pwd";
-        /**
          * 智能门锁修改权限密码
          */
         String RESET_INTELLIGENT_PWD = "reset_intelligent_pwd";

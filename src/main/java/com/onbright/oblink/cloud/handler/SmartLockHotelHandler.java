@@ -77,7 +77,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
     }
 
     /**
-     * 查询门锁状态,成功后必然回调{@link #onStatusChange(String)}，可能回调{@link #batteryValue(int)}
+     * 查询门锁状态,成功后必然回调{@link #onStatusChange(String)}，可能回调{@link #batteryValue(int)}，此方法可查询门锁有无设置权限密码的真实状态
      */
     public void queryLockStatus() {
         if (isNoSerId()) {
@@ -85,50 +85,6 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
         }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_FINGERHOME, GetParameter.queryIntelligentFingerhome(deviceSerId),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
-    }
-
-    /**
-     * 查询开门记录
-     *
-     * @param openRecordLsn 回调
-     */
-    public void queryLockOpenRecord(OpenRecordLsn openRecordLsn) {
-        if (isNoSerId()) {
-            return;
-        }
-        mOpenRecordLsn = openRecordLsn;
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_OPENRECORD,
-                GetParameter.queryIntelligentOpenrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
-    }
-
-    private OpenRecordLsn mOpenRecordLsn;
-
-    /**
-     * 查询开门记录回调接口
-     */
-    public interface OpenRecordLsn {
-        void openRecordLoad(List<LockHistory> lockHistories);
-    }
-
-    /**
-     * 查询警告记录
-     */
-    public void queryLockWarnRecord(WarnRecordLsn warnRecordLsn) {
-        if (isNoSerId()) {
-            return;
-        }
-        mWarnRecordLsn = warnRecordLsn;
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_WARNINGRECORD,
-                GetParameter.queryIntelligentWarningrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
-    }
-
-    private WarnRecordLsn mWarnRecordLsn;
-
-    /**
-     * 查询警报记录回调接口
-     */
-    public interface WarnRecordLsn {
-        void warnRecordLoad(List<LockAlarm> lockAlarms);
     }
 
     /**
@@ -284,39 +240,12 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
     }
 
     /**
-     * 忘记权限密码
-     *
-     * @param forgetPwdLsn 回调
-     */
-    public void forgetAdminPwd(ForgetPwdLsn forgetPwdLsn) {
-        if (isNoSerId()) {
-            return;
-        }
-        mForgetPwdLsn = forgetPwdLsn;
-        if (!hasAdminPwd) {
-            mForgetPwdLsn.noAdminPwd();
-            return;
-        }
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.FORGET_INTELLIGENT_PWD,
-                GetParameter.forgetIntelligentPwd(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
-    }
-
-    private ForgetPwdLsn mForgetPwdLsn;
-
-    /**
-     * 忘记权限密码回调接口
-     */
-    public interface ForgetPwdLsn extends AdminPwdError {
-        void forgetPwdOk();
-    }
-
-    /**
      * 根据推送重置权限密码
      *
-     * @param pwd         密码
-     * @param resetPwdLsn 回调
+     * @param pwd       密码
+     * @param uniqueKey uniqueKey 下级用户唯一标识
      */
-    public void resetAdminPwdByCode(String pwd, ResetPwdLsn resetPwdLsn) {
+    public void resetAdminPwdByCode(String pwd, String uniqueKey, ResetPwdLsn resetPwdLsn) {
         if (isNoSerId()) {
             return;
         }
@@ -326,7 +255,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
             return;
         }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.RESET_INTELLIGENT_PWD_BY_CODE,
-                GetParameter.resetIntelligentPwdByCode(deviceSerId, pwd), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+                GetParameter.resetIntelligentPwdByCode(deviceSerId, pwd, uniqueKey), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
     private ResetPwdLsn mResetPwdLsn;
@@ -433,7 +362,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
         }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.ADD_INTELLIGENT_REMOTE_USER,
                 GetParameter.addIntelligentRemoteUser(deviceSerId, mAuthToken, lockTempUser.getNickName(),
-                        String.valueOf(getLongTime(lockTempUser.getStart())), String.valueOf(getLongTime(lockTempUser.getStart())), lockTempUser.getShowTimes(),
+                        String.valueOf(getLongTime(lockTempUser.getStart())), String.valueOf(getLongTime(lockTempUser.getEnd())), lockTempUser.getShowTimes(),
                         lockTempUser.getMobile(), !TextUtils.isEmpty(lockTempUser.getMobile()), lockTempUser.getIsMax() == 1), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
@@ -501,7 +430,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
             return;
         }
         mModifyTemporaryUserLsn = modifyTemporaryUserLsn;
-        if (lockTempUser.isEffective()) {
+        if (!lockTempUser.isEffective()) {
             mModifyTemporaryUserLsn.temporaryUserExpire();
             return;
         }
@@ -559,6 +488,50 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      */
     public interface SendTemporaryUserPwdLsn extends AuthTokenError {
         void sendTemporaryUserPwdOk();
+    }
+
+    /**
+     * 查询开门记录
+     *
+     * @param openRecordLsn 回调
+     */
+    public void queryLockOpenRecord(OpenRecordLsn openRecordLsn) {
+        if (isNoSerId()) {
+            return;
+        }
+        mOpenRecordLsn = openRecordLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_OPENRECORD,
+                GetParameter.queryIntelligentOpenrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private OpenRecordLsn mOpenRecordLsn;
+
+    /**
+     * 查询开门记录回调接口
+     */
+    public interface OpenRecordLsn {
+        void openRecordLoad(List<LockHistory> lockHistories);
+    }
+
+    /**
+     * 查询警告记录
+     */
+    public void queryLockWarnRecord(WarnRecordLsn warnRecordLsn) {
+        if (isNoSerId()) {
+            return;
+        }
+        mWarnRecordLsn = warnRecordLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_INTELLIGENT_WARNINGRECORD,
+                GetParameter.queryIntelligentWarningrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private WarnRecordLsn mWarnRecordLsn;
+
+    /**
+     * 查询警报记录回调接口
+     */
+    public interface WarnRecordLsn {
+        void warnRecordLoad(List<LockAlarm> lockAlarms);
     }
 
     /**
@@ -691,11 +664,6 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
                 if (mCreatAuthPwdLsn != null) {
                     hasAdminPwd = true;
                     mCreatAuthPwdLsn.creatAdminPwdOk();
-                }
-                break;
-            case CloudConstant.CmdValue.FORGET_INTELLIGENT_PWD:
-                if (mForgetPwdLsn != null) {
-                    mForgetPwdLsn.forgetPwdOk();
                 }
                 break;
             case CloudConstant.CmdValue.RESET_INTELLIGENT_PWD_BY_CODE:

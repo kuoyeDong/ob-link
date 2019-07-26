@@ -55,6 +55,9 @@ public abstract class SmartConnectDeviceHandler extends ConnectDeviceHandler {
      */
     @Override
     public void start() {
+        Log.d(TAG, "start: wifiAdmin.getWifiConnectedSsidAscii(wifiAdmin.getWifiConnectedSsid())"+wifiAdmin.getWifiConnectedSsidAscii(wifiAdmin.getWifiConnectedSsid()));
+        Log.d(TAG, "start: wifiAdmin.getWifiConnectedBssid()"+wifiAdmin.getWifiConnectedBssid());
+        Log.d(TAG, "start: routePwd"+routePwd);
         new SmartConnectDeviceHandler.EsptouchAsyncTask().execute(wifiAdmin.getWifiConnectedSsidAscii(wifiAdmin.getWifiConnectedSsid()), wifiAdmin.getWifiConnectedBssid(), routePwd);
         if (tcpServer == null) {
             tcpServer = new SmartConnectDeviceHandler.TcpServer();

@@ -35,7 +35,6 @@ public class Obox implements Serializable {
     /**
      * obox里面的设备配置信息
      */
-    @SerializedName("")
     private List<Device> device_config;
 
     public List<Group> getGroup_config() {

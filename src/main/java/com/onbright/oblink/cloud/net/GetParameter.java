@@ -465,27 +465,17 @@ public class GetParameter {
     }
 
     /**
-     * 智能门锁忘记权限密码
-     *
-     * @param serialId 门锁序列号
-     */
-    public static FormBody.Builder forgetIntelligentPwd(String serialId) {
-        FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.FORGET_INTELLIGENT_PWD);
-        builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        return builder;
-    }
-
-    /**
      * 智能门锁根据推送重置权限密码
      *
-     * @param serialId 门锁序列号
-     * @param pwd      密码
+     * @param serialId  门锁序列号
+     * @param pwd       密码
+     * @param uniqueKey 下级用户唯一标识
      */
-    public static FormBody.Builder resetIntelligentPwdByCode(String serialId, String pwd) {
+    public static FormBody.Builder resetIntelligentPwdByCode(String serialId, String pwd, String uniqueKey) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.RESET_INTELLIGENT_PWD_BY_CODE);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
+        builder.add("appkey", uniqueKey);
         builder.add(CloudConstant.ParameterKey.PASS_WORD, pwd);
         return builder;
     }

@@ -81,6 +81,9 @@ public class TcpReceive extends Thread {
         try {
             while (canRec) {
                 int rlRead = mSocket.getInputStream().read(sData);
+                if (rlRead < 0) {
+                    continue;
+                }
                 if (rlRead == 68) {
                     byte[] receiveData = new byte[rlRead];
                     System.arraycopy(sData, 0, receiveData, 0, rlRead);
@@ -208,7 +211,7 @@ public class TcpReceive extends Thread {
             case 0x2100:
                 onGetState(msg);
                 break;
-             /* 设置连接与断开服务器*/
+            /* 设置连接与断开服务器*/
             case 0xa012:
                 onSetOboxMode(bf, msg);
                 break;
@@ -394,7 +397,7 @@ public class TcpReceive extends Thread {
     }
 
     private void onEditNodeOrGroup(byte[] bf, Message msg) {
- /*byte7是否成功,8-14节点完整地址，接节点状态*/
+        /*byte7是否成功,8-14节点完整地址，接节点状态*/
         if (bf[7] == OBConstant.ReplyType.SUC) {
             msg.what = OBConstant.ReplyType.EDIT_NODE_OR_GROUP_SUC;
         } else if (bf[7] == OBConstant.ReplyType.FAL) {

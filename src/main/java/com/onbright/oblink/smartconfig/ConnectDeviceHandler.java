@@ -410,6 +410,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
      */
     public static final boolean IS_FAST_MODE = true;
 
+    private LocalDataPool localDataPool = LocalDataPool.newInstance();
     @Override
     public void onReceive(Message message) {
         switch (message.what) {
@@ -430,9 +431,9 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                 isReqOboxMsg = false;
                 obox = new Obox();
                 ParseUtil.parseObox(message, obox, tcpSend, Share.getSp(context));
-                LocalDataPool.newInstance().getTcpSends().put(obox.getObox_serial_id(), tcpSend);
+                localDataPool.getTcpSends().put(obox.getObox_serial_id(), tcpSend);
                 tcpSend.setPaseUpLocad(obox.getObox_serial_id());
-                LocalDataPool.newInstance().setObox(obox);
+                localDataPool.setObox(obox);
                 obNodes = new ArrayList<>();
                 obGroups = new ArrayList<>();
                 obScenes = new ArrayList<>();
@@ -473,7 +474,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
                 break;
             case OBConstant.ReplyType.NOT_REPLY:
                 for (TcpSend tcp :
-                        LocalDataPool.newInstance().getTcpSends().values()) {
+                        localDataPool.getTcpSends().values()) {
                     Log.d(TAG, "tcp config:: name = " + tcp.getOboxName() + "ip = " + tcp.getIp());
                 }
                 Log.d(TAG, "NOT_REPLY");
@@ -581,7 +582,7 @@ public abstract class ConnectDeviceHandler implements Respond, HttpRespond {
      */
     public void releaseSource() {
         EventBus.getDefault().unregister(this);
-        LocalDataPool.newInstance().unRegist(this);
+        localDataPool.unRegist(this);
     }
 
     /**

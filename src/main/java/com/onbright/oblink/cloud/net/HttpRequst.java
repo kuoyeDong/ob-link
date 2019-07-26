@@ -89,10 +89,6 @@ public class HttpRequst {
                 requestBuilder.delete(formBody);
                 break;
         }
-
-        for (int i = 0; i < formBody.size(); i++) {
-
-        }
         LogUtil.log(this,formBody);
         okHttpClient.newCall(requestBuilder.build()).enqueue(new Callback() {
             @Override

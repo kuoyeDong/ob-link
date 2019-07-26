@@ -122,7 +122,7 @@ abstract class DeviceHandler implements HttpRespond, NoSerialId {
             return;
         }
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.onModifyDevice(deviceSerId, "", true),
-                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.DELETE);
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
     @Override

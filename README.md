@@ -27,6 +27,7 @@
 
 # 主要模块
 
+
 ## 1.ObInit(初始化)
 
 ### 功能：与昂宝云交互获得口令并建立mq连接。
@@ -221,7 +222,7 @@
 
         @Override
         public void noAdminPwd() {
-            //无权限密码，请先创建权限密码
+            //无权限密码，请先创建权限密码,或使用queryLockStatus查询
 
         }
 
@@ -246,26 +247,13 @@
 
     });
 
-#### 4.9.智能门锁忘记权限密码
-
-	//回调实例
-	smartLockHotelHandler.forgetAdminPwd(new SmartLockHotelHandler.ForgetPwdLsn() {
-
-        @Override
-        public void forgetPwdOk() {
-            //忘记权限密码成功，可调用resetAdminPwdByCode根据推送重置权限密码
-
-        }
-
-        @Override
-        public void noAdminPwd() {
-            //无权限密码，请先创建权限密码
-
-        }
-
-    });
+#### 4.9.查询锁状态
+	
+	//成功成功必然回调onStatusChange，可能回调batteryValue，调用此方法可查询门锁有无权限密码(如需权限密码相关操作务必先调用此方法)
+	smartLockHotelHandler.queryLockStatus();
 
 #### 4.10.智能门锁根据推送重置权限密码
+
 
 	//新的权限密码，回调实例
 	smartLockHotelHandler.resetAdminPwdByCode("123456", new SmartLockHotelHandler.ResetPwdLsn() {
@@ -284,7 +272,7 @@
 
         @Override
         public void noAdminPwd() {
-            //无权限密码，请先创建权限密码
+            //无权限密码，请先创建权限密码,或使用queryLockStatus查询
 
         }
 
@@ -303,7 +291,7 @@
 
         @Override
         public void noAdminPwd() {
-            //无权限密码，请先创建权限密码
+            //无权限密码，请先创建权限密码,或使用queryLockStatus查询
 
         }
 
@@ -456,6 +444,7 @@
         }
     });
 
+	
 ## 释放资源
 
 	//建议在销毁阶段统一调用，避免遗漏
