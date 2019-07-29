@@ -21,9 +21,10 @@
 	    api 'com.squareup.okhttp3:okhttp:3.14.2'
 	    api 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
 	    api 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
-	    api 'com.orhanobut:logger:2.2.0'
 	    api 'org.greenrobot:eventbus:3.1.1'
 	}
+
+参考demo [https://github.com/kuoyeDong/ob-link](https://github.com/kuoyeDong/ob-link)
 
 # 主要模块
 
@@ -61,13 +62,13 @@
 
         @Override
         public void error(ConnectHandler.ConnectError connectError) {
-            //添加obox失败，请参考参数枚举查看失败原因
+            //添加obox失败，请参考参数枚举查看失败原因，添加obox失败，请参考参数枚举查看失败原因，或查看wifi相关权限是否打开
 
         }
 
         @Override
         public void connectOboxSuc(Obox obox) {
-            //成功添加obox，请自行保存回调中的obox实例，添加设备需要用到obox的序列号
+            //成功添加obox，成功添加obox，请自行保存回调中的obox实例，添加设备需要用到obox的序列号,obox序列号为： obox.getObox_serial_id()
 
         }
 
@@ -209,7 +210,7 @@
         }
     });
 
-#### 4.7.验证门锁权限密码(要操作门锁临时用户，必须验证权限密码，如没有在权限密码则此方法不会执行任何操作，请使用创建权限密码方法createAdminPwd(String, CreatAuthPwdLsn)
+#### 4.7.验证门锁权限密码(要操作门锁临时用户，必须验证权限密码，如没有在权限密码则此方法不会执行任何操作，请使用创建权限密码方法createAdminPwd)
 
 	//权限密码，回调实例
 	smartLockHotelHandler.validateAdminPwd("123456", new SmartLockHotelHandler.ValidateAdminPwdLsn() {
@@ -249,7 +250,7 @@
 
 #### 4.9.查询锁状态
 	
-	//成功成功必然回调onStatusChange，可能回调batteryValue，调用此方法可查询门锁有无权限密码(如需权限密码相关操作务必先调用此方法)
+	//成功成功必然回调lockStatusChange，可能回调batteryValue，调用此方法可查询门锁有无权限密码(如需权限密码相关操作务必先调用此方法)
 	smartLockHotelHandler.queryLockStatus();
 
 #### 4.10.智能门锁根据推送重置权限密码
