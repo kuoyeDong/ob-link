@@ -256,8 +256,8 @@
 #### 4.10.智能门锁根据推送重置权限密码
 
 
-	//新的权限密码，回调实例
-	smartLockHotelHandler.resetAdminPwdByCode("123456", new SmartLockHotelHandler.ResetPwdLsn() {
+	//新的权限密码，uniqueKey，回调实例
+	smartLockHotelHandler.resetAdminPwdByCode("123456", uniqueKey，new SmartLockHotelHandler.ResetPwdLsn() {
 
         @Override
         public void waitLockReset() {
