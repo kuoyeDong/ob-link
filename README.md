@@ -3,20 +3,15 @@
 # 流程图，请详细参阅，大部分不合规操作都将不被执行，并回调提示函数，如遇此情况，重新查阅此流程图。
 
 ![](https://raw.githubusercontent.com/kuoyeDong/ob-link/master/lockStep.png)
-# 使用方法：（待bintray审核通过后替换为在线模式）
 
-# 将aar文件拷贝到libs目录下
+# 使用方法：
 
 # 在gradle中添加如下代码
 
-	repositories {
-    	flatDir {
-       		 dirs 'libs'
-    	}
-	}
-    
     dependencies {
-    	api(name:'oblink-1.0.0', ext:'aar')
+		//ob-bright物联网库
+    	api 'com.dongkuoye103966660:Ob-Link:1.0.2'
+		//以下为物联网库中使用的第三方库，避免与使用者库冲突，不合并打包
 	    api 'com.google.code.gson:gson:2.8.2'
 	    api 'com.squareup.okhttp3:okhttp:3.14.2'
 	    api 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
@@ -24,7 +19,17 @@
 	    api 'org.greenrobot:eventbus:3.1.1'
 	}
 
-参考demo [https://github.com/kuoyeDong/ob-link](https://github.com/kuoyeDong/ob-link)
+# 所需权限
+	
+	android.permission.ACCESS_WIFI_STATE
+	android.permission.CHANGE_WIFI_MULTICAST_STATE
+	android.permission.ACCESS_NETWORK_STATE
+	android.permission.CHANGE_WIFI_STATE
+	android.permission.INTERNET
+	android.permission.WAKE_LOCK
+	android.permission.ACCESS_FINE_LOCATION
+
+参考demo [https://github.com/kuoyeDong/lockdemo](https://github.com/kuoyeDong/lockdemo)
 
 # 主要模块
 

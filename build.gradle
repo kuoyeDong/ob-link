@@ -47,10 +47,10 @@ dependencies {
 }
 publish {
     userOrg = 'dongkuoye103966660'
-    groupId = 'com.obgz'
+    groupId = 'com.dongkuoye103966660'
     artifactId = 'Ob-Link'
-    publishVersion = '1.0.0'
-    desc = 'add obox to route and cloud'
+    publishVersion = '1.0.2'
+    desc = 'on-bright IoT supports Android development kit'
     website = 'https://github.com/kuoyeDong/ob-link'
 }
 
