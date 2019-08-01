@@ -77,7 +77,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
     }
 
     /**
-     * 查询门锁状态,成功后必然回调{@link #onStatusChange(String)}，可能回调{@link #batteryValue(int)}，此方法可查询门锁有无设置权限密码的真实状态
+     * 查询门锁状态,成功后必然回调{@link #lockStatusChange(LockStatusEnum)}，可能回调{@link #batteryValue(int)}，此方法可查询门锁有无设置权限密码的真实状态
      */
     public void queryLockStatus() {
         if (isNoSerId()) {
