@@ -244,6 +244,7 @@ public class ParseServerListener {
                             if (group.getObox_serial_id().equals(obox_serial_id)) {
                                 if (group.getGroupAddr().equals(groupAddr)) {
                                     group.setGroup_state(state);
+                                    break;
                                 }
                             }
                         }
@@ -251,11 +252,12 @@ public class ParseServerListener {
                 }
                 EventMsg eventMsg = new EventMsg();
                 eventMsg.putExtra("serialId", serialId);
-                eventMsg.setAction(OBConstant.StringKey.UPDATE_NODES_CLOUD);
+                eventMsg.putExtra("status", state);
+                eventMsg.setAction(OBConstant.StringKey.CONTROL_STATUS_CHANGE);
                 EventBus.getDefault().post(eventMsg);
                 break;
             }
-            case "a004":/*删除节点、删除组、创建组、重命名节点、组,因为服务器回复不靠谱所以在obox透传中做*/
+            case "a004":/*删除节点、删除组、创建组、重命名节点、组*/
                 isSuccess = data.substring(0, 2);
                 if (isSuccess.equals("00")) {
                     return;

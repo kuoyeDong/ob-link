@@ -187,6 +187,7 @@ abstract class DeviceHandler implements HttpRespond, NoSerialId {
                 onNewDevice(device);
                 break;
             case OBConstant.StringKey.STATUS_CHANGE_REPORT:
+            case OBConstant.StringKey.CONTROL_STATUS_CHANGE:
                 String serialId = (String) eventMsg.getExtra("serialId");
                 String status = (String) eventMsg.getExtra("status");
                 if (serialId.equals(this.deviceSerId)) {

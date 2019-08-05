@@ -137,6 +137,10 @@ public interface OBConstant {
          * rename group id
          */
         String UPDATE_GROUP_ID = "update_group_id";
+        /**
+         *控制指令回复
+         */
+        String CONTROL_STATUS_CHANGE = "control_status_change";
     }
 
     /**
