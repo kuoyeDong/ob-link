@@ -32,40 +32,14 @@ public class GetParameter {
     }
 
     /**
-     * 设置单节点或者组节点的状态,会修改状态最后一个字节
-     *
-     * @param device 节点
-     * @param isBili 是否闪烁
-     */
-    public static FormBody.Builder onSetNodeState(Device device, boolean isBili) {
-        FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
-        builder.add(CloudConstant.ParameterKey.STATE, !isBili ?
-                device.getState().substring(0, 12) + "02" : device.getState().substring(0, 12) + "ff");
-        return builder;
-    }
-
-    /**
-     * 设置节点状态不会修改状态的最后一个字节
-     *
-     * @param device 节点
-     */
-    public static FormBody.Builder onSetNodeState(Device device) {
-        FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
-        builder.add(CloudConstant.ParameterKey.STATE, device.getState());
-        return builder;
-    }
-
-    /**
      * 设置节点状态
      *
-     * @param device 节点
+     * @param deviceSerId 节点
      * @param status 要设置的状态
      */
-    public static FormBody.Builder onSetNodeState(Device device, String status) {
+    public static FormBody.Builder onSetNodeState(String deviceSerId, String status) {
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, device.getSerialId());
+        builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceSerId);
         builder.add(CloudConstant.ParameterKey.STATE, status);
         return builder;
     }
@@ -242,12 +216,12 @@ public class GetParameter {
     /**
      * 获取设备真实状态
      *
-     * @param device 目标设备
+     * @param deviceSerId 设备序列号
      */
-    public static FormBody.Builder getNodeStatus(Device device) {
+    public static FormBody.Builder getNodeStatus(String deviceSerId) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_NODE_REAL_STATUS);
-        builder.add(CloudConstant.ParameterKey.SERIALID, device.getSerialId());
+        builder.add(CloudConstant.ParameterKey.SERIALID, deviceSerId);
         return builder;
     }
 

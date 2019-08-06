@@ -389,6 +389,10 @@ public interface OBConstant {
          */
         int THREE_TOUCH_SWITCH = 23;
         /**
+         * 4路开关
+         */
+        int FOUR_TOUCH_SWITCH = 24;
+        /**
          * 1路开关 + 3路情景面板
          */
         int SINGLE_SWITCH_SCENE_PANEL = 41;

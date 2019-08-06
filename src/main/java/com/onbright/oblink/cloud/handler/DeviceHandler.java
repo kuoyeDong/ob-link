@@ -20,7 +20,7 @@ import org.greenrobot.eventbus.ThreadMode;
  * use by:设备处理基础类，功能点：扫描设备，释放设备，状态回调
  * create by dky at 2019/7/3
  */
-abstract class DeviceHandler implements HttpRespond, NoSerialId {
+public abstract class DeviceHandler implements HttpRespond, NoSerialId {
 
     /**
      * 设备序列号
@@ -200,7 +200,7 @@ abstract class DeviceHandler implements HttpRespond, NoSerialId {
     }
 
     /**
-     * 设备状态变更
+     * 设备状态变更，此方法在超类中被实现复写，转换为与各设备对应的属性变化方法
      *
      * @param status 设备状态
      */

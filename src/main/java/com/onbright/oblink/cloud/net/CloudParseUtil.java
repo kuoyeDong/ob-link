@@ -52,14 +52,14 @@ public class CloudParseUtil {
      */
     public static String getJsonParm(String json, String key) {
         JSONObject jsonObject = null;
-        String val = "null";
+        String val = null;
         try {
             jsonObject = new JSONObject(json);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         if (jsonObject == null) {
-            return val;
+            return null;
         }
         try {
             val = jsonObject.getString(key);

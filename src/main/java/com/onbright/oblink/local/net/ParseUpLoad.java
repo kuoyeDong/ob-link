@@ -138,6 +138,7 @@ public class ParseUpLoad {
                                             case OBConstant.NodeType.SINGLE_TOUCH_SWITCH:
                                             case OBConstant.NodeType.DOUBLE_TOUCH_SWITCH:
                                             case OBConstant.NodeType.THREE_TOUCH_SWITCH:
+                                            case OBConstant.NodeType.FOUR_TOUCH_SWITCH:
                                             case OBConstant.NodeType.ONE_BUTTON_WIRE_SOCKET:
                                             case OBConstant.NodeType.TWO_BUTTON_WIRE_SOCKET:
                                                 state[0] = payLoad[1];
