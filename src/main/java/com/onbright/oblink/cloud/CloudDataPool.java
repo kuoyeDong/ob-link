@@ -12,7 +12,9 @@ import java.util.List;
 
 /**
  * 数据仓库，设定观察者，数据发生变化时发出相应通知
- * Created by adolf_dong on 2019/7/3.
+ *
+ * @author dky
+ * 2019/7/3.
  */
 public class CloudDataPool {
     private static List<Obox> oboxs = new ArrayList<>();

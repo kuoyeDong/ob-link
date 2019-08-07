@@ -7,8 +7,10 @@ import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 
 /**
- * use by:管理wifi单品设备，例如wifi版本的红外转发器,删除wifi单品设备
- * create by dky at 2019/7/2
+ * 管理wifi单品设备，例如wifi版本的红外转发器,删除wifi单品设备
+ *
+ * @author dky
+ * 2019/7/2
  */
 public abstract class WifiDeviceHandler implements HttpRespond {
     /**
@@ -24,8 +26,9 @@ public abstract class WifiDeviceHandler implements HttpRespond {
     }
 
     public void removeWifiDevice() {
-        HttpRequst.getHttpRequst().request(this,CloudConstant.CmdValue.DELETE_ALI_DEV,GetParameter.delWifiDev(wifiDeviceId),"",HttpRequst.POST);
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_ALI_DEV, GetParameter.delWifiDev(wifiDeviceId), "", HttpRequst.POST);
     }
+
     @Override
     public void onSuccess(String action, String json) {
         switch (action) {

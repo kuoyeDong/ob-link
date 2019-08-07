@@ -13,13 +13,25 @@ import com.onbright.oblink.smartconfig.SmartConnectDeviceHandler;
 import java.util.TimeZone;
 
 /**
- * use by:连接obox和wifi设备到云,运行sdk的设备必须连接目标路由
- * create by dky at 2019/7/3
+ * 连接obox和wifi设备到云,运行sdk的设备必须连接目标路由
+ *
+ * @author dky
+ * 2019/7/3
  */
 public class ConnectHandler implements HttpRespond {
+
     private Context context;
+    /**
+     * 连接设备是否OBOX
+     */
     private boolean isObox;
+    /**
+     * SmartConfig处理者
+     */
     private SmartConnectDeviceHandler smartConnectDeviceHandler;
+    /**
+     * 路由器密码
+     */
     private String routePwd;
 
     /**

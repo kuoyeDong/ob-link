@@ -11,8 +11,10 @@ import com.onbright.oblink.cloud.net.MqttHandler;
 
 
 /**
- * use by:sdk初始化,获取昂宝云交互令牌
- * create by dky at 2019/6/25
+ * sdk初始化,获取昂宝云交互令牌
+ *
+ * @author dky
+ * 2019/6/25
  */
 public abstract class ObInit implements HttpRespond {
     public static Context CONTEXT;

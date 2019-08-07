@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.EventMsg;
 import com.onbright.oblink.cloud.bean.Device;
+import com.onbright.oblink.cloud.handler.basehandler.NoSerialId;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
@@ -17,8 +18,10 @@ import org.greenrobot.eventbus.ThreadMode;
 
 
 /**
- * use by:设备处理基础类，功能点：扫描设备，释放设备，状态回调
- * create by dky at 2019/7/3
+ * 设备处理基础类，功能点：扫描设备，释放设备，状态回调
+ *
+ * @author dky
+ * 2019/7/3
  */
 public abstract class DeviceHandler implements HttpRespond, NoSerialId {
 
@@ -47,7 +50,7 @@ public abstract class DeviceHandler implements HttpRespond, NoSerialId {
     protected String time = "30";
 
     /**
-     * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String)}操作
+     * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String, SearchNewDeviceLsn)}操作
      */
     protected DeviceHandler(@Nullable String deviceSerId) {
         this.deviceSerId = deviceSerId;
@@ -91,11 +94,12 @@ public abstract class DeviceHandler implements HttpRespond, NoSerialId {
      * @param oboxSerId 通过哪个obox添加传该obox序列号
      * @param time      添加持续的时间，超过该时间无法再添加,默认30s
      */
-    public void searchNewDevice(String oboxSerId, String time) {
+    public void searchNewDevice(String oboxSerId, String time, SearchNewDeviceLsn searchNewDeviceLsn) {
         if (oboxSerId == null) {
             noSerialId();
             return;
         }
+        mSearchNewDeviceLsn = searchNewDeviceLsn;
         DeviceEnum deviceEnum = getDeviceEnum();
         pType = String.valueOf(deviceEnum.getpType());
         type = String.valueOf(deviceEnum.getType());
@@ -110,42 +114,56 @@ public abstract class DeviceHandler implements HttpRespond, NoSerialId {
     }
 
     /**
-     * @return 子类实现，获取对应的设备枚举
+     * 启动扫描接口
      */
-    protected abstract DeviceEnum getDeviceEnum();
+    public interface SearchNewDeviceLsn {
+        /**
+         * 启动扫描成功
+         */
+        void searchNewDeviceSuc();
+    }
+
+    private SearchNewDeviceLsn mSearchNewDeviceLsn;
 
     /**
      * 删除设备
      */
-    public void deleteDevice() {
+    public void deleteDevice(DeleteDeviceLsn deleteDeviceLsn) {
         if (isNoSerId()) {
             return;
         }
+        mDeleteDeviceLsn = deleteDeviceLsn;
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_DEVICE, GetParameter.onModifyDevice(deviceSerId, "", true),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
+
+    /**
+     * 删除设备接口
+     */
+    public interface DeleteDeviceLsn {
+        /**
+         * 删除设备成功
+         */
+        void deleteDeviceSuc();
+    }
+
+    private DeleteDeviceLsn mDeleteDeviceLsn;
 
     @Override
     public void onSuccess(String action, String json) {
         switch (action) {
             case CloudConstant.CmdValue.SEARCH_NEW_DEVICES:
-                searchNewDeviceSuc();
+                if (mSearchNewDeviceLsn != null) {
+                    mSearchNewDeviceLsn.searchNewDeviceSuc();
+                }
                 break;
             case CloudConstant.CmdValue.DELETE_DEVICE:
-                deleteDeviceSuc();
+                if (mDeleteDeviceLsn != null) {
+                    mDeleteDeviceLsn.deleteDeviceSuc();
+                }
                 break;
         }
     }
-
-    /**
-     * 删除设备成功
-     */
-    public abstract void deleteDeviceSuc();
-
-    /**
-     * 启动扫描成功
-     */
-    public abstract void searchNewDeviceSuc();
 
     /**
      * 获取设备入网是否为主动入网方式
@@ -212,6 +230,11 @@ public abstract class DeviceHandler implements HttpRespond, NoSerialId {
      * @param device 新设备
      */
     protected abstract void onNewDevice(Device device);
+
+    /**
+     * @return 子类实现，获取对应的设备枚举
+     */
+    protected abstract DeviceEnum getDeviceEnum();
 
     /**
      * 解除监听

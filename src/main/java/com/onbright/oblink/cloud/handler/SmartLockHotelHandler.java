@@ -13,6 +13,7 @@ import com.onbright.oblink.cloud.bean.LockPush;
 import com.onbright.oblink.cloud.bean.LockStatus;
 import com.onbright.oblink.cloud.bean.LockTempUser;
 import com.onbright.oblink.cloud.bean.LockUser;
+import com.onbright.oblink.cloud.handler.basehandler.BatteryDevice;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.CloudParseUtil;
 import com.onbright.oblink.cloud.net.GetParameter;
@@ -30,10 +31,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * use by:智能酒店门锁处理，用户、临时用户、状态
- * create by dky at 2019/7/5
+ * 智能酒店门锁处理，用户、临时用户、状态
+ *
+ * @author dky
+ * 2019/7/5
  */
-public abstract class SmartLockHotelHandler extends DeviceHandler {
+public abstract class SmartLockHotelHandler extends DeviceHandler implements BatteryDevice {
     /**
      * 开门上报
      */
@@ -59,7 +62,10 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
 
     private Gson gson = new Gson();
 
-    public SmartLockHotelHandler(@Nullable String deviceSerId) {
+    /**
+     * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String, SearchNewDeviceLsn)}操作
+     */
+    protected SmartLockHotelHandler(@Nullable String deviceSerId) {
         super(deviceSerId);
     }
 
@@ -133,6 +139,9 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
      * 发送验证码到手机回调接口
      */
     public interface SendCodeLsn {
+        /**
+         * 发送验证码成功
+         */
         void sendCodeOk();
     }
 
@@ -818,13 +827,6 @@ public abstract class SmartLockHotelHandler extends DeviceHandler {
             batteryValue(batteryValue);
         }
     }
-
-    /**
-     * 获取到电量
-     *
-     * @param batteryValue 剩余电池百分比
-     */
-    protected abstract void batteryValue(int batteryValue);
 
     /**
      * 门锁状态枚举

@@ -94,17 +94,36 @@ public enum DeviceEnum {
     /**
      * 3路情景面板
      */
-    THREE_SCENE_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.THREE_SCENE_PANEL);
+    THREE_SCENE_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.THREE_SCENE_PANEL),
+
+    /*以下为传感器*/
+    /**
+     * 门磁
+     */
+    DOOR_WINDOW_MAGNET(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.DOOR_WINDOW_MAGNET),
+
+    /**
+     * 水浸传感器
+     */
+    FLOOD(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.FLOOD),
+    /**
+     * 烟雾传感器
+     */
+    SMOKE_SENSOR(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.SMOKE_SENSOR),
+    /**
+     * 红外
+     */
+    RED_SENSOR(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.RED_SENSOR),
+    /**
+     * 温度湿度传感器
+     */
+    TEMP_HUMID_SENSOR(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.TEMP_HUMID_SENSOR);
 
 
-//    单键单线开关，
-//    双键单线开关，
-//    窗帘，
-//    人体感应，
+    /*以下为窗帘*/
+
 //    智能插座，
-//    温湿度传感器，
 //    红外转发器
-
     /**
      * 设备类型
      */

@@ -1,13 +1,16 @@
 package com.onbright.oblink.cloud.handler;
 
+import com.onbright.oblink.cloud.handler.basehandler.NoSerialId;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 
 /**
- * use by:删除Obox
- * create by dky at 2019/7/1
+ * 删除Obox
+ *
+ * @author dky
+ * 2019/7/1
  */
 public abstract class OboxHandler implements HttpRespond, NoSerialId {
 
