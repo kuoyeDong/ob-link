@@ -117,10 +117,16 @@ public enum DeviceEnum {
     /**
      * 温度湿度传感器
      */
-    TEMP_HUMID_SENSOR(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.TEMP_HUMID_SENSOR);
+    TEMP_HUMID_SENSOR(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.TEMP_HUMID_SENSOR),
 
 
-    /*以下为窗帘*/
+    /*以下为窗帘幕布*/
+
+    /**
+     * 窗帘
+     */
+    THE_CURTAINS(OBConstant.NodeType.IS_CURTAIN, OBConstant.NodeType.THE_CURTAINS);
+
 
 //    智能插座，
 //    红外转发器

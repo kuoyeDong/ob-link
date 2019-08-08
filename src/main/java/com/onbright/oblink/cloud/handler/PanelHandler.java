@@ -207,18 +207,22 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
     /**
      * 情景按钮被按下，maxSceneLen等于0时，此方法不会被回调
      *
-     * @param index 被按下的情景按钮位置
+     * @param index 被按下的情景按钮位置，从0开始计数
      */
     public abstract void onScenePress(int index);
 
     /**
      * 设置开关按钮
      *
-     * @param index            开关按钮位置
+     * @param index            开关按钮位置，从0开始计数
      * @param swtichStatusEnum 开关状态枚举
      */
     public void changeSwitchButton(int index, SwtichStatusEnum swtichStatusEnum) {
         if (isNoSerId()) {
+            return;
+        }
+        if (index >= switchNum) {
+            wrongIndex();
             return;
         }
         byte[] staus = new byte[7];
@@ -237,10 +241,14 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
     /**
      * 模拟按下情景按钮
      *
-     * @param index 要按下的情景按钮位置
+     * @param index 要按下的情景按钮位置,从0开始计数
      */
     public void touchSceneButton(int index) {
         if (isNoSerId()) {
+            return;
+        }
+        if (index >= sceneNum) {
+            wrongIndex();
             return;
         }
         byte[] staus = new byte[7];
@@ -252,4 +260,9 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SETTING_NODE_STATUS, GetParameter.onSetNodeState(deviceSerId, sendStatus),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
+
+    /**
+     * 错误的下标回调
+     */
+    protected abstract void wrongIndex();
 }
