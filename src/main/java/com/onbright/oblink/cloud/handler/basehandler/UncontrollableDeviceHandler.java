@@ -3,7 +3,6 @@ package com.onbright.oblink.cloud.handler.basehandler;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.onbright.oblink.cloud.handler.DeviceHandler;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.CloudParseUtil;
 import com.onbright.oblink.cloud.net.GetParameter;

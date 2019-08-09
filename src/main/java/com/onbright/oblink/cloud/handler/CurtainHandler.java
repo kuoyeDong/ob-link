@@ -159,11 +159,20 @@ public abstract class CurtainHandler extends ControllableDeviceHandler {
     @Override
     public void setStatus(String status) {
         super.setStatus(status);
-
+        handleStatus(status);
     }
 
     @Override
     protected void onStatusChange(String status) {
+        handleStatus(status);
+    }
+
+    /**
+     * 处理状态
+     *
+     * @param status 状态
+     */
+    private void handleStatus(String status) {
         byte[] statusBytes = Transformation.hexString2Bytes(status);
         if (statusBytes[3] == 1) {
             isMeasured = true;

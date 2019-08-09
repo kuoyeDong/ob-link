@@ -14,6 +14,7 @@ import com.onbright.oblink.cloud.bean.LockStatus;
 import com.onbright.oblink.cloud.bean.LockTempUser;
 import com.onbright.oblink.cloud.bean.LockUser;
 import com.onbright.oblink.cloud.handler.basehandler.BatteryDevice;
+import com.onbright.oblink.cloud.handler.basehandler.DeviceHandler;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.CloudParseUtil;
 import com.onbright.oblink.cloud.net.GetParameter;
