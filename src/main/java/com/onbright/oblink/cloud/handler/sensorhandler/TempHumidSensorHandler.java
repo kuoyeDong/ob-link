@@ -1,4 +1,4 @@
-package com.onbright.oblink.cloud.handler.sensor;
+package com.onbright.oblink.cloud.handler.sensorhandler;
 
 import android.support.annotation.Nullable;
 

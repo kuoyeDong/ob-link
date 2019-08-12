@@ -1,4 +1,4 @@
-package com.onbright.oblink.cloud.handler.sensor;
+package com.onbright.oblink.cloud.handler.sensorhandler;
 
 import android.support.annotation.Nullable;
 
@@ -6,42 +6,43 @@ import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.cloud.handler.basehandler.BooleanSensorHandler;
 
 /**
- * 水浸处理类
+ * 门窗磁处理
  *
  * @author dky
  * 2019/8/7
  */
-public abstract class FloodSensorHandler extends BooleanSensorHandler {
+public abstract class DoorWindowMagnetSensorHandler extends BooleanSensorHandler {
+
     /**
      * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String, SearchNewDeviceLsn)}操作
      */
-    protected FloodSensorHandler(@Nullable String deviceSerId) {
+    protected DoorWindowMagnetSensorHandler(@Nullable String deviceSerId) {
         super(deviceSerId);
     }
 
     @Override
     public void booleanTrue() {
-        wet();
+        doorOrWindowOpen();
     }
 
     /**
-     * 干的
+     * 门窗磁打开
      */
-    protected abstract void wet();
+    protected abstract void doorOrWindowOpen();
 
     @Override
     public void booleanFalse() {
-        dry();
+        doorOrWindowClose();
     }
 
     /**
-     * 湿的
+     * 门窗磁关闭
      */
-    protected abstract void dry();
+    protected abstract void doorOrWindowClose();
 
     @Override
     protected DeviceEnum getDeviceEnum() {
-        return DeviceEnum.FLOOD;
+        return DeviceEnum.DOOR_WINDOW_MAGNET;
     }
 
 }
