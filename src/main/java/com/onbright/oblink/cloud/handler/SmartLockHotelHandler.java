@@ -99,7 +99,7 @@ public abstract class SmartLockHotelHandler extends DeviceHandler implements Bat
      *
      * @param queryUserLsn 回调
      */
-    public void queryUser(queryUserLsn queryUserLsn) {
+    public void queryUser(QueryUserLsn queryUserLsn) {
         if (isNoSerId()) {
             return;
         }
@@ -108,12 +108,12 @@ public abstract class SmartLockHotelHandler extends DeviceHandler implements Bat
                 GetParameter.queryIntelligentUseringrecord(deviceSerId), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
-    private queryUserLsn mQueryUserLsn;
+    private QueryUserLsn mQueryUserLsn;
 
     /**
      * 查询用户回调接口
      */
-    public interface queryUserLsn {
+    public interface QueryUserLsn {
         void userRecordLoad(List<LockUser> lockUsers);
     }
 

@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.EventMsg;
 import com.onbright.oblink.cloud.bean.Device;
-import com.onbright.oblink.cloud.handler.basehandler.NoSerialId;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;

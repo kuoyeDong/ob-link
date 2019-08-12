@@ -7,7 +7,7 @@ import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 
 /**
- * 管理wifi单品设备，例如wifi版本的红外转发器,删除wifi单品设备
+ * 管理wifi单品设备,删除wifi单品设备，例如wifi版本的红外转发器
  *
  * @author dky
  * 2019/7/2
@@ -16,17 +16,40 @@ public abstract class WifiDeviceHandler implements HttpRespond {
     /**
      * wifi设备序列号
      */
-    private String wifiDeviceId;
+    String wifiDeviceId;
 
     /**
      * @param wifiDeviceId wifi设备序列号
      */
-    public WifiDeviceHandler(String wifiDeviceId) {
+    public WifiDeviceHandler(String wifiDeviceId) throws Exception {
+        if (wifiDeviceId == null) {
+            throw new Exception("wifiDeviceSerId is Null");
+        }
         this.wifiDeviceId = wifiDeviceId;
     }
 
-    public void removeWifiDevice() {
-        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_ALI_DEV, GetParameter.delWifiDev(wifiDeviceId), "", HttpRequst.POST);
+    /**
+     * 删除wifi类设备
+     */
+    public void deleteWifiDevice(DeleteWifiDeviceLsn deleteWifiDeviceLsn) {
+        mDeleteWifiDeviceLsn = deleteWifiDeviceLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.DELETE_ALI_DEV, GetParameter.delWifiDev(wifiDeviceId),
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    private DeleteWifiDeviceLsn mDeleteWifiDeviceLsn;
+
+    /**
+     * 删除wifi设备成功接口
+     */
+    public interface DeleteWifiDeviceLsn {
+        /**
+         * 删除wifi设备成功
+         *
+         * @param wifiDeviceSerId 删除的wifi设备序列号
+         */
+        void deleteWifiDeviceSuc(String wifiDeviceSerId);
+
     }
 
     @Override
@@ -34,16 +57,11 @@ public abstract class WifiDeviceHandler implements HttpRespond {
         switch (action) {
             case CloudConstant.CmdValue.DELETE_ALI_DEV:
                 CloudDataPool.deleteWifiDevice(wifiDeviceId);
-                deleteWifiDeviceSuc(wifiDeviceId);
+                if (mDeleteWifiDeviceLsn != null) {
+                    mDeleteWifiDeviceLsn.deleteWifiDeviceSuc(wifiDeviceId);
+                }
                 break;
         }
     }
-
-    /**
-     * 删除wifi设备成功
-     *
-     * @param wifiDeviceSerId 删除的wifi设备序列号
-     */
-    public abstract void deleteWifiDeviceSuc(String wifiDeviceSerId);
 
 }

@@ -2,12 +2,17 @@ package com.onbright.oblink.cloud;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+import com.onbright.oblink.cloud.bean.WifiDevice;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.CloudParseUtil;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
 import com.onbright.oblink.cloud.net.HttpRespond;
 import com.onbright.oblink.cloud.net.MqttHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 
 /**
@@ -79,6 +84,22 @@ public abstract class ObInit implements HttpRespond {
                 break;
             case CloudConstant.CmdValue.QUERY_DEVICE:
                 CloudParseUtil.initDevice(json, CloudDataPool.getDevices());
+                HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.QUERY_ALI_DEV,
+                        GetParameter.queryAliDevice(), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+                break;
+            case CloudConstant.CmdValue.QUERY_ALI_DEV:
+                JSONArray jsonArray = CloudParseUtil.getJsonArryParm(json, CloudConstant.ParameterKey.CONFIGS);
+                CloudDataPool.getWifiDevices().clear();
+                Gson gson = new Gson();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    WifiDevice wifiDevice = null;
+                    try {
+                        wifiDevice = gson.fromJson(jsonArray.getString(i), WifiDevice.class);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    CloudDataPool.addWifiDevice(wifiDevice);
+                }
                 onInitSuc();
                 break;
         }
