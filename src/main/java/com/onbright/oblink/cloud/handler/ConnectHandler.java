@@ -80,7 +80,7 @@ public class ConnectHandler implements HttpRespond {
      */
     public void start() {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.REGIST_ALIDEV,
-                GetParameter.registAliDev(TimeZone.getDefault().getID(), isObox ? "OBOX" : "DEVICE"), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+                GetParameter.registWifiDev(TimeZone.getDefault().getID(), isObox ? "OBOX" : "DEVICE"), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
     /**

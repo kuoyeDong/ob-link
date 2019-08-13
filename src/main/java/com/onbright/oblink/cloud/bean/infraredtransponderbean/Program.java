@@ -19,7 +19,19 @@ public class Program implements Serializable {
      */
     private String name;
     /**
-     * 遥控方案类型
+     * 遥控方案设备类型
+     * 1 机顶盒
+     * 2电视
+     * 3DVD
+     * 5投影仪
+     * 6风扇
+     * 7空调
+     * 8智能灯
+     * 10互联网机顶盒
+     * 12扫地机
+     * 13音响
+     * 15空气净化器
+     * 0其他(自定义学习)
      */
     private int deviceType;
     /**

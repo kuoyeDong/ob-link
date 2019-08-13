@@ -721,6 +721,10 @@ public interface CloudConstant {
          * 删除设备
          */
         String DELETE_DEVICE = "delete_device";
+        /**
+         * 从遥控云选取码库时，挑选合适码库时发送红外数据
+         */
+        String TEST_PROGRAM = "test_program";
     }
 
 

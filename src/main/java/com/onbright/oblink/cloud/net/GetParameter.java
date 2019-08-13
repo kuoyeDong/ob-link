@@ -35,7 +35,7 @@ public class GetParameter {
      * 设置节点状态
      *
      * @param deviceSerId 节点
-     * @param status 要设置的状态
+     * @param status      要设置的状态
      */
     public static FormBody.Builder onSetNodeState(String deviceSerId, String status) {
         FormBody.Builder builder = new FormBody.Builder();
@@ -226,13 +226,13 @@ public class GetParameter {
     }
 
     /**
-     * 注册阿里设备
+     * 添加到云之前，先注册设备
      *
      * @param zone 时区
      * @param type 设备类型
      * @return 请求参数列表
      */
-    public static FormBody.Builder registAliDev(String zone, String type) {
+    public static FormBody.Builder registWifiDev(String zone, String type) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.REGIST_ALIDEV);
         builder.add(CloudConstant.ParameterKey.ZONE, zone);
@@ -487,7 +487,7 @@ public class GetParameter {
                                                                String mobile, String nickName, String startTime, String endTime, String times, boolean isMax) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.MODIFY_INTELLIGENT_REMOTE_USER);
-        builder.add(CloudConstant.ParameterKey.ID, id + "");
+        builder.add(CloudConstant.ParameterKey.ID, String.valueOf(id));
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
         builder.add(CloudConstant.ParameterKey.PIN, pin);
         builder.add(CloudConstant.ParameterKey.AUTH_TOKEN, authToken);
@@ -613,10 +613,10 @@ public class GetParameter {
      * @param serialId 红外转发器序列号
      * @return un
      */
-    public static FormBody.Builder onDeleteIrDevice(String index, String serialId) {
+    public static FormBody.Builder onDeleteIrDevice(int index, String serialId) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_IR_DEVICE);
-        builder.add(CloudConstant.ParameterKey.INDEX, index);
+        builder.add(CloudConstant.ParameterKey.INDEX, String.valueOf(index));
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
         return builder;
     }
@@ -629,11 +629,11 @@ public class GetParameter {
      * @param name     要设置的新名称
      * @return un
      */
-    public static FormBody.Builder renameIrDevice(String serialId, String index, String name) {
+    public static FormBody.Builder renameIrDevice(String serialId, int index, String name) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.RENAME_IR_DEVICE);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.INDEX, index);
+        builder.add(CloudConstant.ParameterKey.INDEX, String.valueOf(index));
         builder.add(CloudConstant.ParameterKey.NAME, name);
         return builder;
     }
@@ -653,8 +653,8 @@ public class GetParameter {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.CONTROL_IR_DEVICE);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.INDEX, index + "");
-        builder.add(CloudConstant.ParameterKey.KEYTYPE, keyType + "");
+        builder.add(CloudConstant.ParameterKey.INDEX, String.valueOf(index));
+        builder.add(CloudConstant.ParameterKey.KEYTYPE, String.valueOf(keyType));
         builder.add(CloudConstant.ParameterKey.KEY, key);
         return builder;
     }
@@ -674,8 +674,8 @@ public class GetParameter {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.DELETE_IR_DEVICE_KEY);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.INDEX, index + "");
-        builder.add(CloudConstant.ParameterKey.KEYTYPE, keyType + "");
+        builder.add(CloudConstant.ParameterKey.INDEX, String.valueOf(index));
+        builder.add(CloudConstant.ParameterKey.KEYTYPE, String.valueOf(keyType));
         builder.add(CloudConstant.ParameterKey.KEY, key);
         return builder;
     }
@@ -696,10 +696,10 @@ public class GetParameter {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.LEARN_IR_DEVICE_KEY);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.INDEX, index + "");
-        builder.add(CloudConstant.ParameterKey.KEYTYPE, keyType + "");
+        builder.add(CloudConstant.ParameterKey.INDEX, String.valueOf(index));
+        builder.add(CloudConstant.ParameterKey.KEYTYPE, String.valueOf(keyType));
         builder.add(CloudConstant.ParameterKey.KEY, key);
-        builder.add(CloudConstant.ParameterKey.TIME_OUT, timeOut + "");
+        builder.add(CloudConstant.ParameterKey.TIME_OUT, String.valueOf(timeOut));
         return builder;
     }
 
@@ -716,8 +716,8 @@ public class GetParameter {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.CREATE_IR_DEVICE);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.DEVICETYPE, deviceType + "");
-        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId + "");
+        builder.add(CloudConstant.ParameterKey.DEVICETYPE, String.valueOf(deviceType));
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, String.valueOf(brandId));
         builder.add(CloudConstant.ParameterKey.NAME, name);
         return builder;
     }
@@ -730,12 +730,12 @@ public class GetParameter {
      * @param brandId  匹配空调品牌
      * @return un
      */
-    public static FormBody.Builder pairIrRemoteCode(String serialId, int timeOut, String brandId) {
+    public static FormBody.Builder pairIrRemoteCode(String serialId, int timeOut, int brandId) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.PAIR_IR_REMOTECODE);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.TIME_OUT, "" + timeOut);
-        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId);
+        builder.add(CloudConstant.ParameterKey.TIME_OUT, String.valueOf(timeOut));
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, String.valueOf(brandId));
         return builder;
     }
 
@@ -747,11 +747,11 @@ public class GetParameter {
      * @param serialId   红外转发器序列号
      * @return un
      */
-    public static FormBody.Builder queryIrTestCode(String deviceType, String brandId, String serialId) {
+    public static FormBody.Builder queryIrTestCode(int deviceType, int brandId, String serialId) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.QUERY_IR_TESTCODE);
-        builder.add(CloudConstant.ParameterKey.DEVICETYPE, deviceType);
-        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId);
+        builder.add(CloudConstant.ParameterKey.DEVICETYPE, String.valueOf(deviceType));
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, String.valueOf(brandId));
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
         return builder;
     }
@@ -766,11 +766,11 @@ public class GetParameter {
      * @param name       可选，默认为类型加品牌名
      * @return un
      */
-    public static FormBody.Builder bindIrRemotecode(String serialId, String deviceType, String brandId, String remoteId, String name) {
+    public static FormBody.Builder bindIrRemotecode(String serialId, int deviceType, int brandId, String remoteId, String name) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.BIND_IR_REMOTECODE);
-        builder.add(CloudConstant.ParameterKey.DEVICETYPE, deviceType);
-        builder.add(CloudConstant.ParameterKey.BRAND_ID, brandId);
+        builder.add(CloudConstant.ParameterKey.DEVICETYPE, String.valueOf(deviceType));
+        builder.add(CloudConstant.ParameterKey.BRAND_ID, String.valueOf(brandId));
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
         builder.add(CloudConstant.ParameterKey.REMOTEID, remoteId);
         builder.add(CloudConstant.ParameterKey.NAME, name);
