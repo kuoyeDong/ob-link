@@ -31,7 +31,8 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
     private Gson gson = new Gson();
 
     /**
-     * @param wifiDeviceId wifi设备序列号
+     * @param wifiDeviceId wifi设备序列号,wifi设备特殊，所以必须要求有序列号，
+     *                     请自行保存已有wifi设备序列号，或使用{@link ConnectHandler#start()}添加，序列号会在{@link ConnectHandler.ConnectLsn#connectWifiDeviceSuc(String)}返回
      */
     public InfraredTransponderHandler(String wifiDeviceId) throws Exception {
         super(wifiDeviceId);
@@ -252,7 +253,7 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
      * @param program            要学习的红外转发器方案
      * @param keyTypeEnum        按键类型枚举
      * @param key                要学习的按键索引
-     * @param timeOut            超时时间，超出此时间未成功，则key销毁
+     * @param timeOut            超时时间，单位S，超出此时间未成功，则key销毁
      * @param learnProgramKeyLsn 回调
      */
     public void learnProgramKey(Program program, KeyTypeEnum keyTypeEnum, String key, int timeOut, LearnProgramKeyLsn learnProgramKeyLsn) {
@@ -284,7 +285,7 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
     /**
      * 一键匹配空调遥控方案(只支持空调),进入对码模式,调用成功后请在超时时间内按下空调遥控器按钮
      *
-     * @param timeOut 超时时间，红外转发器只会在该时间内处于接收遥控器信号状态
+     * @param timeOut 超时时间，单位S，红外转发器只会在该时间内处于接收遥控器信号状态
      * @param brandId 要学习的空调品牌，请使用{@link #queryBrandOfType(DeviceType, QueryBrandOfTypeLsn)}获取该品牌Id{@link Brand#getBid()}
      */
     public void toPairAirConProgram(int timeOut, int brandId, ToPairAirConProgramLsn toPairAirConProgramLsn) {
@@ -393,6 +394,71 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
 
     private AddProgramLsn mAddProgramLsn;
 
+    /**
+     * 下载遥控方案到红外转发器内，此功能为高级功能版本(支持此功能的红外转发设备有USB输出口)
+     *
+     * @param downloadProgram                  下载到红外转发器的遥控方案
+     * @param timeOut                          超时时间，单位S
+     * @param downLoadToInfraredTransponderLsn 回调
+     */
+    public void downLoadToInfraredTransponder(Program downloadProgram, int timeOut, DownLoadToInfraredTransponderLsn downLoadToInfraredTransponderLsn) {
+        mDownLoadToInfraredTransponderLsn = downLoadToInfraredTransponderLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.LOCAL_IR_DEVICE_DOWNLOAD,
+                GetParameter.localIrDeviceDownload(wifiDeviceId, downloadProgram.getIndex(), timeOut),
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 下载到红外转发器回调接口
+     */
+    public interface DownLoadToInfraredTransponderLsn {
+        /**
+         * 下载中
+         */
+        void downLoading();
+
+        /**
+         * 下载到红外转发器成功
+         *
+         * @param index 对应下载遥控方案的{@link Program#getIndex()}
+         */
+        void downLoadOk(int index);
+
+        /**
+         * 下载到红外转发器失败，可能是网络超时或红外转发器内部存储已满
+         *
+         * @param index 对应下载遥控方案的{@link Program#getIndex()}
+         */
+        void downLoadNotOk(int index);
+    }
+
+    private DownLoadToInfraredTransponderLsn mDownLoadToInfraredTransponderLsn;
+
+    /**
+     * 从红外转发器内删除已经下载的遥控方案，此功能为高级功能版本(支持此功能的红外转发设备有USB输出口)
+     *
+     * @param deleteProgram                  从红外转发器删除的遥控方案
+     * @param deleteOnInfraredTransponderLsn 回调
+     */
+    public void deleteOnInfraredTransponder(Program deleteProgram, DeleteOnInfraredTransponderLsn deleteOnInfraredTransponderLsn) {
+        mDeleteOnInfraredTransponderLsn = deleteOnInfraredTransponderLsn;
+        HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.LOCAL_IR_DEVICE_DELETE,
+                GetParameter.localIrDeviceDelete(wifiDeviceId, deleteProgram.getIndex()),
+                CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 从红外转发器内删除已经下载的遥控方案回调接口
+     */
+    public interface DeleteOnInfraredTransponderLsn {
+        /**
+         * 从红外转发器内删除已经下载的遥控方案成功
+         */
+        void deleteOnInfraredTransponderOk();
+    }
+
+    private DeleteOnInfraredTransponderLsn mDeleteOnInfraredTransponderLsn;
+
     @Override
     public void onSuccess(String action, String json) {
         super.onSuccess(action, json);
@@ -488,30 +554,20 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
                     mAddProgramLsn.addProgramOk();
                 }
                 break;
+            case CloudConstant.CmdValue.LOCAL_IR_DEVICE_DOWNLOAD:
+                if (mDownLoadToInfraredTransponderLsn != null) {
+                    mDownLoadToInfraredTransponderLsn.downLoading();
+                }
+                break;
+            case CloudConstant.CmdValue.LOCAL_IR_DEVICE_DELETE:
+                if (mDeleteOnInfraredTransponderLsn != null) {
+                    mDeleteOnInfraredTransponderLsn.deleteOnInfraredTransponderOk();
+                }
+                break;
             default:
                 break;
         }
     }
-
-    /**
-     * 处理遥控方案列表添加操作
-     *
-     * @param json                json数据
-     * @param alreadyHavePrograms 遥控方案列表
-     */
-    private void addProgramsFromJson(String json, List<Program> alreadyHavePrograms) {
-        JSONArray alreadyHaveProgramsJA = CloudParseUtil.getJsonArryParm(json, "rs");
-        for (int i = 0; i < alreadyHaveProgramsJA.length(); i++) {
-            try {
-                String jsonStr = alreadyHaveProgramsJA.getString(i);
-                Program remote = gson.fromJson(jsonStr, Program.class);
-                alreadyHavePrograms.add(remote);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
     @Override
     public void onMessage(EventMsg eventMsg) {
@@ -547,9 +603,48 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
                     mToPairAirConProgramLsn.toPairAirConProgramOk(pairPrograms);
                 }
                 break;
+            case OBConstant.StringKey.DOWN_IR_REMOTE:
+                String jsonStr = (String) eventMsg.getExtra(OBConstant.StringKey.DOWN_IR_REMOTE);
+                try {
+                    JSONObject downResultObject = new JSONObject(jsonStr);
+                    String serialId = downResultObject.getString("serialId");
+                    if (wifiDeviceId.equals(serialId)) {
+                        int index = downResultObject.getInt("index");
+                        boolean isSuc = downResultObject.getBoolean("success");
+                        if (mDownLoadToInfraredTransponderLsn != null) {
+                            if (isSuc) {
+                                mDownLoadToInfraredTransponderLsn.downLoadOk(index);
+                            } else {
+                                mDownLoadToInfraredTransponderLsn.downLoadNotOk(index);
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
             default:
                 break;
 
+        }
+    }
+
+    /**
+     * 处理遥控方案列表添加操作
+     *
+     * @param json                json数据
+     * @param alreadyHavePrograms 遥控方案列表
+     */
+    private void addProgramsFromJson(String json, List<Program> alreadyHavePrograms) {
+        JSONArray alreadyHaveProgramsJA = CloudParseUtil.getJsonArryParm(json, "rs");
+        for (int i = 0; i < alreadyHaveProgramsJA.length(); i++) {
+            try {
+                String jsonStr = alreadyHaveProgramsJA.getString(i);
+                Program remote = gson.fromJson(jsonStr, Program.class);
+                alreadyHavePrograms.add(remote);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

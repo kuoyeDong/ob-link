@@ -16,8 +16,7 @@ import java.util.List;
 
 
 /**
- * 面板处理,开关按钮开关、情景按钮触发、状态返回
- * 适用设备{@link DeviceEnum#SWITCH,DeviceEnum#SINGLE_TOUCH_SWITCH,DeviceEnum#DOUBLE_TOUCH_SWITCH,DeviceEnum#THREE_TOUCH_SWITCH,DeviceEnum#FOUR_TOUCH_SWITCH,DeviceEnum#SINGLE_SWITCH_SCENE_PANEL,DeviceEnum#DOUBLE_SWITCH_SCENE_PANEL,DeviceEnum#THREE_SWITCH_SCENE_PANEL,DeviceEnum#ONE_BUTTON_WIRE_SOCKET,DeviceEnum#TWO_BUTTON_WIRE_SOCKET,DeviceEnum#THREE_SWITCH_RED_SCENE_PANEL,DeviceEnum#SIX_SCENE_PANEL,DeviceEnum#SIX_SCENE_RED_PANEL,DeviceEnum#SINGLE_SCENE_PANEL,DeviceEnum#DOUBLE_SCENE_PANEL,DeviceEnum#THREE_SCENE_PANEL}
+ * 面板设备处理,开关按钮开关、情景按钮触发、状态返回
  *
  * @author dky
  * 2019/8/6
@@ -47,6 +46,15 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
 
     /**
      * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String, SearchNewDeviceLsn)}操作
+     * @param deviceEnum  适用设备{@link DeviceEnum#SWITCH},{@link DeviceEnum#SINGLE_TOUCH_SWITCH},
+     *                    {@link DeviceEnum#DOUBLE_TOUCH_SWITCH},{@link DeviceEnum#THREE_TOUCH_SWITCH},
+     *                    {@link DeviceEnum#FOUR_TOUCH_SWITCH},{@link DeviceEnum#SINGLE_SWITCH_SCENE_PANEL},
+     *                    {@link DeviceEnum#DOUBLE_SWITCH_SCENE_PANEL},{@link DeviceEnum#THREE_SWITCH_SCENE_PANEL},
+     *                    {@link DeviceEnum#ONE_BUTTON_WIRE_SOCKET},{@link DeviceEnum#TWO_BUTTON_WIRE_SOCKET},
+     *                    {@link DeviceEnum#THREE_SWITCH_RED_SCENE_PANEL},{@link DeviceEnum#SIX_SCENE_PANEL},
+     *                    {@link DeviceEnum#SIX_SCENE_RED_PANEL},{@link DeviceEnum#SINGLE_SCENE_PANEL},
+     *                    {@link DeviceEnum#DOUBLE_SCENE_PANEL},{@link DeviceEnum#THREE_SCENE_PANEL}
+     * @throws Exception 传入不支持设备类型异常
      */
     protected PanelHandler(@Nullable String deviceSerId, DeviceEnum deviceEnum) throws Exception {
         super(deviceSerId);

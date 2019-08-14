@@ -138,7 +138,7 @@ public interface OBConstant {
          */
         String UPDATE_GROUP_ID = "update_group_id";
         /**
-         *控制指令回复
+         * 控制指令回复
          */
         String CONTROL_STATUS_CHANGE = "control_status_change";
     }
@@ -365,13 +365,13 @@ public interface OBConstant {
          */
         int IS_HUMIDIFIER = 3;
         /**
-         * 智能插座/开关
+         * 插座/开关大类
          */
         int IS_OBSOCKET = 4;
         /**
-         * 智能插座
+         * 插座
          */
-        int CHAZUO = 1;
+        int SOCKET = 1;
         /**
          * 单线开关
          */
@@ -643,28 +643,10 @@ public interface OBConstant {
 
     }
 
-
-    /**
-     * 属性动画proper
-     */
-    interface AnimatorProper {
-        String ROTATE = "rotation";
-        String TRANSX = "translationX";
-        String TRANSY = "translationY";
-        String SCALEX = "scaleX";
-        String SCALEY = "scaleY";
-        String ALPHA = "alpha";
-    }
-
     /**
      * 红外设备类型
      */
     interface IrType {
-
-        /**
-         * 其他类型
-         */
-        int OTHER = 0;
         /**
          * 机顶盒
          */
@@ -709,6 +691,10 @@ public interface OBConstant {
          * 空气净化器
          */
         int AIR_CLEAR = 15;
+        /**
+         * 其他类型
+         */
+        int OTHER = 0;
     }
 
     /**

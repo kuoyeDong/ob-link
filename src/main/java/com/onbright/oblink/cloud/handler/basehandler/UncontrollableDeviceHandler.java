@@ -14,7 +14,7 @@ import com.onbright.oblink.cloud.net.HttpRequst;
  * @author dky
  * 2019/8/7
  */
-public abstract class UncontrollableDeviceHandler extends DeviceHandler {
+public abstract class UncontrollableDeviceHandler extends RfDeviceHandler {
     /**
      * 设备状态
      */

@@ -9,20 +9,9 @@ import java.io.Serializable;
  * 2019/8/12
  */
 public class DeviceType implements Serializable {
+
     /**
-     * 设备类型
-     * 1 机顶盒
-     * 2电视
-     * 3DVD
-     * 5投影仪
-     * 6风扇
-     * 7空调
-     * 8智能灯
-     * 10互联网机顶盒
-     * 12扫地机
-     * 13音响
-     * 15空气净化器
-     * 0其他(自定义学习)
+     * 设备类型,参见{@link com.onbright.oblink.local.net.OBConstant.IrType}
      */
     private int t;
     /**

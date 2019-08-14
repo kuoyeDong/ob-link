@@ -17,12 +17,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 
 /**
- * 设备处理基础类，功能点：扫描设备，释放设备，状态回调
+ * Rf类设备处理基础类，功能点：扫描设备，释放设备，状态回调
  *
  * @author dky
  * 2019/7/3
  */
-public abstract class DeviceHandler implements HttpRespond, NoSerialId {
+public abstract class RfDeviceHandler implements HttpRespond, NoSerialId {
 
     /**
      * 设备序列号
@@ -51,7 +51,7 @@ public abstract class DeviceHandler implements HttpRespond, NoSerialId {
     /**
      * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String, SearchNewDeviceLsn)}操作
      */
-    protected DeviceHandler(@Nullable String deviceSerId) {
+    protected RfDeviceHandler(@Nullable String deviceSerId) {
         this.deviceSerId = deviceSerId;
         EventBus.getDefault().register(this);
     }

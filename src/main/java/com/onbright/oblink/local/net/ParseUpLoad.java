@@ -134,7 +134,7 @@ public class ParseUpLoad {
                                         break;
                                     case OBConstant.NodeType.IS_OBSOCKET:
                                         switch (type) {
-                                            case OBConstant.NodeType.CHAZUO:
+                                            case OBConstant.NodeType.SOCKET:
                                             case OBConstant.NodeType.SINGLE_TOUCH_SWITCH:
                                             case OBConstant.NodeType.DOUBLE_TOUCH_SWITCH:
                                             case OBConstant.NodeType.THREE_TOUCH_SWITCH:

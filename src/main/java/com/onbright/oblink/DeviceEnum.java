@@ -119,17 +119,22 @@ public enum DeviceEnum {
      */
     TEMP_HUMID_SENSOR(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.TEMP_HUMID_SENSOR),
 
-
     /*以下为窗帘幕布*/
 
     /**
      * 窗帘
      */
-    THE_CURTAINS(OBConstant.NodeType.IS_CURTAIN, OBConstant.NodeType.THE_CURTAINS);
+    THE_CURTAINS(OBConstant.NodeType.IS_CURTAIN, OBConstant.NodeType.THE_CURTAINS),
 
+    /**
+     * RF插座
+     */
+    SOCKET(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.SOCKET),
 
-//    智能插座，
-//    红外转发器
+    /**
+     * 红外转发器
+     */
+    INFRARED_TRANSPONDER(OBConstant.NodeType.WIFI_IR, 0);
     /**
      * 设备类型
      */

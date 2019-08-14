@@ -37,7 +37,7 @@ public class ConnectHandler implements HttpRespond {
     /**
      * 连接设备回调类
      */
-    public interface ConnectOboxLsn {
+    public interface ConnectLsn {
         /**
          * 连接出错
          *
@@ -55,23 +55,23 @@ public class ConnectHandler implements HttpRespond {
         /**
          * 连接wifi单品设备成功
          *
-         * @param configStr 连接成功的wifi单品设备配置
+         * @param configStr 连接成功的wifi单品设备json配置，包含设备序列号和设备类型（type=50为wifi插座，51位红外转发器）与功能定义
          */
         void connectWifiDeviceSuc(String configStr);
     }
 
-    private ConnectOboxLsn connectOboxLsn;
+    private ConnectLsn mConnectLsn;
 
     /**
-     * @param context        un
-     * @param routePwd       连接路由器的密码
-     * @param connectOboxLsn 回调类
-     * @param isObox         是否连接obox
+     * @param context    un
+     * @param routePwd   连接路由器的密码
+     * @param connectLsn 回调类
+     * @param isObox     是否连接obox
      */
-    public ConnectHandler(Context context, String routePwd, ConnectOboxLsn connectOboxLsn, boolean isObox) {
+    public ConnectHandler(Context context, String routePwd, ConnectLsn connectLsn, boolean isObox) {
         this.context = context;
         this.routePwd = routePwd;
-        this.connectOboxLsn = connectOboxLsn;
+        this.mConnectLsn = connectLsn;
         this.isObox = isObox;
     }
 
@@ -113,8 +113,8 @@ public class ConnectHandler implements HttpRespond {
 
                     @Override
                     public void onConnectRouteError() {
-                        if (connectOboxLsn != null) {
-                            connectOboxLsn.error(ConnectError.connectRouteError);
+                        if (mConnectLsn != null) {
+                            mConnectLsn.error(ConnectError.connectRouteError);
                             destroy();
                         }
                     }
@@ -126,24 +126,24 @@ public class ConnectHandler implements HttpRespond {
 
                     @Override
                     public void onConnectCloudError() {
-                        if (connectOboxLsn != null) {
-                            connectOboxLsn.error(ConnectError.connectCloudError);
+                        if (mConnectLsn != null) {
+                            mConnectLsn.error(ConnectError.connectCloudError);
                             destroy();
                         }
                     }
 
                     @Override
                     protected void addWifiDeviceSuc(String configStr) {
-                        if (connectOboxLsn != null) {
-                            connectOboxLsn.connectWifiDeviceSuc(configStr);
+                        if (mConnectLsn != null) {
+                            mConnectLsn.connectWifiDeviceSuc(configStr);
                             destroy();
                         }
                     }
 
                     @Override
                     protected void addOboxSuc(Obox obox) {
-                        if (connectOboxLsn != null) {
-                            connectOboxLsn.connectOboxSuc(obox);
+                        if (mConnectLsn != null) {
+                            mConnectLsn.connectOboxSuc(obox);
                             destroy();
                         }
                     }
@@ -156,8 +156,8 @@ public class ConnectHandler implements HttpRespond {
     public void onFaild(ErrorCode errorCode, int responseNotOkCode, String operationFailedReason, String action) {
         switch (action) {
             case CloudConstant.CmdValue.REGIST_ALIDEV:
-                if (connectOboxLsn != null) {
-                    connectOboxLsn.error(ConnectError.registError);
+                if (mConnectLsn != null) {
+                    mConnectLsn.error(ConnectError.registError);
                     destroy();
                 }
         }

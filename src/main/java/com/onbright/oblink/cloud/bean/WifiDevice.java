@@ -9,6 +9,7 @@ import java.util.List;
  */
 
 public class WifiDevice implements Serializable {
+
     /**
      * 阿里对应设备唯一id，即以产品序列号
      */
@@ -18,12 +19,12 @@ public class WifiDevice implements Serializable {
      * 设备名称，可获取ob设备的名称
      */
     private String name;
+
     /**
      * 设备类型，对应单品DEVICE还是obox OBOX,
-     * 参照Wifi设备#{@link com.onbright.oblink.local.net.OBConstant.NodeType#WIFI_IR}
+     * 参照Wifi设备{@link com.onbright.oblink.local.net.OBConstant.NodeType#WIFI_SOCKET}
      */
     private String type;
-
 
     /**
      * 设备功能定义

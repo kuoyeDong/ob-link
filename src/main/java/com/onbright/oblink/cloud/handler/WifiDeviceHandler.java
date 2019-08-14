@@ -26,7 +26,8 @@ public abstract class WifiDeviceHandler implements HttpRespond {
     String wifiDeviceId;
 
     /**
-     * @param wifiDeviceId wifi设备序列号
+     * @param wifiDeviceId wifi设备序列号,wifi设备特殊，所以必须要求有序列号，
+     *                     请自行保存已有wifi设备序列号，或使用{@link ConnectHandler#start()}添加，序列号会在{@link ConnectHandler.ConnectLsn#connectWifiDeviceSuc(String)}返回
      */
     public WifiDeviceHandler(String wifiDeviceId) throws Exception {
         if (wifiDeviceId == null) {
@@ -77,6 +78,7 @@ public abstract class WifiDeviceHandler implements HttpRespond {
     public void onMessage(EventMsg eventMsg) {
 
     }
+
     /**
      * 解除监听
      */

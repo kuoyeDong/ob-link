@@ -786,12 +786,12 @@ public class GetParameter {
      * @param timeOut  超时时间/秒
      * @return un
      */
-    public static FormBody.Builder localIrDeviceDownload(String serialId, String index, String timeOut) {
+    public static FormBody.Builder localIrDeviceDownload(String serialId, int index, int timeOut) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.LOCAL_IR_DEVICE_DOWNLOAD);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.INDEX, index);
-        builder.add(CloudConstant.ParameterKey.TIME_OUT, timeOut);
+        builder.add(CloudConstant.ParameterKey.INDEX, String.valueOf(index));
+        builder.add(CloudConstant.ParameterKey.TIME_OUT, String.valueOf(timeOut));
         return builder;
     }
 
@@ -802,11 +802,11 @@ public class GetParameter {
      * @param index    遥控索引ID
      * @return un
      */
-    public static FormBody.Builder localIrDeviceDelete(String serialId, String index) {
+    public static FormBody.Builder localIrDeviceDelete(String serialId, int index) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.LOCAL_IR_DEVICE_DELETE);
         builder.add(CloudConstant.ParameterKey.SERIALID, serialId);
-        builder.add(CloudConstant.ParameterKey.INDEX, index);
+        builder.add(CloudConstant.ParameterKey.INDEX, String.valueOf(index));
         return builder;
     }
 
