@@ -157,7 +157,7 @@ public class ParseServerListener {
         String isSuccess;
         switch (cmd) {
             case "2500": {/*传感器上报数据*/
-                state = data.substring(16, 30);
+                state = data.substring(16, 32);
                 nodeType = data.substring(10, 12);
                 nodeAddr = data.substring(12, 14);
                 LogUtil.log(this,"2500设备上报数据" + "state =" + state + "nodeType =" + nodeType + "nodeAddr =" + nodeAddr + "state"+state);
@@ -222,7 +222,7 @@ public class ParseServerListener {
                 break;
             }
             case "a100": {/*设置状态回复*/
-                state = data.substring(16, 30);
+                state = data.substring(16, 32);
                 nodeAddr = data.substring(14, 16);
                 groupAddr = data.substring(12, 14);
                 if (groupAddr.equals("00")) {

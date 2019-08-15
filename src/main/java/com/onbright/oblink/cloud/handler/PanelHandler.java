@@ -113,6 +113,15 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
             case OBConstant.NodeType.THREE_SCENE_PANEL:
                 setValueAboutIndex(0, 3);
                 break;
+            case OBConstant.NodeType.FOUR_SCENE_PANEL:
+                setValueAboutIndex(0, 4);
+                break;
+            case OBConstant.NodeType.CURTIAN_PANEL:
+                setValueAboutIndex(0, 3);
+                break;
+            case OBConstant.NodeType.DOUBLE_CURTIAN_PANEL:
+                setValueAboutIndex(0, 6);
+                break;
             default:
                 throw new Exception("unSupport deviceType");
         }
@@ -160,7 +169,7 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
         }
         onSwtichStatus(swtichStatusEnums);
         /*没有情景按钮不继续*/
-        if (switchIndex == 0) {
+        if (sceneNum == 0) {
             return;
         }
         /*一次只能按下一个情景按钮*/
@@ -173,6 +182,8 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
     }
 
     /**
+     * 获得开关状态
+     *
      * @param swtichStatusEnums 开关状态枚举列表，列表下标与开关实际下标对应
      */
     public abstract void onSwtichStatus(List<SwtichStatusEnum> swtichStatusEnums);
@@ -220,7 +231,7 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
     public abstract void onScenePress(int index);
 
     /**
-     * 设置开关按钮
+     * 设置开关按钮，成功后回调{@link #onSwtichStatus(List)}、{@link #onScenePress(int)}
      *
      * @param index            开关按钮位置，从0开始计数
      * @param swtichStatusEnum 开关状态枚举
@@ -247,7 +258,7 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
     }
 
     /**
-     * 模拟按下情景按钮
+     * 模拟按下情景按钮，成功后回调{@link #onSwtichStatus(List)}、{@link #onScenePress(int)}
      *
      * @param index 要按下的情景按钮位置,从0开始计数
      */

@@ -95,6 +95,18 @@ public enum DeviceEnum {
      * 3路情景面板
      */
     THREE_SCENE_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.THREE_SCENE_PANEL),
+    /**
+     * 4路情景面板
+     */
+    FOUR_SCENE_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.FOUR_SCENE_PANEL),
+    /**
+     * 单一窗帘面板
+     */
+    CURTIAN_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.CURTIAN_PANEL),
+    /**
+     * 两个窗帘面板
+     */
+    DOUBLE_CURTIAN_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.DOUBLE_CURTIAN_PANEL),
 
     /*以下为传感器*/
     /**
@@ -118,6 +130,15 @@ public enum DeviceEnum {
      * 温度湿度传感器
      */
     TEMP_HUMID_SENSOR(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.TEMP_HUMID_SENSOR),
+    /**
+     * DC人体+光感
+     */
+    DC_BODY_ALS(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.DC_BODY_ALS),
+    /**
+     * AC人体+光感
+     */
+    AC_BODY_ALS(OBConstant.NodeType.IS_SENSOR, OBConstant.NodeType.AC_BODY_ALS),
+
 
     /*以下为窗帘幕布*/
 

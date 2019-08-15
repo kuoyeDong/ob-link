@@ -34,4 +34,23 @@ public abstract class ControllableDeviceHandler extends UncontrollableDeviceHand
         }
     }
 
+    /**
+     * 有些设备的控制协议中，要设置其中某个值，其他非计划设置的参数值没预留忽略值，
+     * 所以这些值如果不按原值发送，极有可能会被改变，造成非预期控制结果，此方法将检查原值是否获取到，如无原值则回调
+     *
+     * @return 如无原始值返回true
+     */
+    protected boolean haveNotStatus() {
+        if (status == null) {
+            mustHaveStatus();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 必须要有原状态值回调，如有存储上次状态值请使用{@link #setStatus(String)},或使用查询状态方法{@link #queryDeviceStatus()}
+     */
+    protected abstract void mustHaveStatus();
 }

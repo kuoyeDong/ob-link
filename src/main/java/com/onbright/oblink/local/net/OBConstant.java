@@ -439,6 +439,18 @@ public interface OBConstant {
          */
         int THREE_SCENE_PANEL = 33;
         /**
+         * 4路情景面板
+         */
+        int FOUR_SCENE_PANEL = 34;
+        /**
+         * 单一窗帘面板
+         */
+        int CURTIAN_PANEL = 91;
+        /**
+         * 两个窗帘面板
+         */
+        int DOUBLE_CURTIAN_PANEL = 92;
+        /**
          * 智能开合类设备
          */
         int IS_CURTAIN = 5;
@@ -558,6 +570,17 @@ public interface OBConstant {
          * 门磁
          */
         int DOOR_WINDOW_MAGNET = 21;
+
+        /**
+         * DC人体+光感
+         */
+        int DC_BODY_ALS = 23;
+
+        /**
+         * AC人体+光感
+         */
+        int AC_BODY_ALS = 24;
+
         /**
          * 插卡取电感应器，00插卡，01拔出，02断电
          */

@@ -709,7 +709,7 @@ public class GetParameter {
      * @param serialId   红外转发器序列号
      * @param deviceType 学习的设备类型
      * @param brandId    学习的品牌，如无置0
-     * @param name       用户自定义输入，默认为自定义遥控器+类型名
+     * @param name       用户自定义输入
      * @return un
      */
     public static FormBody.Builder createIrDevice(String serialId, int deviceType, int brandId, String name) {

@@ -30,9 +30,19 @@ public abstract class BooleanSensorHandler extends UncontrollableDeviceHandler i
         } else {
             booleanTrue();
         }
-        if (getDeviceEnum().getType() != OBConstant.NodeType.RED_SENSOR) {
-            batteryValue(MathUtil.validByte(stausBytes[3]));
+        if (getDeviceEnum().getType() != OBConstant.NodeType.RED_SENSOR
+                && getDeviceEnum().getType() != OBConstant.NodeType.AC_BODY_ALS) {
+            batteryValue(MathUtil.validByte(stausBytes[getBatteryIndex()]));
         }
+    }
+
+    /**
+     * 不同设备电量下标不同，子类可复写此方法返回正确电量字节下标
+     *
+     * @return 电量在状态的字节下标
+     */
+    protected int getBatteryIndex() {
+        return 3;
     }
 
     /**

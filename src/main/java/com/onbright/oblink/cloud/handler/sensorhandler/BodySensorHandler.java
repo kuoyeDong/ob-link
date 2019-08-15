@@ -44,8 +44,4 @@ public abstract class BodySensorHandler extends BooleanSensorHandler {
         return DeviceEnum.RED_SENSOR;
     }
 
-    @Override
-    public void batteryValue(int batteryValue) {
-        /*人体传感器电量不存在，因为其也适用布尔类传感器，在此拦截实现，请不要进行无意义复写*/
-    }
 }

@@ -27,12 +27,24 @@ public abstract class UncontrollableDeviceHandler extends RfDeviceHandler {
         super(deviceSerId);
     }
 
+    /**
+     * 返回当前对象内的现有设备状态，并无网络交互，
+     * 可通过此方法获取到状态值保存，下次使用本类时可取出该状态值使用{@link #setStatus(String)}初始化状态值
+     *
+     * @return 设备状态
+     */
     public String getStatus() {
         return status;
     }
 
+    /**
+     * 设置初始状态，并无网络交互，会调用{@link #onStatusChange(String)}
+     *
+     * @param status 七个字节的初始状态
+     */
     public void setStatus(String status) {
         this.status = status;
+        onStatusChange(status);
     }
 
     /**
@@ -57,6 +69,11 @@ public abstract class UncontrollableDeviceHandler extends RfDeviceHandler {
         }
     }
 
+    /**
+     * 处理状态
+     *
+     * @param json 设置或获取状态json
+     */
     protected void onGetStatus(String json) {
         String status = CloudParseUtil.getJsonParm(json, "status");
         if (!TextUtils.isEmpty(status)) {

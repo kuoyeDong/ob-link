@@ -179,6 +179,7 @@ public abstract class RfDeviceHandler implements HttpRespond, NoSerialId {
                     case OBConstant.NodeType.TEMP_HUMID_SENSOR:
                     case OBConstant.NodeType.DC_RED_SENSOR:
                     case OBConstant.NodeType.DOOR_WINDOW_MAGNET:
+                    case OBConstant.NodeType.DC_BODY_ALS:
                         return true;
                 }
                 break;

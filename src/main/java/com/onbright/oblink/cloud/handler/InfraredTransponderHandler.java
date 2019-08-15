@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 处理红外转发器
+ * 处理红外转发器,码库、控制
  *
  * @author dky
  * 2019/8/9
