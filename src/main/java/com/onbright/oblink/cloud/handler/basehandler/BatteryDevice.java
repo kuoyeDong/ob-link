@@ -10,7 +10,7 @@ public interface BatteryDevice {
     /**
      * 电池设备电量
      *
-     * @param batteryValue 电量值，门锁为具体百分比，上电池传感器为阶值
+     * @param batteryValue 电量值，门锁为具体百分比，上电池传感器为阶值,从弱到强0-3
      */
     void batteryValue(int batteryValue);
 }

@@ -962,7 +962,7 @@ public class ParseUtil {
         if (obNode == null) {
             return;
         }
-        byte[] status = Arrays.copyOfRange(bytes, 15, 15 + 7);
+        byte[] status = Arrays.copyOfRange(bytes, 15, 15 + 8);
         if (isSingle) {
             switch (message.what) {
                 case OBConstant.ReplyType.SET_STATUS_SUC:

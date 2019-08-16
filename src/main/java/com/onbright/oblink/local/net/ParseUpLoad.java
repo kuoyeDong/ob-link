@@ -135,15 +135,9 @@ public class ParseUpLoad {
                                     case OBConstant.NodeType.IS_OBSOCKET:
                                         switch (type) {
                                             case OBConstant.NodeType.SOCKET:
-                                            case OBConstant.NodeType.SINGLE_TOUCH_SWITCH:
-                                            case OBConstant.NodeType.DOUBLE_TOUCH_SWITCH:
-                                            case OBConstant.NodeType.THREE_TOUCH_SWITCH:
-                                            case OBConstant.NodeType.FOUR_TOUCH_SWITCH:
-                                            case OBConstant.NodeType.ONE_BUTTON_WIRE_SOCKET:
-                                            case OBConstant.NodeType.TWO_BUTTON_WIRE_SOCKET:
                                                 state[0] = payLoad[1];
                                                 state[1] = payLoad[0];
-                                                System.arraycopy(payLoad, 2, state, 2, 5);
+                                                System.arraycopy(payLoad, 2, state, 2, state.length - 2);
                                                 break;
                                             case OBConstant.NodeType.SINGLE_SWITCH_SCENE_PANEL:
                                             case OBConstant.NodeType.DOUBLE_SWITCH_SCENE_PANEL:
@@ -151,15 +145,16 @@ public class ParseUpLoad {
                                             case OBConstant.NodeType.THREE_SWITCH_RED_SCENE_PANEL:
                                                 state[0] = payLoad[1];
                                                 state[1] = payLoad[3];
-                                                System.arraycopy(payLoad, 2, state, 2, 5);
+                                                System.arraycopy(payLoad, 2, state, 2, state.length - 2);
                                                 break;
                                             default:
-                                                System.arraycopy(payLoad, 0, state, 0, 7);
+                                                state[0] = payLoad[1];
+                                                System.arraycopy(payLoad, 1, state, 1, state.length - 1);
                                                 break;
                                         }
                                         break;
                                     default:
-                                        System.arraycopy(payLoad, 0, state, 0, 7);
+                                        System.arraycopy(payLoad, 0, state, 0, state.length);
                                         break;
                                 }
                                 obNode.setState(state);

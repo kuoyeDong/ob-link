@@ -23,13 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by shifan_xiao on 2017/9/11.
  * 解析服务器长连接数据处理
  */
 
 public class ParseServerListener {
     private String dataPrefix = "";
-
 
     public synchronized void parseServerData(String dataString) {
         String json = "";
@@ -160,7 +158,7 @@ public class ParseServerListener {
                 state = data.substring(16, 32);
                 nodeType = data.substring(10, 12);
                 nodeAddr = data.substring(12, 14);
-                LogUtil.log(this,"2500设备上报数据" + "state =" + state + "nodeType =" + nodeType + "nodeAddr =" + nodeAddr + "state"+state);
+                LogUtil.log(this, "2500设备上报数据" + "state =" + state + "nodeType =" + nodeType + "nodeAddr =" + nodeAddr + "state" + state);
                 String status = null;
                 int pType, cType;
                 for (int i = 0; i < CloudDataPool.getDevices().size(); i++) {
@@ -184,24 +182,16 @@ public class ParseServerListener {
                                 case OBConstant.NodeType.IS_OBSOCKET:
                                     switch (cType) {
                                         case OBConstant.NodeType.SOCKET:
-                                        case OBConstant.NodeType.SINGLE_TOUCH_SWITCH:
-                                        case OBConstant.NodeType.DOUBLE_TOUCH_SWITCH:
-                                        case OBConstant.NodeType.THREE_TOUCH_SWITCH:
-                                        case OBConstant.NodeType.FOUR_TOUCH_SWITCH:
-                                        case OBConstant.NodeType.ONE_BUTTON_WIRE_SOCKET:
-                                        case OBConstant.NodeType.TWO_BUTTON_WIRE_SOCKET:
-                                            // 0,1互换位置按键开关位置
-                                            status = state.substring(2, 4) + state.substring(0, 2) + state.substring(4, 14);
+                                            status = state.substring(2, 4) + state.substring(0, 2) + state.substring(4);
                                             break;
                                         case OBConstant.NodeType.SINGLE_SWITCH_SCENE_PANEL:
                                         case OBConstant.NodeType.DOUBLE_SWITCH_SCENE_PANEL:
                                         case OBConstant.NodeType.THREE_SWITCH_SCENE_PANEL:
                                         case OBConstant.NodeType.THREE_SWITCH_RED_SCENE_PANEL:
-                                            // 0,1互换情景开关位置，3,1互换按键开关位置
-                                            status = state.substring(2, 4) + state.substring(6, 8) + state.substring(4, 6) + state.substring(0, 2) + state.substring(8, 14);
+                                            status = state.substring(2, 4) + state.substring(6, 8) + "0000" + state.substring(8);
                                             break;
                                         default:
-                                            status = state;
+                                            status = state.substring(2, 4) + "00" + state.substring(4);
                                             break;
                                     }
                                     break;
@@ -302,7 +292,7 @@ public class ParseServerListener {
                         eventMsg.putExtra("isModifyStruct", true);
                         eventMsg.putExtra("operate_type", operation);
                         EventBus.getDefault().post(eventMsg);
-                        LogUtil.log(this,"删除节点或删除组" + "isDeleteNode=" + isDeleteNode + "isDeleteGroup= " + isDeleteGroup);
+                        LogUtil.log(this, "删除节点或删除组" + "isDeleteNode=" + isDeleteNode + "isDeleteGroup= " + isDeleteGroup);
                         break;
                     }
                     case "01": {//add
@@ -311,7 +301,7 @@ public class ParseServerListener {
                         eventMsg.putExtra("cmd", cmd);
                         eventMsg.putExtra("operate_type", operation);
                         EventBus.getDefault().post(eventMsg);
-                        LogUtil.log(this,"添加节点到组");
+                        LogUtil.log(this, "添加节点到组");
 //                    if (groupAddr.equals("00")) {
 //
 //                    } else {
@@ -342,7 +332,7 @@ public class ParseServerListener {
                                         EventMsg eventMsg = new EventMsg();
                                         eventMsg.setAction(OBConstant.StringKey.UPDATE_NODE_ID);
                                         EventBus.getDefault().post(eventMsg);
-                                        LogUtil.log(this,"节点重命名");
+                                        LogUtil.log(this, "节点重命名");
                                         break;
                                     }
                                 }
@@ -356,7 +346,7 @@ public class ParseServerListener {
                                             EventMsg eventMsg = new EventMsg();
                                             eventMsg.setAction(OBConstant.StringKey.UPDATE_GROUP_ID);
                                             EventBus.getDefault().post(eventMsg);
-                                            LogUtil.log(this,"组重命名");
+                                            LogUtil.log(this, "组重命名");
                                             break;
                                         }
                                     }
@@ -407,7 +397,7 @@ public class ParseServerListener {
                 eventMsg.putExtra("isDeleteGroup", false);
                 eventMsg.putExtra("isDeleteNode", false);
                 EventBus.getDefault().post(eventMsg);
-                LogUtil.log(this,"修改组节点，组操作");
+                LogUtil.log(this, "修改组节点，组操作");
                 break;
             }
             case "a008":  //release
@@ -431,7 +421,7 @@ public class ParseServerListener {
                 byte b = (byte) MathUtil.byteIndexValid(child[0], 0, 7);
                 deviceType = Transformation.byte2HexString(a);
                 deviceChildType = Transformation.byte2HexString(b);
-                LogUtil.log(this,"扫描设备" + "deviceType = " + deviceType + "deviceChildType =" + deviceChildType);
+                LogUtil.log(this, "扫描设备" + "deviceType = " + deviceType + "deviceChildType =" + deviceChildType);
                 deviceName = getNodeId(Transformation.hexString2Bytes(data.substring(6, 38)));
                 serialId = data.substring(38, 48);
                 obox_serial_id = data.substring(48, 58);
