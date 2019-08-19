@@ -39,6 +39,7 @@ public class GetParameter {
      */
     public static FormBody.Builder onSetNodeState(String deviceSerId, String status) {
         FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.SETTING_NODE_STATUS);
         builder.add(CloudConstant.ParameterKey.DEVICE_SERIAL_ID, deviceSerId);
         builder.add(CloudConstant.ParameterKey.STATE, status);
         return builder;
