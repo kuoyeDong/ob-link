@@ -188,6 +188,7 @@ public class ParseServerListener {
                                         case OBConstant.NodeType.DOUBLE_SWITCH_SCENE_PANEL:
                                         case OBConstant.NodeType.THREE_SWITCH_SCENE_PANEL:
                                         case OBConstant.NodeType.THREE_SWITCH_RED_SCENE_PANEL:
+                                        case OBConstant.NodeType.TWO_SWITCH_TWO_SCENE_PANEL:
                                             status = state.substring(2, 4) + state.substring(6, 8) + "0000" + state.substring(8);
                                             break;
                                         default:

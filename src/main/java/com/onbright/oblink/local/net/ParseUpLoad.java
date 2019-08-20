@@ -143,6 +143,7 @@ public class ParseUpLoad {
                                             case OBConstant.NodeType.DOUBLE_SWITCH_SCENE_PANEL:
                                             case OBConstant.NodeType.THREE_SWITCH_SCENE_PANEL:
                                             case OBConstant.NodeType.THREE_SWITCH_RED_SCENE_PANEL:
+                                            case OBConstant.NodeType.TWO_SWITCH_TWO_SCENE_PANEL:
                                                 state[0] = payLoad[1];
                                                 state[1] = payLoad[3];
                                                 System.arraycopy(payLoad, 2, state, 2, state.length - 2);

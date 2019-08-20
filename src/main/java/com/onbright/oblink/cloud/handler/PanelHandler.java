@@ -53,7 +53,9 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
      *                    {@link DeviceEnum#ONE_BUTTON_WIRE_SOCKET},{@link DeviceEnum#TWO_BUTTON_WIRE_SOCKET},
      *                    {@link DeviceEnum#THREE_SWITCH_RED_SCENE_PANEL},{@link DeviceEnum#SIX_SCENE_PANEL},
      *                    {@link DeviceEnum#SIX_SCENE_RED_PANEL},{@link DeviceEnum#SINGLE_SCENE_PANEL},
-     *                    {@link DeviceEnum#DOUBLE_SCENE_PANEL},{@link DeviceEnum#THREE_SCENE_PANEL}
+     *                    {@link DeviceEnum#DOUBLE_SCENE_PANEL},{@link DeviceEnum#THREE_SCENE_PANEL},
+     *                    {@link DeviceEnum#FOUR_SCENE_PANEL},{@link DeviceEnum#TWO_SWITCH_TWO_SCENE_PANEL},
+     *                    {@link DeviceEnum#CURTIAN_PANEL}，{@link DeviceEnum#DOUBLE_CURTIAN_PANEL}
      * @throws Exception 传入不支持设备类型异常
      */
     protected PanelHandler(@Nullable String deviceSerId, DeviceEnum deviceEnum) throws Exception {
@@ -115,6 +117,9 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
                 break;
             case OBConstant.NodeType.FOUR_SCENE_PANEL:
                 setValueAboutIndex(0, 4);
+                break;
+            case OBConstant.NodeType.TWO_SWITCH_TWO_SCENE_PANEL:
+                setValueAboutIndex(2, 2);
                 break;
             case OBConstant.NodeType.CURTIAN_PANEL:
                 setValueAboutIndex(0, 3);

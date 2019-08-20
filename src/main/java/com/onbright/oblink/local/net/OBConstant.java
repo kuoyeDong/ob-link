@@ -443,6 +443,10 @@ public interface OBConstant {
          */
         int FOUR_SCENE_PANEL = 34;
         /**
+         * 2开关+2情景面板
+         */
+        int TWO_SWITCH_TWO_SCENE_PANEL = 62;
+        /**
          * 单一窗帘面板
          */
         int CURTIAN_PANEL = 91;

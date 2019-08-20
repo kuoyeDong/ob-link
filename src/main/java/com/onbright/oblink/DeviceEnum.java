@@ -100,6 +100,10 @@ public enum DeviceEnum {
      */
     FOUR_SCENE_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.FOUR_SCENE_PANEL),
     /**
+     * 2开关+2情景面板
+     */
+    TWO_SWITCH_TWO_SCENE_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.TWO_SWITCH_TWO_SCENE_PANEL),
+    /**
      * 单一窗帘面板
      */
     CURTIAN_PANEL(OBConstant.NodeType.IS_OBSOCKET, OBConstant.NodeType.CURTIAN_PANEL),
