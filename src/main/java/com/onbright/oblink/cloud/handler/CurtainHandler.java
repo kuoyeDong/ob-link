@@ -157,12 +157,6 @@ public abstract class CurtainHandler extends ControllableDeviceHandler {
     }
 
     @Override
-    public void setStatus(String status) {
-        super.setStatus(status);
-        handleStatus(status);
-    }
-
-    @Override
     protected void onStatusChange(String status) {
         handleStatus(status);
     }
