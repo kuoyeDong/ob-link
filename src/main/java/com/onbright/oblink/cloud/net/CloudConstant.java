@@ -725,6 +725,14 @@ public interface CloudConstant {
          * 从遥控云选取码库时，挑选合适码库时发送红外数据
          */
         String TEST_PROGRAM = "test_program";
+        /**
+         * 添加场景
+         */
+        String ADD_SC_INFO = "add_sc_info";
+        /**
+         * 修改场景
+         */
+        String MODIFY_SC_INFO = "modify_sc_info";
     }
 
 

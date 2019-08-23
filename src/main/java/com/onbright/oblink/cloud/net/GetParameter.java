@@ -7,6 +7,7 @@ import com.onbright.oblink.cloud.bean.Device;
 import com.onbright.oblink.cloud.bean.LockPush;
 import com.onbright.oblink.Obox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.FormBody;
@@ -197,6 +198,50 @@ public class GetParameter {
         Gson gson = new Gson();
         String gsonStr = gson.toJson(curentScene);
         builder.add(CloudConstant.ParameterKey.SCENE, gsonStr);
+        return builder;
+    }
+
+    /**
+     * @param cloudScene 场景
+     */
+    public static FormBody.Builder onDeleteScene(CloudScene cloudScene) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.EXECUTE_SC);
+        builder.add(CloudConstant.ParameterKey.SCENE_NUMBER, cloudScene.getScene_number());
+        builder.add(CloudConstant.ParameterKey.SCENE_STATUS, CloudConstant.CmdValue.DELETE_SCENE);
+        return builder;
+    }
+
+    /**
+     * @param cloudScene 场景
+     */
+    public static FormBody.Builder onEnableScene(CloudScene cloudScene) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.EXECUTE_SC);
+        builder.add(CloudConstant.ParameterKey.SCENE_NUMBER, cloudScene.getScene_number());
+        builder.add(CloudConstant.ParameterKey.SCENE_STATUS, CloudConstant.CmdValue.ENABLE_SCENE);
+        return builder;
+    }
+
+    /**
+     * @param cloudScene 场景
+     */
+    public static FormBody.Builder onDisableScene(CloudScene cloudScene) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.EXECUTE_SC);
+        builder.add(CloudConstant.ParameterKey.SCENE_NUMBER, cloudScene.getScene_number());
+        builder.add(CloudConstant.ParameterKey.SCENE_STATUS, CloudConstant.CmdValue.DISABLE_SCENE);
+        return builder;
+    }
+
+    /**
+     * @param cloudScene 场景
+     */
+    public static FormBody.Builder onActionScene(CloudScene cloudScene) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add(CloudConstant.ParameterKey.CMD, CloudConstant.CmdValue.EXECUTE_SC);
+        builder.add(CloudConstant.ParameterKey.SCENE_NUMBER, cloudScene.getScene_number());
+        builder.add(CloudConstant.ParameterKey.SCENE_STATUS, CloudConstant.CmdValue.ACTION_SCENE);
         return builder;
     }
 
