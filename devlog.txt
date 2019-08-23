@@ -1,6 +1,6 @@
 https://tpyliujunjie.github.io/apiForOb/api
-上午：
-画流程图；
-build aar；
-更新demo，使用setDeviceSerId;
-更新文档，更新描述，添加流程图；
+
+实现共有接口 BeAction、BeCondition。实现转换方法
+完成场景比对检测
+
+
