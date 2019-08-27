@@ -166,5 +166,20 @@ public class CloudDataPool {
             }
         }
     }
+
+    /**
+     * 获取特定序列号的Rf设备
+     *
+     * @param deviceSerId 序列号
+     * @return 目标设备，没找到则返回null
+     */
+    public static Device getDeviceForSerId(String deviceSerId) {
+        for (Device device : devices) {
+            if (device.getSerialId().equals(deviceSerId)) {
+                return device;
+            }
+        }
+        return null;
+    }
 }
 

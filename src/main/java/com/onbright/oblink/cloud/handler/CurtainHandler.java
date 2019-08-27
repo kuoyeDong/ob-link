@@ -3,9 +3,7 @@ package com.onbright.oblink.cloud.handler;
 import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
-import com.onbright.oblink.cloud.bean.Action;
-import com.onbright.oblink.cloud.bean.BeAction;
-import com.onbright.oblink.cloud.handler.basehandler.ControllableDeviceHandler;
+import com.onbright.oblink.cloud.handler.basehandler.ControllableRfDeviceHandler;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
@@ -17,7 +15,7 @@ import com.onbright.oblink.local.net.Transformation;
  * @author dky
  * 2019/8/8
  */
-public abstract class CurtainHandler extends ControllableDeviceHandler implements BeAction {
+public abstract class CurtainHandler extends ControllableRfDeviceHandler {
 
     /**
      * 是否被测量过,说明：只有测量过的窗帘才能按阶开合，默认没测量过，调用请求设备状态接口{@link #queryDeviceStatus()}以确认此状态
@@ -245,11 +243,5 @@ public abstract class CurtainHandler extends ControllableDeviceHandler implement
                 GetParameter.onSetNodeState(deviceSerId, sendStatus), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
-    @Override
-    public Action toAction(Object... parameters) {
-        Action action = new Action();
 
-        action.setAction(sendStatus);
-        return new Action();
-    }
 }

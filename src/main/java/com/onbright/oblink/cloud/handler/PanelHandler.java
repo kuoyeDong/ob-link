@@ -4,7 +4,12 @@ import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.MathUtil;
-import com.onbright.oblink.cloud.handler.basehandler.ControllableDeviceHandler;
+import com.onbright.oblink.cloud.CloudDataPool;
+import com.onbright.oblink.cloud.bean.Action;
+import com.onbright.oblink.cloud.bean.BeCondition;
+import com.onbright.oblink.cloud.bean.Condition;
+import com.onbright.oblink.cloud.bean.Device;
+import com.onbright.oblink.cloud.handler.basehandler.ControllableRfDeviceHandler;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
 import com.onbright.oblink.cloud.net.HttpRequst;
@@ -21,7 +26,7 @@ import java.util.List;
  * @author dky
  * 2019/8/6
  */
-public abstract class PanelHandler extends ControllableDeviceHandler {
+public abstract class PanelHandler extends ControllableRfDeviceHandler implements BeCondition {
     /**
      * 情景按钮下标，纯开关时，此数据不会被用到
      */
@@ -263,6 +268,33 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
     }
 
     /**
+     * 获取场景的执行开关按钮行为对象
+     *
+     * @param index            参考{@link #changeSwitchButton(int, SwtichStatusEnum)}
+     * @param swtichStatusEnum 参考{@link #changeSwitchButton(int, SwtichStatusEnum)}
+     * @return 行为对象
+     * @throws Exception 没找到设备异常，此时请重新初始化Sdk，或确认该序列号设备在系统中
+     */
+    public Action changeSwitchButtonToAction(int index, SwtichStatusEnum swtichStatusEnum) throws Exception {
+        if (isNoSerId()) {
+            return null;
+        }
+        if (index >= switchNum) {
+            wrongIndex();
+            return null;
+        }
+        byte[] staus = new byte[7];
+        for (int i = 0; i < switchNum; i++) {
+            if (index != i) {
+                staus[switchIndex] = MathUtil.setMultiBitIndex(staus[switchIndex], i * 2, 2, SwtichStatusEnum.HOLD.getVal());
+            } else {
+                staus[switchIndex] = MathUtil.setMultiBitIndex(staus[switchIndex], i * 2, 2, swtichStatusEnum.getVal());
+            }
+        }
+        return toAction(Transformation.byteArryToHexString(staus));
+    }
+
+    /**
      * 模拟按下情景按钮，成功后回调{@link #onSwtichStatus(List)}、{@link #onScenePress(int)}
      *
      * @param index 要按下的情景按钮位置,从0开始计数
@@ -286,7 +318,49 @@ public abstract class PanelHandler extends ControllableDeviceHandler {
     }
 
     /**
+     * 获取场景的执行情景按钮行为对象
+     *
+     * @param index 参考{@link #touchSceneButton(int)}
+     * @return 行为对象
+     * @throws Exception 没找到设备异常，此时请重新初始化Sdk，或确认该序列号设备在系统中
+     */
+    public Condition touchSceneButtonToCondition(int index) throws Exception {
+        if (isNoSerId()) {
+            return null;
+        }
+        if (index >= sceneNum) {
+            wrongIndex();
+            return null;
+        }
+        byte[] staus = new byte[8];
+        staus[0] = 0x4a;
+        staus[1] = MathUtil.setBitIndex(staus[1], index, true);
+        return toCondition(Transformation.byteArryToHexString(staus));
+    }
+
+    /**
      * 错误的下标回调
      */
     protected abstract void wrongIndex();
+
+    @Override
+    public Condition toCondition(String conditionProperty) throws Exception {
+        Device device = CloudDataPool.getDeviceForSerId(deviceSerId);
+        if (device == null) {
+            throw new Exception("not find device,can not toCondition");
+        }
+        Condition cdt = new Condition();
+        int pType = Integer.parseInt(device.getDevice_type(), 16);
+        boolean isPrint = pType == OBConstant.NodeType.SMART_FINGER;
+        cdt.setCondition_type(isPrint ? "03" : "01");
+        cdt.setAddr(device.getAddr());
+        cdt.setDevice_child_type(device.getDevice_child_type());
+        cdt.setDevice_type(device.getDevice_type());
+        cdt.setObox_serial_id(device.getObox_serial_id());
+        cdt.setSerialId(device.getSerialId());
+        cdt.setConditionID(device.getName() != null ? device.getName() : device.getSerialId());
+        cdt.setOboxs(null);
+        cdt.setCondition(conditionProperty);
+        return cdt;
+    }
 }

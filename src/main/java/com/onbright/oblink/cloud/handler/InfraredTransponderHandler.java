@@ -3,6 +3,8 @@ package com.onbright.oblink.cloud.handler;
 
 import com.google.gson.Gson;
 import com.onbright.oblink.EventMsg;
+import com.onbright.oblink.cloud.bean.Action;
+import com.onbright.oblink.cloud.bean.BeAction;
 import com.onbright.oblink.cloud.bean.infraredtransponderbean.Brand;
 import com.onbright.oblink.cloud.bean.infraredtransponderbean.DeviceType;
 import com.onbright.oblink.cloud.bean.infraredtransponderbean.KeyTypeEnum;
@@ -26,7 +28,7 @@ import java.util.List;
  * @author dky
  * 2019/8/9
  */
-public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
+public abstract class InfraredTransponderHandler extends WifiDeviceHandler implements BeAction {
 
     private Gson gson = new Gson();
 
@@ -646,5 +648,11 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public Action toAction(String actionProperty) {
+
+        return null;
     }
 }

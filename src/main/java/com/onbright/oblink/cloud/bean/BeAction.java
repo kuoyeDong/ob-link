@@ -8,9 +8,9 @@ package com.onbright.oblink.cloud.bean;
  */
 public interface BeAction {
     /**
-     * @param parameters 行为参数
+     * @param actionProperty 行为参数
      * @return 行为对象
      */
-    Action toAction(Object... parameters);
+    Action toAction(String actionProperty) throws Exception;
 
 }

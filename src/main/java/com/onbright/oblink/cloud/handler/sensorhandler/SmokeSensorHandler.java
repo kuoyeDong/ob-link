@@ -43,4 +43,5 @@ public abstract class SmokeSensorHandler extends BooleanSensorHandler {
     protected DeviceEnum getDeviceEnum() {
         return DeviceEnum.SMOKE_SENSOR;
     }
+
 }

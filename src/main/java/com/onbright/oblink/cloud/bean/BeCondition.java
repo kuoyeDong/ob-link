@@ -10,9 +10,9 @@ public interface BeCondition {
     /**
      * 转化为条件
      *
-     * @param parameters 条件参数
+     * @param conditionProperty 条件参数
      * @return 条件对象
      */
-    Condition toCondition(Object... parameters);
+    Condition toCondition(String conditionProperty) throws Exception;
 
 }

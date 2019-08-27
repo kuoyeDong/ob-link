@@ -12,7 +12,7 @@ import com.onbright.oblink.local.net.Transformation;
  * @author dky
  * 2019/8/7
  */
-public abstract class BooleanSensorHandler extends UncontrollableDeviceHandler implements BatteryDevice {
+public abstract class BooleanSensorHandler extends UnControllableRfDeviceHandler implements BatteryDevice {
 
     /**
      * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String, SearchNewDeviceLsn)}操作

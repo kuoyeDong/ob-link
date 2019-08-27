@@ -101,12 +101,26 @@ public class Action implements Serializable {
         this.serialId = serialId;
     }
 
+    /**
+     * @return 非红外转发行为，不能超过8字节，超出部分被sub
+     */
     public String getAction() {
-        return action;
+        if (action != null && action.length() > 16 && !action.contains("{")) {
+            return action.substring(0, 16);
+        } else {
+            return action;
+        }
     }
 
+    /**
+     * @param action 非红外转发行为，不能超过8字节，超出部分被sub
+     */
     public void setAction(String action) {
-        this.action = action;
+        if (action != null && action.length() > 16 && !action.contains("{")) {
+            this.action = action.substring(0, 16);
+        } else {
+            this.action = action;
+        }
     }
 
     public String getNode_type() {

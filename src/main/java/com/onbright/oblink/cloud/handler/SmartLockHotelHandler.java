@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.EventMsg;
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.cloud.bean.LockAlarm;
 import com.onbright.oblink.cloud.bean.LockHistory;
 import com.onbright.oblink.cloud.bean.LockPush;
@@ -14,7 +15,7 @@ import com.onbright.oblink.cloud.bean.LockStatus;
 import com.onbright.oblink.cloud.bean.LockTempUser;
 import com.onbright.oblink.cloud.bean.LockUser;
 import com.onbright.oblink.cloud.handler.basehandler.BatteryDevice;
-import com.onbright.oblink.cloud.handler.basehandler.RfDeviceHandler;
+import com.onbright.oblink.cloud.handler.basehandler.UnControllableRfDeviceHandler;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.CloudParseUtil;
 import com.onbright.oblink.cloud.net.GetParameter;
@@ -37,7 +38,7 @@ import java.util.List;
  * @author dky
  * 2019/7/5
  */
-public abstract class SmartLockHotelHandler extends RfDeviceHandler implements BatteryDevice {
+public abstract class SmartLockHotelHandler extends UnControllableRfDeviceHandler implements BatteryDevice {
     /**
      * 开门上报
      */
@@ -894,4 +895,5 @@ public abstract class SmartLockHotelHandler extends RfDeviceHandler implements B
                 break;
         }
     }
+
 }
