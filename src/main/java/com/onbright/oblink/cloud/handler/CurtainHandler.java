@@ -3,6 +3,7 @@ package com.onbright.oblink.cloud.handler;
 import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
+import com.onbright.oblink.cloud.bean.Action;
 import com.onbright.oblink.cloud.handler.basehandler.ControllableRfDeviceHandler;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
@@ -87,6 +88,16 @@ public abstract class CurtainHandler extends ControllableRfDeviceHandler {
     }
 
     /**
+     * 取得打开窗帘行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action openToAction() throws Exception {
+        return toAction(Transformation.byteArryToHexString(getBytesForModeLevel((byte) OPEN, (byte) 0)));
+    }
+
+    /**
      * 关闭窗帘
      */
     public void close() {
@@ -94,10 +105,30 @@ public abstract class CurtainHandler extends ControllableRfDeviceHandler {
     }
 
     /**
+     * 取得关闭窗帘行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action closeToAction() throws Exception {
+        return toAction(Transformation.byteArryToHexString(getBytesForModeLevel((byte) CLOSE, (byte) 0)));
+    }
+
+    /**
      * 停止正在进行的动作
      */
     public void stop() {
         change(STOP, 0);
+    }
+
+    /**
+     * 取得停止窗帘行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action stopToAction() throws Exception {
+        return toAction(Transformation.byteArryToHexString(getBytesForModeLevel((byte) STOP, (byte) 0)));
     }
 
     /**
@@ -116,6 +147,17 @@ public abstract class CurtainHandler extends ControllableRfDeviceHandler {
         if (checkIsMeasured()) {
             change(SEEK_LEVEL, level * NUM);
         }
+    }
+
+    /**
+     * 取得滑动到档位窗帘行为对象
+     *
+     * @param level 档位，取值范围1-10
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action levelToToAction(int level) throws Exception {
+        return toAction(Transformation.byteArryToHexString(getBytesForModeLevel((byte) SEEK_LEVEL, (byte) (level * NUM))));
     }
 
     /**
@@ -154,6 +196,16 @@ public abstract class CurtainHandler extends ControllableRfDeviceHandler {
         if (checkIsMeasured()) {
             change(LOAD_LEVEL, 0);
         }
+    }
+
+    /**
+     * 取得滑动到记录档位窗帘行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action loadLevelToAction() throws Exception {
+        return toAction(Transformation.byteArryToHexString(getBytesForModeLevel((byte) LOAD_LEVEL, (byte) 0)));
     }
 
     @Override
@@ -235,13 +287,24 @@ public abstract class CurtainHandler extends ControllableRfDeviceHandler {
      * @param level 档位设置时的档位
      */
     private void change(int mode, int level) {
-        byte[] statusCache = new byte[7];
-        statusCache[MODEINDEX] = (byte) mode;
-        statusCache[LEVEL_INDEX] = (byte) level;
+        byte[] statusCache = getBytesForModeLevel((byte) mode, (byte) level);
         sendStatus = Transformation.byteArryToHexString(statusCache);
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SETTING_NODE_STATUS,
                 GetParameter.onSetNodeState(deviceSerId, sendStatus), CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
 
+    /**
+     * 根据模式和档位获得字节数组
+     *
+     * @param mode  模式
+     * @param level 档位设置时的档位
+     * @return 目标字节
+     */
+    private byte[] getBytesForModeLevel(byte mode, byte level) {
+        byte[] statusCache = new byte[7];
+        statusCache[MODEINDEX] = mode;
+        statusCache[LEVEL_INDEX] = level;
+        return statusCache;
+    }
 
 }

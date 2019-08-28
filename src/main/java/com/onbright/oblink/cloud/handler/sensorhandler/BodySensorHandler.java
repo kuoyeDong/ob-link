@@ -3,6 +3,7 @@ package com.onbright.oblink.cloud.handler.sensorhandler;
 import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
+import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.cloud.handler.basehandler.BooleanSensorHandler;
 
 /**
@@ -25,9 +26,19 @@ public abstract class BodySensorHandler extends BooleanSensorHandler {
     }
 
     /**
-     * 这里有人
+     * 有人
      */
     protected abstract void someOneHere();
+
+    /**
+     * 取得有人状态条件对象
+     *
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition someOneHereToCondition() throws Exception {
+        return booleanTrueToCondition();
+    }
 
     @Override
     public void booleanFalse() {
@@ -35,9 +46,19 @@ public abstract class BodySensorHandler extends BooleanSensorHandler {
     }
 
     /**
-     * 这里没人
+     * 无人
      */
     protected abstract void noOneHere();
+
+    /**
+     * 取得无人状态条件对象
+     *
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition noOneHereToCondition() throws Exception {
+        return booleanFalseToCondition();
+    }
 
     @Override
     protected DeviceEnum getDeviceEnum() {

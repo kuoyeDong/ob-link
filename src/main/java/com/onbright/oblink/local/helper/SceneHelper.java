@@ -3,7 +3,7 @@ package com.onbright.oblink.local.helper;
 import android.content.Context;
 import android.os.Message;
 
-import com.onbright.oblink.ParseCondition;
+import com.onbright.oblink.cloud.handler.scenehandler.ParseCondition;
 import com.onbright.oblink.StringUtil;
 import com.onbright.oblink.local.LocalDataPool;
 import com.onbright.oblink.local.bean.ActionReply;

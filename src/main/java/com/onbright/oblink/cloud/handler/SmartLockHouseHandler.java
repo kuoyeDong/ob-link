@@ -33,12 +33,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 智能酒店门锁处理，用户、临时用户、状态
+ * 智能家居门锁处理，用户、临时用户、状态
  *
  * @author dky
  * 2019/7/5
  */
-public abstract class SmartLockHotelHandler extends UnControllableRfDeviceHandler implements BatteryDevice {
+public abstract class SmartLockHouseHandler extends UnControllableRfDeviceHandler implements BatteryDevice {
     /**
      * 开门上报
      */
@@ -67,7 +67,7 @@ public abstract class SmartLockHotelHandler extends UnControllableRfDeviceHandle
     /**
      * @param deviceSerId 操作rf设备的序列号，为null只能进行{@link #searchNewDevice(String, String, SearchNewDeviceLsn)}操作
      */
-    protected SmartLockHotelHandler(@Nullable String deviceSerId) {
+    protected SmartLockHouseHandler(@Nullable String deviceSerId) {
         super(deviceSerId);
     }
 
@@ -894,6 +894,42 @@ public abstract class SmartLockHotelHandler extends UnControllableRfDeviceHandle
                 }
                 break;
         }
+    }
+
+    /**
+     * 设定用户开锁为场景条件
+     *
+     * @param lockUser 开锁用户
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition toUserCondition(LockUser lockUser) throws Exception {
+        if (isNoSerId()) {
+            return null;
+        }
+        int pinInt = Integer.valueOf(lockUser.getPin());
+        String condition;
+        if (pinInt <= 255) {
+            condition = "4ac34a" + Transformation.byte2HexString((byte) pinInt) + "00000000";
+        } else {
+            condition = "4ac352" + Transformation.byte2HexString((byte) pinInt) + Transformation.byte2HexString((byte) (pinInt >> 8)) + "000000";
+        }
+        return toCondition(condition);
+    }
+
+    /**
+     * 设定临时用户开锁为场景条件
+     *
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition toTemporaryUserCondition() throws Exception {
+        if (isNoSerId()) {
+            return null;
+        }
+        int pinInt = Integer.valueOf("1500");
+        String condition = "4ac351" + Transformation.byte2HexString((byte) pinInt) + Transformation.byte2HexString((byte) (pinInt >> 8)) + "000000";
+        return toCondition(condition);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.onbright.oblink.cloud.handler;
+package com.onbright.oblink.cloud.handler.scenehandler;
 
 import com.google.gson.Gson;
 import com.onbright.oblink.cloud.bean.CloudScene;
@@ -377,4 +377,6 @@ public abstract class SceneHandler implements HttpRespond {
          */
         void actionNotMatch();
     }
+
+
 }

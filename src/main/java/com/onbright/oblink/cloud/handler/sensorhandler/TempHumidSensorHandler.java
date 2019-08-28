@@ -4,8 +4,10 @@ import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.cloud.handler.basehandler.BatteryDevice;
 import com.onbright.oblink.cloud.handler.basehandler.UnControllableRfDeviceHandler;
+import com.onbright.oblink.cloud.handler.scenehandler.ConditionRule;
 import com.onbright.oblink.local.net.Transformation;
 
 /**
@@ -52,6 +54,25 @@ public abstract class TempHumidSensorHandler extends UnControllableRfDeviceHandl
     @Override
     protected DeviceEnum getDeviceEnum() {
         return DeviceEnum.TEMP_HUMID_SENSOR;
+    }
+
+    /**
+     * 设置温度湿度场景条件
+     *
+     * @param tempRule  温度规则
+     * @param tempVal   对应温度值(零下49-80摄氏度)
+     * @param humidRule 湿度规则
+     * @param humidVal  对应湿度值(0-100百分比)
+     * @return 场景条件
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition tempHumidtoCondition(ConditionRule tempRule, int tempVal, ConditionRule humidRule, int humidVal) throws Exception {
+        byte[] condition = new byte[8];
+        condition[0] = (byte) tempRule.getVal();
+        condition[1] = (byte) (tempVal + 30);
+        condition[2] = (byte) humidRule.getVal();
+        condition[3] = (byte) humidVal;
+        return toCondition(Transformation.byteArryToHexString(condition));
     }
 
 }

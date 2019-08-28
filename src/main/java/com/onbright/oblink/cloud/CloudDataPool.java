@@ -181,5 +181,20 @@ public class CloudDataPool {
         }
         return null;
     }
+
+    /**
+     * 获取特定序列号的Wifi设备
+     *
+     * @param wifiDeviceId 序列号
+     * @return 目标设备，没找到则返回null
+     */
+    public static WifiDevice getWifiDeviceForSerId(String wifiDeviceId) {
+        for (WifiDevice wifiDevice : wifiDevices) {
+            if (wifiDevice.getDeviceId().equals(wifiDeviceId)) {
+                return wifiDevice;
+            }
+        }
+        return null;
+    }
 }
 

@@ -3,8 +3,11 @@ package com.onbright.oblink.cloud.handler;
 
 import com.google.gson.Gson;
 import com.onbright.oblink.EventMsg;
+import com.onbright.oblink.cloud.CloudDataPool;
 import com.onbright.oblink.cloud.bean.Action;
 import com.onbright.oblink.cloud.bean.BeAction;
+import com.onbright.oblink.cloud.bean.IrAction;
+import com.onbright.oblink.cloud.bean.WifiDevice;
 import com.onbright.oblink.cloud.bean.infraredtransponderbean.Brand;
 import com.onbright.oblink.cloud.bean.infraredtransponderbean.DeviceType;
 import com.onbright.oblink.cloud.bean.infraredtransponderbean.KeyTypeEnum;
@@ -650,9 +653,36 @@ public abstract class InfraredTransponderHandler extends WifiDeviceHandler imple
         }
     }
 
-    @Override
-    public Action toAction(String actionProperty) {
+    /**
+     * 取得红外转发器发送按键的行为对象
+     *
+     * @param program     遥控方案
+     * @param keyTypeEnum 按键类型
+     * @param keyName     按键索引
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action transToAction(Program program, KeyTypeEnum keyTypeEnum, String keyName) throws Exception {
+        IrAction irAction = new IrAction(program.getIndex(), program.getName(), keyTypeEnum.getKeyType(), keyName);
+        Gson gson = new Gson();
+        return toAction(gson.toJson(irAction));
+    }
 
-        return null;
+    @Override
+    public Action toAction(String actionProperty) throws Exception {
+        WifiDevice wifiDevice = CloudDataPool.getWifiDeviceForSerId(wifiDeviceId);
+        if (wifiDevice == null) {
+            throw new Exception("not find device,can not toAction");
+        }
+        Action action = new Action();
+        action.setNode_type("07");
+        action.setSerialId(wifiDevice.getDeviceId());
+        action.setAddr("fe");
+        action.setObox_serial_id(wifiDevice.getDeviceId());
+        action.setDevice_type(wifiDevice.getType());
+        action.setDevice_child_type("01");
+        action.setActionName(wifiDevice.getName());
+        action.setAction(actionProperty);
+        return action;
     }
 }

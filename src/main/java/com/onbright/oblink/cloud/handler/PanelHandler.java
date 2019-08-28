@@ -273,7 +273,7 @@ public abstract class PanelHandler extends ControllableRfDeviceHandler implement
      * @param index            参考{@link #changeSwitchButton(int, SwtichStatusEnum)}
      * @param swtichStatusEnum 参考{@link #changeSwitchButton(int, SwtichStatusEnum)}
      * @return 行为对象
-     * @throws Exception 没找到设备异常，此时请重新初始化Sdk，或确认该序列号设备在系统中
+     * @throws Exception 参考{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
      */
     public Action changeSwitchButtonToAction(int index, SwtichStatusEnum swtichStatusEnum) throws Exception {
         if (isNoSerId()) {
@@ -322,7 +322,7 @@ public abstract class PanelHandler extends ControllableRfDeviceHandler implement
      *
      * @param index 参考{@link #touchSceneButton(int)}
      * @return 行为对象
-     * @throws Exception 没找到设备异常，此时请重新初始化Sdk，或确认该序列号设备在系统中
+     * @throws Exception 参考{@link BeCondition#toCondition(String)}
      */
     public Condition touchSceneButtonToCondition(int index) throws Exception {
         if (isNoSerId()) {

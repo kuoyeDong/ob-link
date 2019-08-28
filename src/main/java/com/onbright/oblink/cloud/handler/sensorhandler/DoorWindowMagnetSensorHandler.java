@@ -3,6 +3,7 @@ package com.onbright.oblink.cloud.handler.sensorhandler;
 import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
+import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.cloud.handler.basehandler.BooleanSensorHandler;
 
 /**
@@ -30,6 +31,16 @@ public abstract class DoorWindowMagnetSensorHandler extends BooleanSensorHandler
      */
     protected abstract void doorOrWindowOpen();
 
+    /**
+     * 取得门窗磁打开状态条件对象
+     *
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition doorOrWindowOpenToCondition() throws Exception {
+        return booleanTrueToCondition();
+    }
+
     @Override
     public void booleanFalse() {
         doorOrWindowClose();
@@ -39,6 +50,16 @@ public abstract class DoorWindowMagnetSensorHandler extends BooleanSensorHandler
      * 门窗磁关闭
      */
     protected abstract void doorOrWindowClose();
+
+    /**
+     * 取得门窗磁关闭状态条件对象
+     *
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition doorOrWindowCloseToCondition() throws Exception {
+        return booleanFalseToCondition();
+    }
 
     @Override
     protected DeviceEnum getDeviceEnum() {

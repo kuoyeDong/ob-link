@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.cloud.bean.Action;
 import com.onbright.oblink.cloud.handler.basehandler.ControllableRfDeviceHandler;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.GetParameter;
@@ -42,6 +43,18 @@ public abstract class SocketHandler extends ControllableRfDeviceHandler {
     }
 
     /**
+     * 取得打开开关行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action turnOnSocketToAction() throws Exception {
+        byte[] bytes = new byte[8];
+        bytes[0] = 1;
+        return toAction(Transformation.byteArryToHexString(bytes));
+    }
+
+    /**
      * 关闭开关
      */
     public void turnOffSocket() {
@@ -52,6 +65,17 @@ public abstract class SocketHandler extends ControllableRfDeviceHandler {
         HttpRequst.getHttpRequst().request(this, CloudConstant.CmdValue.SETTING_NODE_STATUS,
                 GetParameter.onSetNodeState(deviceSerId, sendStatus),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
+    }
+
+    /**
+     * 取得关闭开关行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action turnOffSocketToAction() throws Exception {
+        byte[] bytes = new byte[8];
+        return toAction(Transformation.byteArryToHexString(bytes));
     }
 
     /**
@@ -73,6 +97,22 @@ public abstract class SocketHandler extends ControllableRfDeviceHandler {
     }
 
     /**
+     * 取得打开指示灯开关行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action turnOnIndicatorLightToAction() throws Exception {
+        if (haveNotStatus()) {
+            return null;
+        }
+        byte[] bytes = new byte[8];
+        bytes[0] = (byte) Integer.parseInt(status.substring(0, 2), 16);
+        bytes[3] = 1;
+        return toAction(Transformation.byteArryToHexString(bytes));
+    }
+
+    /**
      * 关闭指示灯
      */
     public void turnOffIndicatorLight() {
@@ -89,7 +129,21 @@ public abstract class SocketHandler extends ControllableRfDeviceHandler {
                 GetParameter.onSetNodeState(deviceSerId, sendStatus),
                 CloudConstant.Source.CONSUMER_OPEN, HttpRequst.POST);
     }
-
+    /**
+     * 取得关闭指示灯开关行为对象
+     *
+     * @return 行为对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
+     */
+    public Action turnOffIndicatorLightToAction() throws Exception {
+        if (haveNotStatus()) {
+            return null;
+        }
+        byte[] bytes = new byte[8];
+        bytes[0] = (byte) Integer.parseInt(status.substring(0, 2), 16);
+        bytes[3] = 2;
+        return toAction(Transformation.byteArryToHexString(bytes));
+    }
     /**
      * 修改过载功率上报阈值
      *

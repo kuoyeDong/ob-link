@@ -3,6 +3,7 @@ package com.onbright.oblink.cloud.handler.basehandler;
 import android.support.annotation.Nullable;
 
 import com.onbright.oblink.MathUtil;
+import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.local.net.OBConstant;
 import com.onbright.oblink.local.net.Transformation;
 
@@ -55,4 +56,28 @@ public abstract class BooleanSensorHandler extends UnControllableRfDeviceHandler
      */
     public abstract void booleanFalse();
 
+    /**
+     * 取得有状态条件对象
+     *
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition booleanTrueToCondition() throws Exception {
+        byte[] condition = new byte[8];
+        condition[0] = 0x4A;
+        condition[1] = 1;
+        return toCondition(Transformation.byteArryToHexString(condition));
+    }
+
+    /**
+     * 取得没有状态条件对象
+     *
+     * @return 条件对象
+     * @throws Exception 参见{@link com.onbright.oblink.cloud.bean.BeCondition#toCondition(String)}
+     */
+    public Condition booleanFalseToCondition() throws Exception {
+        byte[] condition = new byte[8];
+        condition[0] = 0x4A;
+        return toCondition(Transformation.byteArryToHexString(condition));
+    }
 }
