@@ -1,5 +1,7 @@
 package com.onbright.oblink.cloud.bean;
 
+import java.util.List;
+
 /**
  * 可当成场景条件的节点接口
  *
@@ -7,6 +9,7 @@ package com.onbright.oblink.cloud.bean;
  * 2019/8/26
  */
 public interface BeCondition {
+
     /**
      * 转化为条件
      *

@@ -1,7 +1,9 @@
 package com.onbright.oblink.cloud.handler.scenehandler;
 
 import com.google.gson.Gson;
+import com.onbright.oblink.cloud.bean.Action;
 import com.onbright.oblink.cloud.bean.CloudScene;
+import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.cloud.net.CloudConstant;
 import com.onbright.oblink.cloud.net.CloudParseUtil;
 import com.onbright.oblink.cloud.net.GetParameter;
@@ -13,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 场景管理：创建场景、删除场景、编辑场景触发的先决条件、编辑场景触发的设备行为动作。
@@ -64,12 +67,20 @@ public abstract class SceneHandler implements HttpRespond {
      */
     public void addScene(CloudScene cloudScene, AddSceneLsn addSceneLsn) {
         mAddSceneLsn = addSceneLsn;
-        if (!checkCondition(cloudScene)) {
-            if (mAddSceneLsn != null) {
-                mAddSceneLsn.conditionNotMatch();
-            }
+        int conditionResult = checkCondition(cloudScene);
+        switch (conditionResult) {
+            case CONDITION_LIMIT:
+                if (mAddSceneLsn != null) {
+                    mAddSceneLsn.conditionNumNotMatch();
+                }
+                return;
+            case CONDITION_NOT_ALONG_OBOX:
+                if (mAddSceneLsn != null) {
+                    mAddSceneLsn.conditionNotOneObox();
+                }
+                return;
         }
-        if (!checkeAction(cloudScene)) {
+        if (actionNotMatch(cloudScene)) {
             if (mAddSceneLsn != null) {
                 mAddSceneLsn.actionNotMatch();
             }
@@ -99,12 +110,20 @@ public abstract class SceneHandler implements HttpRespond {
      */
     public void modifyScene(CloudScene cloudScene, ModifySceneLsn modifySceneLsn) {
         mModifySceneLsn = modifySceneLsn;
-        if (!checkCondition(cloudScene)) {
-            if (mModifySceneLsn != null) {
-                mModifySceneLsn.conditionNotMatch();
-            }
+        int conditionResult = checkCondition(cloudScene);
+        switch (conditionResult) {
+            case CONDITION_LIMIT:
+                if (mAddSceneLsn != null) {
+                    mAddSceneLsn.conditionNumNotMatch();
+                }
+                return;
+            case CONDITION_NOT_ALONG_OBOX:
+                if (mAddSceneLsn != null) {
+                    mAddSceneLsn.conditionNotOneObox();
+                }
+                return;
         }
-        if (!checkeAction(cloudScene)) {
+        if (actionNotMatch(cloudScene)) {
             if (mModifySceneLsn != null) {
                 mModifySceneLsn.actionNotMatch();
             }
@@ -338,29 +357,63 @@ public abstract class SceneHandler implements HttpRespond {
     }
 
     /**
-     * 检查条件
+     * 检查条件是否合规,下发到本地的场景，条件节点必须属于同一obox
      *
      * @param cloudScene 目标检测场景
      * @return 符合返回true
      */
-    private boolean checkCondition(CloudScene cloudScene) {
-        if (CloudScene.LOCAL.equals(cloudScene.getScene_type())) {
-            cloudScene.getConditions();
+    private int checkCondition(CloudScene cloudScene) {
+        List<List<Condition>> conditionss = cloudScene.getConditions();
+        if (conditionss.size() > CONDITION_LIMIT) {
+            return CONDITION_LIMIT;
         }
-        return true;
+        for (List<Condition> conditions : conditionss) {
+            if (conditions.size() > CONDITION_LIMIT) {
+                return CONDITION_LIMIT;
+            }
+        }
+        if (CloudScene.LOCAL.equals(cloudScene.getScene_type())) {
+            for (List<Condition> conditions : conditionss) {
+                for (Condition condition : conditions) {
+                    if (!cloudScene.getObox_serial_id().equals(condition.getObox_serial_id())) {
+                        return CONDITION_NOT_ALONG_OBOX;
+                    }
+                }
+            }
+        }
+        return CONDITION_OK;
     }
 
     /**
-     * 检查行为
-     *
-     * @param cloudScene 目标检测
-     * @return 符合返回true
+     * 本地场景时，条件不同属OBOX
      */
-    private boolean checkeAction(CloudScene cloudScene) {
-        if (CloudScene.LOCAL.equals(cloudScene.getScene_type())) {
+    private static final int CONDITION_NOT_ALONG_OBOX = 1;
+    /**
+     * 条件超出3*3限制
+     */
+    private static final int CONDITION_LIMIT = 3;
+    /**
+     * 条件合规
+     */
+    private static final int CONDITION_OK = 2;
 
+    /**
+     * 检查行为是否不符合规范，下发到本地的场景，行为节点必须属于同一obox
+     *
+     * @param cloudScene 目标检测场景
+     * @return 不符合返回true
+     */
+    private boolean actionNotMatch(CloudScene cloudScene) {
+        if (CloudScene.LOCAL.equals(cloudScene.getScene_type())) {
+            List<Action> actions = cloudScene.getActions();
+            for (Action action : actions) {
+                if (!cloudScene.getObox_serial_id().equals(action.getObox_serial_id())) {
+                    return true;
+                }
+            }
+            return false;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -368,15 +421,19 @@ public abstract class SceneHandler implements HttpRespond {
      */
     private interface NotMatch {
         /**
-         * 条件不符合
+         * 条件数量不符合
          */
-        void conditionNotMatch();
+        void conditionNumNotMatch();
 
         /**
-         * 行为不符合
+         * 条件不同属Obox
+         */
+        void conditionNotOneObox();
+
+        /**
+         * 本地场景时，条件节点不在同一Obox
          */
         void actionNotMatch();
     }
-
 
 }

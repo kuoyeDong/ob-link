@@ -11,8 +11,10 @@ import com.onbright.oblink.local.bean.SceneCondition;
 import com.onbright.oblink.local.net.OBConstant;
 import com.onbright.oblink.local.net.Transformation;
 
+import java.util.List;
+
 /**
- * 解析服务器场景condition语意话内容主要用于展示
+ * 解析场景condition语意话内容主要用于展示
  *
  * @author dky
  * 2019/8/7
@@ -22,33 +24,31 @@ public class ParseCondition {
     /**
      * 服务器模式解析condition显示
      *
-     * @param context   上下文
      * @param condition 服务器模式的condition
      * @return 语意话文字
      */
-    public String getCdtShowMsg(Context context, Condition condition) {
-        String space = ": ";
+    public List<Integer> getCdtShowMsg(Condition condition) {
         String cdtdetial = null;
         int conditionType = Integer.parseInt(condition.getCondition_type(), 16);
         switch (conditionType) {
             /*定时场景*/
             case Condition.TIMING:
-                cdtdetial = onTime(context, condition, space);
+                cdtdetial = onTime(condition);
                 break;
             /*联动场景*/
             case Condition.SENSOR:
-                cdtdetial = onLink(context, condition, space);
+                cdtdetial = onLink(condition);
                 break;
             /*遥控器场景*/
             case Condition.REMOTE:
-                cdtdetial = onRemote(context, condition, space);
+                cdtdetial = onRemote(condition);
                 break;
             /*门锁，指纹机*/
             case Condition.FINGERPRINT_MACHINE:
                 if (condition.getDevice_type() != null && Integer.parseInt(condition.getDevice_type(), 16) == OBConstant.NodeType.SMART_LOCK) {
-                    cdtdetial = onLock(context, condition, space);
+                    cdtdetial = onLock(condition);
                 } else {
-                    cdtdetial = onFingerMachine(context, condition, space, true);
+                    cdtdetial = onFingerMachine(condition, true);
                 }
                 break;
         }
@@ -63,7 +63,7 @@ public class ParseCondition {
      * @param space     un
      * @return un
      */
-    private String onLock(Context context, Condition condition, String space) {
+    private List<Integer> onLock(Context context, Condition condition, String space) {
         String conditionStr = null;
         String conditionVal = condition.getCondition();
         String conditionType = conditionVal.substring(2, 4);
@@ -75,11 +75,11 @@ public class ParseCondition {
                 switch (pinIndex) {
                     case 0x4a:/*1个字节等于，普通用户*/
                         int pinVal = Integer.valueOf(conditionVal.substring(6, 8), 16);
-                        conditionStr = context.getString(R.string.lock_user) + pinVal + context.getString(R.string.pressed);
+                        conditionStr = context.getString(R.string.lock_user) + pinVal;
                         break;
                     case 0x52:/*2个字节等于，普通用户,低字节在前，高字节在后*/
                         pinVal = Integer.valueOf(conditionVal.substring(6, 8), 16) + (Integer.valueOf(conditionVal.substring(8, 10), 16) << 8);
-                        conditionStr = context.getString(R.string.lock_user) + pinVal + context.getString(R.string.pressed);
+                        conditionStr = context.getString(R.string.lock_user) + pinVal;
                         break;
                     case 0x51:/*2个字节大于，远程用户*/
                         conditionStr = context.getString(R.string.remote_open_lock);
@@ -97,7 +97,7 @@ public class ParseCondition {
     /**
      * 指纹机
      */
-    private String onFingerMachine(Context context, Condition condition, String space, boolean isCloud) {
+    private List<Integer> onFingerMachine(Context context, Condition condition, String space, boolean isCloud) {
         return context.getString(R.string.finger_print_machine) +
                 space + condition.getConditionID() + context.getString(R.string.pin) +
                 (isCloud ? condition.getCondition() : Integer.parseInt(condition.getCondition().substring(4, 6) +
@@ -105,46 +105,46 @@ public class ParseCondition {
                 + context.getString(R.string.pressed);
     }
 
-    /**
-     * 解析本地登录模式场景内条件信息
-     *
-     * @param context        上下文
-     * @param sceneCondition 本地场景的条件
-     */
-    public String getLocalShowMsg(Context context, SceneCondition sceneCondition, String key) {
-        String space = ": ";
-        String cdtdetial = null;
-        int conditionType = sceneCondition.getconditionType();
-        Condition condition = new Condition();
-        if (sceneCondition.getCondition(key) == null) {
-            return "";
-        }
-        condition.setCondition(Transformation.byteArryToHexString(sceneCondition.getCondition(key)));
-        if (sceneCondition instanceof ObNode) {
-            ObNode os = (ObNode) sceneCondition;
-            condition.setDevice_type(Transformation.byte2HexString((byte) os.getParentType()));
-            condition.setDevice_child_type(Transformation.byte2HexString((byte) os.getType()));
-            condition.setConditionID(os.getNodeId());
-        }
-        switch (conditionType) {
-            /*定时场景*/
-            case SceneCondition.TIMING:
-                cdtdetial = onTime(context, condition, space);
-                break;
-            /*联动场景*/
-            case SceneCondition.SENSOR:
-                cdtdetial = onLink(context, condition, space);
-                break;
-            /*遥控器场景*/
-            case SceneCondition.CONTROL:
-                cdtdetial = onRemote(context, condition, space);
-                break;
-        }
-        return cdtdetial;
-    }
+//    /**
+//     * 解析本地登录模式场景内条件信息
+//     *
+//     * @param context        上下文
+//     * @param sceneCondition 本地场景的条件
+//     */
+//    public List<Integer> getLocalShowMsg(Context context, SceneCondition sceneCondition, String key) {
+//        String space = ": ";
+//        String cdtdetial = null;
+//        int conditionType = sceneCondition.getconditionType();
+//        Condition condition = new Condition();
+//        if (sceneCondition.getCondition(key) == null) {
+//            return "";
+//        }
+//        condition.setCondition(Transformation.byteArryToHexString(sceneCondition.getCondition(key)));
+//        if (sceneCondition instanceof ObNode) {
+//            ObNode os = (ObNode) sceneCondition;
+//            condition.setDevice_type(Transformation.byte2HexString((byte) os.getParentType()));
+//            condition.setDevice_child_type(Transformation.byte2HexString((byte) os.getType()));
+//            condition.setConditionID(os.getNodeId());
+//        }
+//        switch (conditionType) {
+//            /*定时场景*/
+//            case SceneCondition.TIMING:
+//                cdtdetial = onTime(context, condition, space);
+//                break;
+//            /*联动场景*/
+//            case SceneCondition.SENSOR:
+//                cdtdetial = onLink(context, condition, space);
+//                break;
+//            /*遥控器场景*/
+//            case SceneCondition.CONTROL:
+//                cdtdetial = onRemote(context, condition, space);
+//                break;
+//        }
+//        return cdtdetial;
+//    }
 
     @NonNull
-    private String onRemote(Context context, Condition condition, String space) {
+    private List<Integer> onRemote(Context context, Condition condition, String space) {
         String item;
         String cdtdetial;
         item = context.getString(R.string.remote_contidion);
@@ -175,7 +175,7 @@ public class ParseCondition {
     }
 
     @NonNull
-    private String onLink(Context context, Condition condition, String space) {
+    private List<Integer> onLink(Context context, Condition condition, String space) {
         String item;
         String cdtdetial;
         item = context.getString(R.string.link_condition);
@@ -206,7 +206,6 @@ public class ParseCondition {
                             cdtStateStr = context.getString(R.string.radar_lev_1);
                         }
                         break;
-
                     case OBConstant.NodeType.CO:
                         break;
                     case OBConstant.NodeType.ENVIRONMENTAL:
@@ -237,21 +236,19 @@ public class ParseCondition {
                         }
                         break;
                     case OBConstant.NodeType.TEMP_HUMID_SENSOR:
-                        String tempMathStr = math2Str(context, Integer.parseInt(condition.getCondition().substring(0, 2), 16));
-                        int tempInt = Integer.parseInt(condition.getCondition().substring(2, 4), 16);
-                        if (tempInt != 255) {
-                            tempInt -= 30;
-                        }
-                        String humiMathStr = math2Str(context, Integer.parseInt(condition.getCondition().substring(4, 6), 16));
-                        int humiInt = Integer.parseInt(condition.getCondition().substring(6, 8), 16);
+                        byte[] cdtBytes = Transformation.hexString2Bytes(condition.getCondition());
+                        byte tempRule = cdtBytes[0];
+                        int tempVal = MathUtil.validByte(cdtBytes[1]);
+                        byte humidRule = cdtBytes[2];
+                        int humidVal = MathUtil.validByte(cdtBytes[3]);
                         StringBuilder sb = new StringBuilder();
-                        if (tempInt != 255) {
-                            sb.append(context.getString(R.string.temp)).append(tempMathStr).append(tempInt);
+                        if (tempVal != 0xff) {
+                            sb.append(context.getString(R.string.temp)).append(math2Str(context, MathUtil.validByte(tempRule))).append(tempVal - 30);
                         }
-                        if (humiInt != 255) {
-                            sb.append(context.getString(R.string.hum)).append(humiMathStr).append(humiInt);
+                        if (!(humidRule == 0 && humidVal == 0)) {
+                            sb.append(context.getString(R.string.hum)).append(math2Str(context, MathUtil.validByte(humidRule))).append(humidVal);
                         }
-                        if (tempInt == 255 && humiInt == 255) {
+                        if (sb.length() == 0) {
                             sb.append(context.getString(R.string.not_set));
                         }
                         cdtStateStr = sb.toString();
@@ -285,7 +282,7 @@ public class ParseCondition {
                         break;
                     case OBConstant.NodeType.DC_BODY_ALS:
                     case OBConstant.NodeType.AC_BODY_ALS:
-                        byte[] cdtBytes = Transformation.hexString2Bytes(condition.getCondition());
+                        cdtBytes = Transformation.hexString2Bytes(condition.getCondition());
                         byte bodyRule = cdtBytes[0];
                         int bodyVal = MathUtil.validByte(cdtBytes[1]);
                         byte lightRule = cdtBytes[2];
@@ -377,20 +374,18 @@ public class ParseCondition {
     }
 
     @NonNull
-    private String onTime(Context context, Condition condition, String space) {
+    private List<Integer> onTime(Context context, Condition condition, String space) {
         String item;
-        String cdtdetial;
         item = context.getString(R.string.time_condition);
         String time = condition.getCondition();
         /*一般时间*/
         if (time.substring(0, 2).equals("00")) {
-            cdtdetial = onSimpleTime(item, space, time);
+            return onSimpleTime(item, space, time);
         }
         /*循环时间*/
         else {
-            cdtdetial = onCircleTime(context, item, space, time);
+            return onCircleTime(context, item, space, time);
         }
-        return cdtdetial;
     }
 
     /**
@@ -400,7 +395,7 @@ public class ParseCondition {
      * @param rule    判断条件数据
      * @return 语义
      */
-    private String math2Str(Context context, int rule) {
+    private Integer math2Str(Context context, int rule) {
         String mathStr = null;
         switch (rule) {
             case 0x49:
@@ -423,7 +418,7 @@ public class ParseCondition {
     }
 
     @NonNull
-    private String onCircleTime(Context context, String item, String space, String time) {
+    private List<Integer> onCircleTime(Context context, String item, String space, String time) {
         String cdtdetial;
         byte circle = (byte) Integer.parseInt(time.substring(0, 2), 16);
         StringBuilder sb = new StringBuilder();
@@ -485,7 +480,7 @@ public class ParseCondition {
     }
 
     @NonNull
-    private String onSimpleTime(String item, String space, String time) {
+    private List<Integer> onSimpleTime(String item, String space, String time) {
         String cdtdetial;
         String year = "20" + apendzero(String.valueOf(Integer.parseInt(time.substring(4, 6), 16)));
         String month = apendzero(String.valueOf(Integer.parseInt(time.substring(6, 8), 16)));
@@ -495,12 +490,4 @@ public class ParseCondition {
         cdtdetial = item + space + year + "-" + month + "-" + day + "  " + hour + ":" + min;
         return cdtdetial;
     }
-
-    private String apendzero(String time) {
-        if (time.length() < 2) {
-            time = "0" + time;
-        }
-        return time;
-    }
-
 }

@@ -13,8 +13,24 @@ import java.util.List;
  * Created by adolf_dong on 2016/1/7.
  */
 public class CloudScene implements Serializable, Checkable {
+    /**
+     * 保存在云端的场景
+     */
     public static final String SERVER = "00";
+    /**
+     * 下发到obox的场景
+     */
     public static final String LOCAL = "01";
+
+    /**
+     * 关闭场景，并非删除，使得场景暂时失效
+     */
+    public static final String DISABLE = "00";
+
+    /**
+     * 打开场景，并非新增，使得场景生效
+     */
+    public static final String ENABLE = "01";
 
     /**
      * 情景名称
@@ -38,19 +54,24 @@ public class CloudScene implements Serializable, Checkable {
      */
     private String obox_scene_number;
     /**
-     * 条件场景使能，值为00| 01
-     * 场景的使能状态 Disable|Enable, 在创建时候任何时候都必须传
+     * 场景的使能
+     * {}
+     * Disable|Enable,
+     * {@link #ENABLE#DISABLE}
      */
-    private String scene_status;
+    private String scene_status = ENABLE;
 
     /**
-     * 00|01  , 条件｜fail-safe
-     * 如不传，则默认是条件
+     * 场景类型
+     * {@link #SERVER#LOCAL}
      */
-    private String scene_type = "00";
+    private String scene_type = SERVER;
 
     /**
-     * 条件
+     * 条件组集合，请注意两层集合结构，每层最多三个条件，如下所示
+     * [[condition,condition,condition],[condition,condition,condition],[condition,condition,condition]]
+     * 内层集合中，三个条件同时满足才会触发场景
+     * 外层集合中，三个条件组任一满足即可触发场景
      */
     private List<List<Condition>> conditions;
 
@@ -69,7 +90,7 @@ public class CloudScene implements Serializable, Checkable {
     }
 
     /**
-     * 场景组
+     * 场景组,可自定规则组成链式表或容器集，也可不使用
      */
     private String scene_group = "00";
 

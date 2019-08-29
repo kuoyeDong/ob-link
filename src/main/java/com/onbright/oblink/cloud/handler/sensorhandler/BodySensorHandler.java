@@ -6,6 +6,8 @@ import com.onbright.oblink.DeviceEnum;
 import com.onbright.oblink.cloud.bean.Condition;
 import com.onbright.oblink.cloud.handler.basehandler.BooleanSensorHandler;
 
+import java.util.List;
+
 /**
  * 处理人体感应传感器
  *
