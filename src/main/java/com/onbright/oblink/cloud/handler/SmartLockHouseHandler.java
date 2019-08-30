@@ -767,7 +767,7 @@ public abstract class SmartLockHouseHandler extends UnControllableRfDeviceHandle
         showBattery(betty);
         int cmd = MathUtil.validByte(statusBytes[1]);
         if (cmd == OPEN) {
-            switch (statusBytes[5]) {
+            switch (statusBytes[2]) {
                 case 0:
                     lockStatusChange(LockStatusEnum.FINGER_PRINT);
                     break;
@@ -785,6 +785,9 @@ public abstract class SmartLockHouseHandler extends UnControllableRfDeviceHandle
                     break;
                 case 5:
                     lockStatusChange(LockStatusEnum.TEMP_LOCK_USER_OPEN);
+                    break;
+                case 7:
+                    lockStatusChange(LockStatusEnum.INDOOR_UNLOCKING);
                     break;
             }
         } else if (cmd == CARD) {
@@ -878,7 +881,12 @@ public abstract class SmartLockHouseHandler extends UnControllableRfDeviceHandle
         /**
          * 反锁解除
          */
-        BACK_LOCK_RELEASE
+        BACK_LOCK_RELEASE,
+
+        /**
+         * 室内开锁
+         */
+        INDOOR_UNLOCKING
     }
 
     @Override
@@ -931,5 +939,6 @@ public abstract class SmartLockHouseHandler extends UnControllableRfDeviceHandle
         String condition = "4ac351" + Transformation.byte2HexString((byte) pinInt) + Transformation.byte2HexString((byte) (pinInt >> 8)) + "000000";
         return toCondition(condition);
     }
+
 
 }

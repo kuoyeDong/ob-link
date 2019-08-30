@@ -61,6 +61,7 @@ public abstract class RfDeviceHandler implements HttpRespond, NoSerialId {
         EventBus.getDefault().register(this);
     }
 
+
     /**
      * 返回当前对象内的现有设备状态，并无网络交互，
      * 可通过此方法获取到状态值保存，下次使用本类时可取出该状态值使用{@link #setStatus(String)}初始化状态值

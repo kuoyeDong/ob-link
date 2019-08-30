@@ -10,12 +10,25 @@ import java.util.List;
  */
 public class Condition implements Serializable {
 
+    /**
+     * 时间
+     */
     public static final int TIMING = 0;
+    /**
+     * 传感器联动
+     */
     public static final int SENSOR = 1;
+    /**
+     * 遥控器
+     */
     public static final int REMOTE = 2;
+    /**
+     * 门锁，指纹机
+     */
     public static final int FINGERPRINT_MACHINE = 3;
     /**
-     * 时间/设备/遥控器 00/01/02
+     * 条件类型
+     * {@link #TIMING#SENSOR#REMOTE#FINGERPRINT_MACHINE}
      */
     private String condition_type;
 

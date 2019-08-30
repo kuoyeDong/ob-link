@@ -612,8 +612,8 @@ public abstract class SceneHelper {
      * @param sceneCondition 要解析的条件
      * @return 情景条件显示信息
      */
-    public String getConditionShowString(SceneCondition sceneCondition) {
+    public List<Object> getConditionShowString(SceneCondition sceneCondition) {
         ParseCondition pc = new ParseCondition();
-        return pc.getLocalShowMsg(context, sceneCondition, "" + obScene.getSerisNum());
+        return pc.getLocalShowMsg(sceneCondition, "" + obScene.getSerisNum());
     }
 }

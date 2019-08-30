@@ -23,6 +23,7 @@ public class LockHistoryBean implements Serializable {
      * 8,删除用户
      * 9,锁关闭
      * 10,注册成功
+     * 12,室内开锁
      */
     private int operation;
     /**
