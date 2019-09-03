@@ -10,7 +10,7 @@
 
     dependencies {
 		//ob-bright物联网库
-    	api 'com.dongkuoye103966660:Ob-Link:1.0.2'
+    	api 'com.dongkuoye103966660:Ob-Link:1.0.3'
 		//以下为物联网库中使用的第三方库，避免与使用者库冲突，不合并打包
 	    api 'com.google.code.gson:gson:2.8.2'
 	    api 'com.squareup.okhttp3:okhttp:3.14.2'
@@ -63,7 +63,7 @@
 ### 功能：连接obox或wifi设备到云。
 	
 	//上下文，手机连接的wifi密码，回调实例
-	ConnectHandler connectHandler = new ConnectHandler(this, "mymm1234", new ConnectHandler.ConnectOboxLsn() {
+	ConnectHandler connectHandler = new ConnectHandler(this, "mymm1234", new ConnectHandler.ConnectLsn() {
 
         @Override
         public void error(ConnectHandler.ConnectError connectError) {
@@ -123,7 +123,7 @@
 #### 4.1.对象的初始化
 
 	//锁序列号,若此序列号为空时执行必需序列号的操作，将直接回调noSerialId而不进行目标操作
-	smartLockHotelHandler = new SmartLockHotelHandler(lockSerId) {
+	smartLockHouseHandler = new SmartLockHouseHandler(lockSerId) {
 
 		@Override
         public void noSerialId() {
@@ -138,20 +138,8 @@
         }
 
         @Override
-        protected void batteryValue(int i) {
+        public void batteryValue(int i) {
             //当前电量值发生变化，回调参数为电量百分比
-
-        }
-
-        @Override
-        public void deleteDeviceSuc() {
-            //成功删除设备
-
-        }
-
-        @Override
-        public void searchNewDeviceSuc() {
-            //成功开启扫描，请等待扫描时传入的时间，单位为秒
 
         }
 
@@ -172,17 +160,27 @@
 #### 4.2.添加门锁
 
 	//OBOX序列号(门锁为OBOX下级设备)，扫描时间(十进制),开启扫描成功回调searchNewDeviceSuc，扫描到门锁回调onNewDevice
-	smartLockHotelHandler.searchNewDevice(oboxSerId, "30");
+	smartLockHouseHandler.searchNewDevice(oboxSerId, "30", new RfDeviceHandler.SearchNewDeviceLsn() {
+        @Override
+        public void searchNewDeviceSuc() {
+            showMsg("成功开启扫描，请等待扫描时传入的时间，单位为秒");
+        }
+    });
 
 #### 4.3.删除门锁
 
 	//删除门锁，成功回调deleteDeviceSuc
-	smartLockHotelHandler.deleteDevice();
+	smartLockHouseHandler.deleteDevice(new RfDeviceHandler.DeleteDeviceLsn() {
+        @Override
+        public void deleteDeviceSuc() {
+
+        }
+    });
 
 #### 4.4.获取用户列表
 
 	//回调实例
-	smartLockHotelHandler.queryUser(new SmartLockHotelHandler.queryUserLsn() {
+	smartLockHouseHandler.queryUser(new SmartLockHouseHandler.QueryUserLsn() {
 
         @Override
         public void userRecordLoad(List<LockUser> list) {
@@ -194,7 +192,7 @@
 #### 4.5.发送验证码到胁迫时目标手机，此方法用于设定短信接受人时，获得接受人许可,要使用此功能首先要在门锁设置用户胁迫指纹
 
 	//用户实例，接受胁迫信息的手机号码，回调实例
-	smartLockHotelHandler.sendValidateCode(lockUser, "18666860862", new SmartLockHotelHandler.SendCodeLsn() {
+	smartLockHouseHandler.sendValidateCode(lockUser, "18666860862", new SmartLockHouseHandler.SendCodeLsn() {
 
         @Override
         public void sendCodeOk() {
@@ -206,7 +204,7 @@
 #### 4.6.修改门锁用户
 
 	//门锁用户实例，验证码，回调实例
-    smartLockHotelHandler.modifyUser(lockUser, "收到的短信验证码", new SmartLockHotelHandler.ModifyUserLsn() {
+    smartLockHouseHandler.modifyUser(lockUser, "收到的短信验证码", new SmartLockHouseHandler.ModifyUserLsn() {
 
         @Override
         public void modifyUserOk() {
@@ -218,7 +216,7 @@
 #### 4.7.验证门锁权限密码(要操作门锁临时用户，必须验证权限密码，如没有在权限密码则此方法不会执行任何操作，请使用创建权限密码方法createAdminPwd)
 
 	//权限密码，回调实例
-	smartLockHotelHandler.validateAdminPwd("123456", new SmartLockHotelHandler.ValidateAdminPwdLsn() {
+	smartLockHouseHandler.validateAdminPwd("123456", new SmartLockHouseHandler.ValidateAdminPwdLsn() {
 
         @Override
         public void validateAdminPwdOk() {
@@ -237,7 +235,7 @@
 #### 4.8.门锁创建权限密码
 
 	//权限密码，回调实例
-	smartLockHotelHandler.createAdminPwd("123456", new SmartLockHotelHandler.CreatAuthPwdLsn() {
+	smartLockHouseHandler.createAdminPwd("123456", new SmartLockHouseHandler.CreatAuthPwdLsn() {
 
         @Override
         public void creatAdminPwdOk() {
@@ -256,13 +254,13 @@
 #### 4.9.查询锁状态
 	
 	//成功成功必然回调lockStatusChange，可能回调batteryValue，调用此方法可查询门锁有无权限密码(如需权限密码相关操作务必先调用此方法)
-	smartLockHotelHandler.queryLockStatus();
+	smartLockHouseHandler.queryLockStatus();
 
 #### 4.10.智能门锁根据推送重置权限密码
 
 
 	//新的权限密码，uniqueKey，回调实例
-	smartLockHotelHandler.resetAdminPwdByCode("123456", uniqueKey，new SmartLockHotelHandler.ResetPwdLsn() {
+	smartLockHouseHandler.resetAdminPwdByCode("123456", uniqueKey，new SmartLockHouseHandler.ResetPwdLsn() {
 
         @Override
         public void waitLockReset() {
@@ -287,7 +285,7 @@
 #### 4.11.修改门锁权限密码
 
 	//旧密码，新密码，回调实例
-	smartLockHotelHandler.modifyAdminPwd("123456", "123456", new SmartLockHotelHandler.ModifyPwdLsn() {
+	smartLockHouseHandler.modifyAdminPwd("123456", "123456", new SmartLockHouseHandler.ModifyPwdLsn() {
 
         @Override
         public void modifyPwdOk() {
@@ -306,7 +304,7 @@
 #### 4.12.查询门锁临时用户
 
 	//回调实例
-	smartLockHotelHandler.queryTemporaryUser(new SmartLockHotelHandler.QueryTemporaryUserLsn() {
+	smartLockHouseHandler.queryTemporaryUser(new SmartLockHouseHandler.QueryTemporaryUserLsn() {
 
         @Override
         public void queryTemporaryUserOk(List<LockTempUser> list) {
@@ -325,7 +323,7 @@
 #### 4.13.添加临时用户
 
 	//名称，有效期的起始时间，有效期的终止时间，可执行开门次数(十进制)，回调实例	
-	smartLockHotelHandler.addTemporaryUser("nickName", "2019-07-22 00:00:00", "2019-07-22 23:00:00", "3", new SmartLockHotelHandler.AddTemporaryUserLsn() {
+	smartLockHouseHandler.addTemporaryUser("nickName", "2019-07-22 00:00:00", "2019-07-22 23:00:00", "3", new SmartLockHouseHandler.AddTemporaryUserLsn() {
 
         @Override
         public void addTemporaryUserOk(LockTempUser lockTempUser) {
@@ -344,7 +342,7 @@
 #### 4.14.删除临时用户
 
 	//删除的临时用户实例，回调实例
-	smartLockHotelHandler.deleteTemporaryUser(lockTempUser, new SmartLockHotelHandler.DeleteTemporaryUserLsn() {
+	smartLockHouseHandler.deleteTemporaryUser(lockTempUser, new SmartLockHouseHandler.DeleteTemporaryUserLsn() {
 
         @Override
         public void deleteTemporaryUserOk() {
@@ -363,7 +361,7 @@
 #### 4.15.修改门锁临时用户
 
 	//修改的临时用户实例，回调实例
-    smartLockHotelHandler.modifyTemporaryUser(modifyLockTempUser, new SmartLockHotelHandler.ModifyTemporaryUserLsn() {
+    smartLockHouseHandler.modifyTemporaryUser(modifyLockTempUser, new SmartLockHouseHandler.ModifyTemporaryUserLsn() {
 
         @Override
         public void modifyTemporaryUserOk(LockTempUser lockTempUser) {
@@ -388,7 +386,7 @@
 #### 4.16.发送密码给临时用户
 
 	//临时用户实例，回调实例
-    smartLockHotelHandler.sendTemporaryUserPwd(sendPwdTempUser, new SmartLockHotelHandler.SendTemporaryUserPwdLsn() {
+    smartLockHouseHandler.sendTemporaryUserPwd(sendPwdTempUser, new SmartLockHouseHandler.SendTemporaryUserPwdLsn() {
 
         @Override
         public void sendTemporaryUserPwdOk() {
@@ -407,7 +405,7 @@
 #### 4.17.查询推送设置列表
 
 	//回调实例
-	smartLockHotelHandler.queryPush(new SmartLockHotelHandler.QueryPushLsn() {
+	smartLockHouseHandler.queryPush(new SmartLockHotelHandler.QueryPushLsn() {
 
         @Override
         public void queryPushOk(String s, List<LockPush> list) {
@@ -420,7 +418,7 @@
 #### 4.18.修改推送设置
 
 	//电话号码，推送配置列表，回调实例
-    smartLockHotelHandler.modifyPush("18666860862", lockPushes, new SmartLockHotelHandler.ModifyPushLsn() {
+    smartLockHouseHandler.modifyPush("18666860862", lockPushes, new SmartLockHouseHandler.ModifyPushLsn() {
 
         @Override
         public void modifyPushOk() {
@@ -433,7 +431,7 @@
 #### 4.19.查询开门记录
 	
 	//回调实例
-	smartLockHotelHandler.queryLockOpenRecord(new SmartLockHotelHandler.OpenRecordLsn() {
+	smartLockHouseHandler.queryLockOpenRecord(new SmartLockHouseHandler.OpenRecordLsn() {
         @Override
         public void openRecordLoad(List<LockHistory> list) {
             //查询开锁记录成功，请自取回调列表实例处理
@@ -443,7 +441,7 @@
 #### 4.20.查询警报记录
 
 	//回调实例
-	smartLockHotelHandler.queryLockWarnRecord(new SmartLockHotelHandler.WarnRecordLsn() {
+	smartLockHouseHandler.queryLockWarnRecord(new SmartLockHouseHandler.WarnRecordLsn() {
         @Override
         public void warnRecordLoad(List<LockAlarm> list) {
 			//查询警报记录成功，请自取回调列表实例处理

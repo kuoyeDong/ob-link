@@ -112,10 +112,10 @@ public class ParseUpLoad {
                         for (ObNode obNode : obNodes) {
                             byte[] cachecpladdr = obNode.getCplAddr();
                             if (Arrays.equals(cachecpladdr, cpladdr)) {
-                                byte[] payLoad = Arrays.copyOfRange(upload, index[8] + 7 + 1, index[8] + 7 + 1 + 7);
+                                byte[] payLoad = Arrays.copyOfRange(upload, index[8] + 7 + 1, index[8] + 7 + 1 + 8);
                                 int ptype = obNode.getParentType();
                                 int type = obNode.getType();
-                                byte[] state = new byte[7];
+                                byte[] state = new byte[8];
                                 switch (ptype) {
                                     case OBConstant.NodeType.IS_SENSOR:
                                         switch (type) {
