@@ -12,11 +12,11 @@
 		//ob-bright物联网库
 		api 'com.dongkuoye103966660:Ob-Link:1.0.3'
 		//以下为物联网库中使用的第三方库，避免与使用者库冲突，不合并打包
-	    api 'com.google.code.gson:gson:2.8.2'
-	    api 'com.squareup.okhttp3:okhttp:3.14.2'
-	    api 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
-	    api 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
-	    api 'org.greenrobot:eventbus:3.1.1'
+		api 'com.google.code.gson:gson:2.8.2'
+		api 'com.squareup.okhttp3:okhttp:3.14.2'
+		api 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+		api 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+		api 'org.greenrobot:eventbus:3.1.1'
 	}
 
 # 所需权限
