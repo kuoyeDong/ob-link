@@ -9,8 +9,10 @@
 # 在gradle中添加如下代码
 
     dependencies {
+
 		//ob-bright物联网库
     	api 'com.dongkuoye103966660:Ob-Link:1.0.3'
+
 		//以下为物联网库中使用的第三方库，避免与使用者库冲突，不合并打包
 	    api 'com.google.code.gson:gson:2.8.2'
 	    api 'com.squareup.okhttp3:okhttp:3.14.2'
