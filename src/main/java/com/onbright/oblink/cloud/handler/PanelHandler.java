@@ -270,26 +270,21 @@ public abstract class PanelHandler extends ControllableRfDeviceHandler implement
     /**
      * 获取场景的执行开关按钮行为对象
      *
-     * @param index            参考{@link #changeSwitchButton(int, SwtichStatusEnum)}
-     * @param swtichStatusEnum 参考{@link #changeSwitchButton(int, SwtichStatusEnum)}
+     * @param swtichStatusEnums 开关状态枚举列表，按添加顺序依次对应0,1,2...
      * @return 行为对象
      * @throws Exception 参考{@link com.onbright.oblink.cloud.bean.BeAction#toAction(String)}
      */
-    public Action changeSwitchButtonToAction(int index, SwtichStatusEnum swtichStatusEnum) throws Exception {
+    public Action changeSwitchButtonToAction(List<SwtichStatusEnum> swtichStatusEnums) throws Exception {
         if (isNoSerId()) {
             return null;
         }
-        if (index >= switchNum) {
+        if (swtichStatusEnums.size() > switchNum) {
             wrongIndex();
             return null;
         }
         byte[] staus = new byte[7];
         for (int i = 0; i < switchNum; i++) {
-            if (index != i) {
-                staus[switchIndex] = MathUtil.setMultiBitIndex(staus[switchIndex], i * 2, 2, SwtichStatusEnum.HOLD.getVal());
-            } else {
-                staus[switchIndex] = MathUtil.setMultiBitIndex(staus[switchIndex], i * 2, 2, swtichStatusEnum.getVal());
-            }
+            staus[switchIndex] = MathUtil.setMultiBitIndex(staus[switchIndex], i * 2, 2, swtichStatusEnums.get(i).getVal());
         }
         return toAction(Transformation.byteArryToHexString(staus));
     }
