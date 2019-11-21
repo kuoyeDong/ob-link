@@ -168,31 +168,13 @@ public class ParseServerListener {
                             pType = Integer.parseInt(CloudDataPool.getDevices().get(i).getDevice_type(), 16);
                             cType = Integer.parseInt(CloudDataPool.getDevices().get(i).getDevice_child_type(), 16);
                             switch (pType) {
-                                case OBConstant.NodeType.IS_SENSOR:
-                                    switch (cType) {
-                                        case OBConstant.NodeType.ENVROMENT_SENSOR:
-                                            status = state;
-                                            CloudDataPool.getDevices().get(i).setState(status);
-                                            return;
-                                        default:
-                                            status = state;
-                                            break;
-                                    }
-                                    break;
                                 case OBConstant.NodeType.IS_OBSOCKET:
                                     switch (cType) {
                                         case OBConstant.NodeType.SOCKET:
                                             status = state.substring(2, 4) + state.substring(0, 2) + state.substring(4);
                                             break;
-                                        case OBConstant.NodeType.SINGLE_SWITCH_SCENE_PANEL:
-                                        case OBConstant.NodeType.DOUBLE_SWITCH_SCENE_PANEL:
-                                        case OBConstant.NodeType.THREE_SWITCH_SCENE_PANEL:
-                                        case OBConstant.NodeType.THREE_SWITCH_RED_SCENE_PANEL:
-                                        case OBConstant.NodeType.TWO_SWITCH_TWO_SCENE_PANEL:
-                                            status = state.substring(2, 4) + state.substring(6, 8) + "0000" + state.substring(8);
-                                            break;
                                         default:
-                                            status = state.substring(2, 4) + "00" + state.substring(4);
+                                            status = state.substring(2, 4) + state.substring(6, 8) + "0000" + state.substring(8);
                                             break;
                                     }
                                     break;

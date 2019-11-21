@@ -94,11 +94,11 @@ public class ParseUpLoad {
                     context.sendBroadcast(intent);
                     break;
             }
-            LogUtil.log(this,"parseupload broad cast");
+            LogUtil.log(this, "parseupload broad cast");
         } else {
             /*2500上报*/
             byte[] oboxStrArry = Arrays.copyOfRange(upload, index[8], index[8] + 5);
-            LogUtil.log(this,"oboxStrArry == " + Transformation.byteArryToHexString(oboxStrArry));
+            LogUtil.log(this, "oboxStrArry == " + Transformation.byteArryToHexString(oboxStrArry));
             String oboxStr = Transformation.byteArryToHexString(oboxStrArry);
             if (NeedReply) {
                 tcpSend.sendAck();
@@ -117,21 +117,6 @@ public class ParseUpLoad {
                                 int type = obNode.getType();
                                 byte[] state = new byte[8];
                                 switch (ptype) {
-                                    case OBConstant.NodeType.IS_SENSOR:
-                                        switch (type) {
-                                            case OBConstant.NodeType.ENVROMENT_SENSOR:
-                                                if (MathUtil.byteIndexValid(payLoad[0], 4, 4) == 0) {
-                                                    System.arraycopy(payLoad, 0, obNode.getState(), 0, 6);
-                                                } else {
-                                                    System.arraycopy(payLoad, 0, obNode.getState(), 6, 6);
-                                                }
-                                                sendBroadUpdateNodeState(obNode);
-                                                return;
-                                            default:
-                                                System.arraycopy(payLoad, 0, state, 0, 7);
-                                                break;
-                                        }
-                                        break;
                                     case OBConstant.NodeType.IS_OBSOCKET:
                                         switch (type) {
                                             case OBConstant.NodeType.SOCKET:
@@ -139,18 +124,10 @@ public class ParseUpLoad {
                                                 state[1] = payLoad[0];
                                                 System.arraycopy(payLoad, 2, state, 2, state.length - 2);
                                                 break;
-                                            case OBConstant.NodeType.SINGLE_SWITCH_SCENE_PANEL:
-                                            case OBConstant.NodeType.DOUBLE_SWITCH_SCENE_PANEL:
-                                            case OBConstant.NodeType.THREE_SWITCH_SCENE_PANEL:
-                                            case OBConstant.NodeType.THREE_SWITCH_RED_SCENE_PANEL:
-                                            case OBConstant.NodeType.TWO_SWITCH_TWO_SCENE_PANEL:
+                                            default:
                                                 state[0] = payLoad[1];
                                                 state[1] = payLoad[3];
                                                 System.arraycopy(payLoad, 2, state, 2, state.length - 2);
-                                                break;
-                                            default:
-                                                state[0] = payLoad[1];
-                                                System.arraycopy(payLoad, 1, state, 1, state.length - 1);
                                                 break;
                                         }
                                         break;
